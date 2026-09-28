@@ -45,6 +45,16 @@ Coverage limits, both real:
 - The Abitur dataset itself suppresses any school with fewer than 16 candidates — those schools simply don't appear anywhere in this data, at any tier.
 - Abitur only exists at schools with an Oberstufe (Gymnasien, ISS, vocational, private, Kollegs) — **this signal says nothing about Grundschulen**, which is what most families with young kids actually care about first.
 
+## Source-file audit
+
+Before merging, each input file was checked individually — shape, dtypes, duplicates, missingness, cardinality, value-range sanity — rather than trusting the join to surface problems on its own. `secondary_sales`/`rentals`/`new_construction`/`kiez_prices_monthly` already got this treatment in the main business EDA report; the five sources unique to this table were audited separately.
+
+**Clean, no fixes needed:** `Berlin_crimes.csv` (District names match our Bezirk naming exactly, 150 Codes = 150 Locations 1:1, no negatives, no dupes), `berlin_air_quality...csv` (station_id↔station_name 1:1, no dupes, no negative readings, sparse CO/O3 confirmed as a real network limitation not a bug), `kitas_wfs.csv` (no dupe `e_nr`, all PLZ well-formed; `e_platz` is 0.8% missing — those 22 Kitas contribute nothing to `total_kita_capacity`, a small known undercount, not an error), `abitur-2025.xlsx` (all sanity checks pass: `n.best` ∈ [0,1], `mn.scls` ∈ [1.5, 3.06], passed-count never exceeds total-count; 6 private-school codes have a `-K`/`-Y` suffix format that wouldn't have matched the PLZ crosswalk anyway, so no actual impact).
+
+**Two real bugs found and fixed** in `schulbaumassnahmen-2026.xlsx`:
+1. `n_school_construction_projects` was counted via the `BSO-Tranche` column, which is 17% null — real construction-project rows with no tranche label were silently excluded, undercounting activity. Fixed by counting on `Adresse` instead (100% populated). Verified: the column now sums to exactly 370 across all PLZ, matching the source file's row count.
+2. One school (`09K07`, Sophie-Brahe-Gemeinschaftsschule) has two campuses listed as one field, `"12435, 12437"` — this failed the 5-digit PLZ format check entirely and the whole row silently dropped out of the PLZ join. Fixed by taking the first PLZ as primary; the second campus still isn't independently represented, a remaining minor gap for that one school.
+
 ## Known gap: population by age
 
 Not included. Real data exists in principle (Amt für Statistik Berlin-Brandenburg publishes population-by-age at Ortsteil/Planungsraum level), but the link daten.berlin.de points to is dead — their `/opendata` path 404s, the site was restructured. Needs either finding the current URL on their site directly, or an archive.org snapshot of the old CSV. Flagging rather than faking it.

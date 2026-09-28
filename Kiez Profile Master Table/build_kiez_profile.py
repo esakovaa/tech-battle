@@ -55,10 +55,13 @@ print(f"[2] Kitas aggregated: {kita_agg['n_kitas'].sum()} total across {len(kita
 # 3. Schools (construction/expansion projects) — real, direct PLZ
 # =================================================================
 schools = pd.read_excel(f"{SRC}/schulbaumassnahmen-2026.xlsx", sheet_name="Schulen", dtype={"PLZ": str})
-schools["PLZ"] = schools["PLZ"].astype(str).str.zfill(5)
 schools["Schulplätze nach Baumaßnahme"] = pd.to_numeric(schools["Schulplätze nach Baumaßnahme"], errors="coerce")
+# One school (09K07) has two campus PLZs in one field ("12435, 12437") — take the
+# first as primary; its second campus won't independently appear in the PLZ join.
+schools["PLZ"] = schools["PLZ"].astype(str).str.split(",").str[0].str.strip().str.zfill(5)
 schools_agg = schools.groupby("PLZ").agg(
-    n_school_construction_projects=("BSO-Tranche", "count"),
+    # count on "Adresse", not "BSO-Tranche" (17% null -> undercounts real project rows)
+    n_school_construction_projects=("Adresse", "count"),
     n_unique_schools_with_projects=("Berliner Schulnummer", "nunique"),
     total_planned_school_capacity=("Schulplätze nach Baumaßnahme", "max"),
 ).reset_index().rename(columns={"PLZ": "plz"})
