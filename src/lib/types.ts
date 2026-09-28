@@ -154,16 +154,19 @@ export interface UserPreferences {
 }
 
 // The soft-weighted (non-filter) scoring factors, derived from the intake
-// above. Filters (kids.kita/kidDoctor, hobbies) are handled separately in
-// rank.ts, not scored — see findTopAlternatives' filter/degrade step.
+// above. Only kids.kita/kidDoctor are hard filters (see deriveFilters in
+// rank.ts) — hobbies are a soft, deliberately lightly-weighted factor
+// (see preferencesToWeights): a missing hobby shouldn't exclude an
+// otherwise-great Kiez, just nudge it down a little.
 export interface FactorWeights {
   price: number;
   green_space: number;
   noise_air: number;
   schools: number;
+  hobbies: number;
 }
 
-export const SOFT_FACTOR_KEYS: (keyof FactorWeights)[] = ["price", "green_space", "noise_air", "schools"];
+export const SOFT_FACTOR_KEYS: (keyof FactorWeights)[] = ["price", "green_space", "noise_air", "schools", "hobbies"];
 
 export interface RankedResult {
   plr: PlanungsraumProfile;

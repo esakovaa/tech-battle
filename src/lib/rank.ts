@@ -65,23 +65,49 @@ function factorScore(p: PlanungsraumProfile, key: keyof FactorWeights): number |
       if (grade == null) return null; // shouldn't happen — Bezirk fallback is complete
       return normalize(grade, schoolRange.min, schoolRange.max, false); // lower grade = better
     }
+    case "hobbies": {
+      // Only meaningful when computed with the user's selected hobbies in
+      // scope — see selectedHobbiesScore below, called from scorePlanungsraum.
+      return null;
+    }
   }
+}
+
+/** Fraction of the user's selected hobbies available in this Planungsraum's
+ *  ZIP code — e.g. picking yoga+gym and having only gym nearby scores 0.5,
+ *  not a full miss. Returns null if no hobbies were selected (factor
+ *  excluded from scoring entirely, same as any other unmeasured factor). */
+function selectedHobbiesScore(p: PlanungsraumProfile, hobbies: UserPreferences["hobbies"]): number | null {
+  const selected: ("yoga" | "gym" | "bouldering")[] = [];
+  if (hobbies.yoga) selected.push("yoga");
+  if (hobbies.gym) selected.push("gym");
+  if (hobbies.bouldering) selected.push("bouldering");
+  if (selected.length === 0) return null;
+
+  const has = (h: "yoga" | "gym" | "bouldering") =>
+    h === "yoga" ? p.has_yoga_studios_plz : h === "gym" ? p.has_gym_plz : p.has_bouldering_plz;
+  const hits = selected.filter((h) => has(h) === 1).length;
+  return hits / selected.length;
 }
 
 /** Fixed weight per answer tier — these are intake answers (minimal/flexible/
  *  not_a_concern, yes/no), not a 1-5 slider, so weights are fixed constants
  *  per tier rather than user-supplied numbers. */
 export function preferencesToWeights(prefs: UserPreferences): FactorWeights {
+  const anyHobbySelected = prefs.hobbies.yoga || prefs.hobbies.gym || prefs.hobbies.bouldering;
   const raw: FactorWeights = {
     price: prefs.rentBudget === "minimal" ? 3 : prefs.rentBudget === "flexible" ? 1.5 : 0,
     green_space: prefs.parksImportant ? 3 : 0,
     noise_air: prefs.noiseAirSensitive ? 3 : 0,
     schools: prefs.kids.highSchool ? 3 : 0,
+    // Deliberately much lighter than the other tiers (max 3) — a missing
+    // hobby should nudge the score down a little, not act as a gate.
+    hobbies: anyHobbySelected ? 1 : 0,
   };
   const total = SOFT_FACTOR_KEYS.reduce((s, k) => s + raw[k], 0);
   // Safety net: if the user flagged nothing as important, don't degenerate
   // to an all-zero score (which would make ranking a tie-break coin flip) —
-  // fall back to equal weight across all 4 soft factors.
+  // fall back to equal weight across all soft factors.
   if (total === 0) {
     const w = {} as FactorWeights;
     for (const k of SOFT_FACTOR_KEYS) w[k] = 1 / SOFT_FACTOR_KEYS.length;
@@ -94,13 +120,14 @@ export function preferencesToWeights(prefs: UserPreferences): FactorWeights {
 
 export function scorePlanungsraum(
   p: PlanungsraumProfile,
-  weights: FactorWeights
+  weights: FactorWeights,
+  hobbies: UserPreferences["hobbies"]
 ): { score: number; factorScores: Record<keyof FactorWeights, number | null> } {
   const factorScores = {} as Record<keyof FactorWeights, number | null>;
   let weightedSum = 0;
   let weightUsed = 0;
   for (const key of SOFT_FACTOR_KEYS) {
-    const s = factorScore(p, key);
+    const s = key === "hobbies" ? selectedHobbiesScore(p, hobbies) : factorScore(p, key);
     factorScores[key] = s;
     if (s != null) {
       weightedSum += s * weights[key];
@@ -112,8 +139,9 @@ export function scorePlanungsraum(
 
 // ---------------------------------------------------------------
 // Hard filters — excluding, not just score-affecting. Only kita and
-// kid-doctor presence and the selected hobbies work this way; everything
-// else the user rates is a soft weight (above).
+// kid-doctor presence work this way; everything else the user rates
+// (including hobbies, deliberately — see preferencesToWeights) is a soft
+// weight instead.
 // ---------------------------------------------------------------
 export interface Filter {
   key: string;
@@ -129,26 +157,6 @@ export function deriveFilters(prefs: UserPreferences): Filter[] {
   }
   if (prefs.kids.kidDoctor) {
     filters.push({ key: "kidDoctor", label: "Has a Kinderarzt in the ZIP code", test: (p) => p.has_kinderarzt_plz === 1 });
-  }
-
-  const selectedHobbies: ("yoga" | "gym" | "bouldering")[] = [];
-  if (prefs.hobbies.yoga) selectedHobbies.push("yoga");
-  if (prefs.hobbies.gym) selectedHobbies.push("gym");
-  if (prefs.hobbies.bouldering) selectedHobbies.push("bouldering");
-  // OR across selected hobbies (at least one available), not AND — picking
-  // yoga+gym means "either is fine," not "both are required."
-  if (selectedHobbies.length > 0) {
-    filters.push({
-      key: "hobbies",
-      label: `Has at least one of: ${selectedHobbies.join(", ")} (in the ZIP code)`,
-      test: (p) =>
-        selectedHobbies.some((h) => {
-          if (h === "yoga") return p.has_yoga_studios_plz === 1;
-          if (h === "gym") return p.has_gym_plz === 1;
-          if (h === "bouldering") return p.has_bouldering_plz === 1;
-          return false;
-        }),
-    });
   }
 
   // kids.primarySchool and kids.highSchool are intentionally not filters —
@@ -221,7 +229,7 @@ export function findTopAlternatives(
   const weights = preferencesToWeights(prefs);
   const ranked = filtered
     .map((p) => {
-      const { score, factorScores } = scorePlanungsraum(p, weights);
+      const { score, factorScores } = scorePlanungsraum(p, weights, prefs.hobbies);
       return { plr: p, score, factorScores } as RankedResult;
     })
     .sort((a, b) => b.score - a.score);
