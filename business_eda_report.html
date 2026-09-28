@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Berlin Housing Datasets — Business EDA</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    color-scheme: light;
+    --page: #f9f9f7; --surface: #fcfcfb; --text-primary: #0b0b0b; --text-secondary: #52514e;
+    --muted: #898781; --grid: #e1e0d9; --baseline: #c3c2b7; --border: rgba(11,11,11,0.10);
+    --blue: #2a78d6; --orange: #eb6834; --warning: #fab219; --warning-bg: #fff8e8; --warning-border: #f0c04a;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page: #0d0d0d; --surface: #1a1a19; --text-primary: #ffffff; --text-secondary: #c3c2b7;
+      --muted: #898781; --grid: #2c2c2a; --baseline: #383835; --border: rgba(255,255,255,0.10);
+      --blue: #3987e5; --orange: #d95926; --warning: #fab219; --warning-bg: #2a2410; --warning-border: #6b5620;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--page); color:var(--text-primary); font-family: system-ui,-apple-system,"Segoe UI",sans-serif; line-height:1.55; }
+  .wrap { max-width: 900px; margin:0 auto; padding: 32px 16px 90px; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .sub { color: var(--text-secondary); font-size: 14px; }
+  .meta { color: var(--muted); font-size: 13px; margin-top: 4px; }
+
+  .stat-row { display:grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr)); gap:10px; margin: 22px 0 26px; }
+  .stat-tile { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:12px 14px; }
+  .stat-tile .value { font-size: 18px; font-weight:600; }
+  .stat-tile .label { font-size: 11.5px; color:var(--muted); margin-top:2px; }
+
+  .warning-box {
+    background: var(--warning-bg); border: 1px solid var(--warning-border); border-radius: 12px;
+    padding: 18px 20px; margin: 20px 0 30px;
+  }
+  .warning-box h2 { font-size: 15px; margin: 0 0 10px; display:flex; align-items:center; gap:8px; }
+  .warning-box h2::before { content: "⚠"; color: var(--warning); font-size: 16px; }
+  .warning-box ol { margin: 0; padding-left: 20px; font-size: 13.5px; }
+  .warning-box li { margin-bottom: 10px; }
+  .warning-box li:last-child { margin-bottom: 0; }
+  .warning-box b { font-weight: 600; }
+
+  .note-box {
+    background: rgba(42,120,214,0.06); border: 1px solid rgba(42,120,214,0.25); border-radius: 12px;
+    padding: 16px 20px; margin: 20px 0 30px; font-size: 13.5px;
+  }
+  .note-box h2 { font-size: 14.5px; margin: 0 0 8px; color: var(--blue); }
+  .note-box li { margin-bottom: 6px; }
+  .tag.good { background: #0ca30c; }
+
+  .part-divider { margin: 42px 0 18px; padding-bottom: 8px; border-bottom: 1px solid var(--baseline); }
+  .part-divider .kicker { font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .part-divider h2 { font-size: 19px; margin: 2px 0 4px; }
+  .part-divider .sub { font-size: 13.5px; }
+
+  section.card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px 22px; margin-bottom:18px; }
+  section.card h3 { font-size: 14.5px; margin: 0 0 4px; display:flex; align-items:center; gap:8px; flex-wrap: wrap; }
+  .tag { font-size:10.5px; font-weight:600; padding:2px 8px; border-radius:999px; color:#fff; background:var(--blue); }
+  .tag.caution { background: var(--warning); color: #3a2c00; }
+  img { width:100%; height:auto; border-radius:6px; display:block; margin: 10px 0; }
+  .insight { font-size: 13.8px; }
+  .insight b { font-weight:600; }
+  table { width:100%; border-collapse:collapse; font-size:12.8px; margin-top:6px; }
+  th, td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--grid); }
+  th { color: var(--muted); font-weight:500; }
+
+  .mvp-card { border-left: 3px solid var(--blue); }
+  .mvp-card.weak { border-left: 3px solid var(--muted); opacity: 0.92; }
+  .mvp-card h3 { font-size: 15.5px; }
+  .metric-line { background: rgba(42,120,214,0.07); border-radius:8px; padding:10px 12px; font-size:13px; margin-top:10px; }
+  footer { color: var(--muted); font-size: 12px; margin-top: 30px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Berlin Housing Datasets — Business-Focused EDA</h1>
+  <div class="sub">dataset1 (secondary sales, new construction, rentals, monthly Kiez trends, transit) + dataset2 (real listings) — looking for MVP-worthy signal.</div>
+  <div class="meta">Generated 2026-09-25 · 6 files, ~101k rows total, 2020–2026, 12 Bezirke / 82 Ortsteile</div>
+</header>
+
+<div class="stat-row">
+  <div class="stat-tile"><div class="value">50,000</div><div class="label">secondary sales</div></div>
+  <div class="stat-tile"><div class="value">10,000</div><div class="label">new construction</div></div>
+  <div class="stat-tile"><div class="value">30,000</div><div class="label">rentals</div></div>
+  <div class="stat-tile"><div class="value">6,232</div><div class="label">monthly Kiez rows</div></div>
+  <div class="stat-tile"><div class="value">135</div><div class="label">transit stations</div></div>
+  <div class="stat-tile"><div class="value">4,939</div><div class="label">real Berlin listings</div></div>
+</div>
+
+<div class="note-box">
+  <h2>Update — dataset publisher's documentation found (Kaggle: "Berlin Real Estate 2020–2026")</h2>
+  This is a hybrid dataset: <b>real anchors</b> (Ortsteil coordinates, transit stations, ECB rate timeline, ImmoScout24/Engel&nbsp;&amp;&nbsp;Völkers/Wertgutachten base prices per Ortsteil, real event dates) combined with a documented <b>hedonic pricing formula</b> that generates individual listing characteristics and prices. This resolves two of the four items below — one gets corrected, one gets reinforced. See Part 0.5 for the item that flips from "artifact" to "genuine and pitch-worthy."
+</div>
+
+<div class="warning-box">
+  <h2>Data reliability check — still true after reading the docs</h2>
+  <ol>
+    <li><b>Rental yield is mathematically identical across every district</b> (3.598%–3.601%, essentially zero variance) — <b>confirmed by design</b>, not a bug: the docs state cold rent is computed as a fixed 3.0–4.5% gross yield off the buy price. <b>Still don't present "yield varies by district"</b> as a finding — it's a formula, not observed market behavior.</li>
+    <li><b>Absolute price levels run ~41% below real Berlin listings</b> — re-checked with a fair, year-matched comparison (2023-only: €3,511 vs €5,847/m², still a 67% gap) rather than the original pooled-year comparison, and <b>the gap holds up</b>. Use this dataset for relative/structural relationships, not absolute € figures quoted to judges.</li>
+  </ol>
+</div>
+
+<div class="warning-box" style="--warning: #0ca30c; background: rgba(12,163,12,0.06); border-color: rgba(12,163,12,0.3);">
+  <h2 style="color:#0ca30c;">Correction — the Jan 2022 "jump" is not backwards economics</h2>
+  I originally flagged this as an artifact because price rose in the same month mortgage rates rose. The docs clarify: this is an <b>intentionally scripted historical timeline</b> — buy-side growth 2020→2022 peak, ECB-shock trough 2023 H2, recovery from 2024 — implemented as monthly step-multipliers rather than smooth drift, which is why it looks like a discrete jump rather than gradual movement. The <i>macro narrative</i> is real and deliberate (the author explicitly suggests a "buy vs. rent divergence" analysis on it); only the <i>month-to-month shape</i> is a simplification. Retracting the "don't build on this" caution from the original warning.</div>
+
+<div class="warning-box" style="--warning: #0ca30c; background: rgba(12,163,12,0.06); border-color: rgba(12,163,12,0.3);">
+  <h2 style="color:#0ca30c;">Correction — kiez_premium is real-anchored, just coarser than WFS</h2>
+  Checked: every listing in the 5 priciest Ortsteile (Hansaviertel, Tiergarten, Mitte, Grunewald, Wilmersdorf) is 100% "high" kiez_premium — it's a binned version of the real per-Ortsteil base-price anchors (ImmoScout24/Engel&nbsp;&amp;&nbsp;Völkers medians), not invented. The "loose alignment" with WFS `wol` in the original Part 3.5 has two real explanations, neither of which is "kiez_premium is fake": (1) it operates at <b>Ortsteil grain</b> (82 zones) vs. WFS's <b>address grain</b> — genuinely different resolutions of the same underlying signal; (2) the docs disclose listing coordinates are <b>jittered ±0.7–1.0km</b>, which alone degrades any point-level nearest-neighbor join. The practical conclusion is unchanged (don't expect WFS to sharpen predictions on this specific dataset) but the reasoning was wrong — it's precision/grain, not fabrication.</div>
+
+<div class="part-divider">
+  <div class="kicker">Part 0.5</div>
+  <h2>The Mietendeckel event — the strongest finding in the dataset</h2>
+  <div class="sub">A real, dateable historical event, cleanly present in the data. Directly ties back to the housing-activism research from the start of this project (Deutsche Wohnen &amp; Co enteignen, the same Constitutional Court ruling).</div>
+</div>
+
+<section class="card">
+  <h3>Rent suppression, then a same-month catch-up rally <span class="tag good">Confirmed, real event</span></h3>
+  <img src="charts/b16_mietendeckel_event.png" alt="Line chart of citywide average rent per square meter per month, showing suppression during the Mietendeckel rent freeze and a sharp catch-up rally after the Constitutional Court ruling in April 2021">
+  <div class="insight">Citywide rent holds flat at ~€11.5–11.7/m²/month through the Mietendeckel period, then jumps to €13.0 <b>the month after</b> the April 15, 2021 ruling — a clean +11.8% catch-up, exactly on the real date. This is the dataset author's own Suggested Task #1 ("Mietendeckel Event Study"), and it's genuinely pitch-worthy: it's a real policy shock with a precise before/after date, not a fitted trend line.</div>
+</section>
+
+<div class="part-divider">
+  <div class="kicker">Part 1</div>
+  <h2>Validated relationships — safe to build on</h2>
+  <div class="sub">Checked each for degenerate/artificial patterns before trusting them. These four are genuine, non-degenerate, monotonic relationships.</div>
+</div>
+
+<section class="card">
+  <h3>Location quality (kiez_premium) <span class="tag">Strong</span></h3>
+  <img src="charts/b06_kiez_premium_effect.png" alt="Bar chart of average price per square meter by kiez_premium rating: low, medium, high">
+  <div class="insight"><b>High</b>-rated Kiez areas sell for <b>+139%</b> vs. <b>low</b>-rated (€6,350 vs €2,650/m²) — by far the strongest single driver in this data, and it's an ordinal 3-tier system exactly analogous to Berlin's real Wohnlage classification (einfach/mittel/gut) we already downloaded from the government WFS.</div>
+</section>
+
+<section class="card">
+  <h3>Transit proximity <span class="tag">Strong</span></h3>
+  <img src="charts/b05_transit_premium.png" alt="Bar chart of price per square meter by walking distance band to nearest transit station">
+  <div class="insight">Homes within 10 minutes of a station sell for <b>+52%</b> vs. 20+ minutes away. Clean, monotonic decay — and cross-validated by the correlation matrix in Part 2 (transit_distance_min correlates -0.42 with price, distance-to-center -0.48).</div>
+</section>
+
+<section class="card">
+  <h3>Energy efficiency class <span class="tag">Strong</span></h3>
+  <img src="charts/b14_energy_class.png" alt="Bar chart of price per square meter by energy efficiency class from A_plus to H">
+  <div class="insight">Perfectly monotonic A+ → H decline: A+ commands <b>+73%</b> over class H. Real-world plausible given EU/German energy-efficiency retrofit mandates — a differentiator none of the "find an apartment faster" competitors (Get The Flat, Movly, FlatHunt) are visibly building around.</div>
+</section>
+
+<section class="card">
+  <h3>New-build premium over secondary market <span class="tag caution">Weaker than it looks</span></h3>
+  <img src="charts/b04_new_vs_secondary_gap.png" alt="Grouped bar chart comparing secondary and new construction price per square meter by Bezirk">
+  <div class="insight">The bar chart looks like it shows big differences by district, but the <b>relative</b> premium is actually tight: 23.9% (Pankow) to 27.5% (Mitte) — a real but modest 3.6-point spread. This is a genuine, non-degenerate relationship (unlike yield), just weaker than the absolute-€ bars visually suggest. Better used as "new-build costs ~25% more, budget accordingly" than as a district-arbitrage finder.</div>
+</section>
+
+<div class="part-divider">
+  <div class="kicker">Part 2</div>
+  <h2>Detailed EDA — distributions, correlations, outliers, geography</h2>
+</div>
+
+<section class="card">
+  <h3>Correlation matrix — secondary_sales</h3>
+  <img src="charts/b07_correlation_heatmap.png" alt="Correlation heatmap of numeric fields in the secondary sales dataset">
+  <div class="insight"><b>rooms ↔ area_m2</b> (0.88) is the expected multicollinearity pair. <b>transit_distance_min ↔ to_brandenburg_gate_km</b> (0.60) confirms stations cluster near the center, as expected. Price correlates most with proximity (-0.42, -0.48) and only weakly with rooms/area (0.16–0.18) — location dominates size in this data, consistent with Part 1's findings.</div>
+</section>
+
+<section class="card">
+  <h3>Distribution of key fields — secondary_sales</h3>
+  <img src="charts/b08_histogram_grid.png" alt="Grid of histograms for area, price per square meter, rooms, floor, transit distance, distance to center, year built, and mortgage rate">
+  <div class="insight">area_m2 and price_per_m2_eur are right-skewed as expected. mortgage_rate_at_listing is multi-modal — consistent with the discrete-jump artifact flagged above (rates step between a few fixed values rather than drifting continuously).</div>
+</section>
+
+<section class="card">
+  <h3>Outlier scan (IQR) — secondary_sales</h3>
+  <img src="charts/b09_boxplot_grid.png" alt="Grid of boxplots with outlier counts for the same fields">
+  <div class="insight"><b>rooms</b> has the most flagged outliers (5.6%) — likely large/shared apartments, plausible rather than erroneous. transit_distance_min and mortgage_rate have near-zero outliers, consistent with bounded, low-noise synthetic generation.</div>
+</section>
+
+<section class="card">
+  <h3>Rentals — key distributions</h3>
+  <img src="charts/b10_rentals_distributions.png" alt="Histograms of rent per square meter, monthly kaltmiete, and kaution months">
+  <div class="insight">kaution_months clusters tightly around the German-standard 3-month deposit cap — a realistic, non-artifact detail that suggests the rental side was built with real legal constraints in mind, unlike the yield-generation issue above.</div>
+</section>
+
+<section class="card">
+  <h3>Geography — price/m² + transit network</h3>
+  <img src="charts/b11_geo_map.png" alt="Scatter map of secondary sales colored by price per square meter, with transit stations overlaid as triangles">
+  <div class="insight">Price clusters visibly around the transit network in the city core, fading toward outlying blobs. Note the geography itself reads as discrete synthetic clusters (sharp gaps between areas) rather than a continuous real street grid — fine for structural analysis, not for literal geographic claims.</div>
+</section>
+
+<div class="part-divider">
+  <div class="kicker">Part 3</div>
+  <h2>External validation — synthetic vs. real</h2>
+</div>
+
+<section class="card">
+  <h3>Synthetic secondary_sales vs. real Berlin listings (immowelt.de)</h3>
+  <img src="charts/b12_external_validation.png" alt="Overlaid histograms comparing price per square meter distributions between the synthetic dataset and real Berlin listings">
+  <div class="insight">Real listings (n=4,939, Berlin-filtered from dataset2) sit well above the synthetic distribution — median <b>€5,841/m²</b> vs. <b>€3,434/m²</b> synthetic, a 70% gap. This is the single most important number in this report for calibrating expectations: whatever Monday's real challenge data looks like, don't assume it'll match this dataset's price scale.</div>
+</section>
+
+<div class="part-divider">
+  <div class="kicker">Part 3.5</div>
+  <h2>Joining the real government Wohnlage — does it add anything?</h2>
+  <div class="sub">Tested empirically on both halves of the data: a null result on the synthetic side, a real one on the real side.</div>
+</div>
+
+<section class="card">
+  <h3>On dataset1 (synthetic) — no incremental signal <span class="tag caution">Null result</span></h3>
+  <div class="insight">
+    Spatially joined every <code>secondary_sales</code> row to its nearest real WFS address (median match distance 34m — a genuinely local join). Synthetic <code>kiez_premium</code> aligns with real <code>wol</code> only loosely:
+  </div>
+  <table>
+    <tr><th></th><th>einfach</th><th>mittel</th><th>gut</th></tr>
+    <tr><td>synthetic "low"</td><td>51.8%</td><td>44.6%</td><td>3.6%</td></tr>
+    <tr><td>synthetic "medium"</td><td>31.0%</td><td>51.0%</td><td>18.0%</td></tr>
+    <tr><td>synthetic "high"</td><td>6.0%</td><td>30.8%</td><td>63.3%</td></tr>
+  </table>
+  <div class="insight" style="margin-top:10px;">
+    And within synthetic <code>medium</code> alone, real <code>wol</code> gives €3,948 (einfach) vs. €3,617 (gut) — flat, even backwards. <b>Price here was generated from the invented tier, not from real geography</b> — the citywide correlation you'd see is coincidental (synthetic blobs loosely overlap real nicer areas), not causal. Joining WFS onto this dataset doesn't add a usable feature.
+  </div>
+</section>
+
+<section class="card">
+  <h3>On dataset2 (real listings) — genuine, monotonic signal <span class="tag">Validated</span></h3>
+  <img src="charts/b15_real_wohnlage_validation.png" alt="Bar chart of average price per square meter by dominant Wohnlage category, joined at PLZ level to real listings">
+  <div class="insight">
+    Aggregated WFS to PLZ level (dominant Wohnlage per postal code, 193 Berlin PLZs, 99.9% match rate) and joined onto the real <code>real_estate_listings_clean.csv</code> — both sides now real data, no synthetic generator in the loop:
+    <br><br>
+    <b>einfach €5,036/m² → mittel €6,184/m² → gut €7,471/m²</b> — a genuine 48% premium, monotonic, on real listings. This is the most trustworthy single relationship in the whole report, and directly upgrades MVP idea A below from "uses an invented proxy" to "built on the actual official Berlin Wohnlage classification."
+  </div>
+  <div class="metric-line">Saved: <code>dataset2/real_estate_listings_with_wohnlage.csv</code> — real_estate_listings_clean.csv + pct_einfach/pct_mittel/pct_gut/dominant_wol per row.</div>
+</section>
+
+<div class="part-divider">
+  <div class="kicker">Part 4</div>
+  <h2>MVP idea candidates — grounded in what actually held up</h2>
+  <div class="sub">Only built from Part 1's validated relationships, not the flagged artifacts.</div>
+</div>
+
+<section class="card mvp-card">
+  <h3>A. Fair-Price / Overpay Checker <span class="tag">Now validated on real data</span></h3>
+  <div class="insight">Given an address + asking price, tell a buyer/renter whether it's fair, over-, or under-priced vs. comparable homes matched on location tier, size, energy class, and transit access. Part 3.5 confirmed this on real data, not just the synthetic proxy: real Wohnlage explains a genuine 48% price spread on real Berlin listings — this isn't a hoped-for relationship, it's measured.</div>
+  <div class="metric-line"><b>Metric:</b> "% premium/deficit vs. comparable-adjusted median price/m²." <b>Judge fit:</b> Get The Flat (housing automation).</div>
+</section>
+
+<section class="card mvp-card">
+  <h3>B. Commute-Adjusted Affordability Map</h3>
+  <div class="insight">For newcomers choosing where to live, rank neighborhoods by "effective affordability" combining rent/price with transit commute time to a chosen work location — not just raw price. The 52% transit-distance premium and the real geocoded transit_stations table make this concretely buildable.</div>
+  <div class="metric-line"><b>Metric:</b> "€ effective monthly cost = rent + implied commute-time cost, by Kiez." <b>Judge fit:</b> Delivery Hero (routing/logistics DNA); echoes last year's "newcomer belonging" theme.</div>
+</section>
+
+<section class="card mvp-card">
+  <h3>C. Retrofit ROI Estimator</h3>
+  <div class="insight">For a given building's energy class and era, estimate the price uplift achievable from an energy retrofit vs. its cost — prioritizing which buildings are the best retrofit investment. The cleanest, most monotonic relationship in the whole dataset (73% A+ vs H spread), and a genuinely different angle from the crowded "find-a-flat-faster" competitor space we researched earlier.</div>
+  <div class="metric-line"><b>Metric:</b> "Estimated € price uplift per energy-class step improved, by building era." <b>Judge fit:</b> EU climate-policy relevance; differentiated positioning.</div>
+</section>
+
+<section class="card mvp-card">
+  <h3>E. "What Would My Rent Have Done" — Policy Shock Navigator <span class="tag good">New, strongest data backing</span></h3>
+  <div class="insight">A personal-impact tool: given a rent and move-in date, show how that rent would have moved through Berlin's real policy shocks (Mietendeckel suppression → 2021 catch-up rally → 2022 refugee-driven demand surge → 2022–24 energy-crisis Nebenkosten spike). Makes an abstract "housing crisis" concrete and personal — directly continues last year's "Kiez Connect: newcomer belonging" theme (understanding the market you've just moved into), and it's the single cleanest, most real, most dateable pattern in either dataset (Part 0.5).</div>
+  <div class="metric-line"><b>Metric:</b> "% and € swing in comparable rent across each policy event, for the user's own Kiez." <b>Judge fit:</b> strong narrative fit for a panel that includes housing-automation (Get The Flat) and general access/belonging framing (echoes 2025's winning team, KiezConnect).</div>
+</section>
+
+<section class="card mvp-card weak">
+  <h3>D. New-Build vs. Secondary Decision Helper <span class="tag caution">Weaker signal</span></h3>
+  <div class="insight">A calculator for "is it worth paying the new-build premium here" — technically buildable, but the premium is nearly uniform citywide (23.9–27.5%), so there's little district-level differentiation to make this actually insightful. Listed for completeness, not recommended as the lead idea.</div>
+</section>
+
+<footer>
+  Business-EDA of your added datasets. Data-reliability findings (Part 0) should be shared with Santiago before either of you builds on this data further. Script: <a href="business_eda.py">business_eda.py</a> · Charts: <a href="charts/">charts/</a>
+</footer>
+
+</div>
+</body>
+</html>

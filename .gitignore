@@ -1,0 +1,11 @@
+# macOS
+.DS_Store
+
+# Raw geodata — 146MB, exceeds GitHub's 100MB limit.
+# Regenerate with: see README / data/wohnlagen_2026.csv is the lightweight equivalent.
+data/wohnlagen_2026.geojson
+
+# Python
+__pycache__/
+*.pyc
+.venv/

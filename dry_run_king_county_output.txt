@@ -1,0 +1,131 @@
+
+[  0.0s elapsed] PHASE 1 — TRIAGE
+----------------------------------------------------------------------
+Tables: 1 (single flat file)
+Grain: 1 row = 1 house sale transaction
+Subject: flats/houses (closest analogue to Berlin listings data)
+Shape: (21597, 23)
+Schema check: 3 id-like columns found -> ['id', 'house_id', 'id.1']
+  -> anomaly flagged: need to check if these agree or diverge
+1.0 fraction id==house_id
+0.0 fraction id==id.1
+
+[  0.0s elapsed] PHASE 2.1 — Structural checks
+----------------------------------------------------------------------
+Full-row duplicates: 0
+Duplicate 'id' values: 177
+Sample of duplicated ids (first 6 rows):
+       id       date    price
+  1000102 2015-04-22 300000.0
+  1000102 2014-09-16 280000.0
+  7200179 2014-10-16 150000.0
+  7200179 2015-04-24 175000.0
+109200390 2014-10-20 250000.0
+109200390 2014-08-20 245000.0
+
+[  0.0s elapsed] PHASE 2.1b — dtype checks
+----------------------------------------------------------------------
+date dtype: str -> needs datetime conversion
+waterfront dtype: float64 -> should be boolean/category, is float (has NaNs?)
+waterfront unique: [nan  0.  1.]
+
+[  0.0s elapsed] PHASE 2.2 — Missing data
+----------------------------------------------------------------------
+yr_renovated     0.178173
+waterfront       0.110710
+sqft_basement    0.020929
+view             0.002917
+dtype: float64
+
+[  0.0s elapsed] PHASE 2.3 — Outliers (price, sqft_living)
+----------------------------------------------------------------------
+price: 1st pct=154000.0, 99th pct=1970000.0, max=7700000.0
+sqft_living: 1st pct=720.0, 99th pct=4980.0, max=13540.0
+bedrooms: 1st pct=2.0, 99th pct=6.0, max=33.0
+bedrooms max is suspicious -> 33.0 bedrooms row:
+bedrooms           33.00
+bathrooms           1.75
+sqft_living      1620.00
+price          640000.00
+Name: 15856, dtype: float64
+
+[  0.1s elapsed] PHASE 2.4 — Branch: flats/houses normalization
+----------------------------------------------------------------------
+count    21597.000000
+mean       264.143368
+std        110.000061
+min         87.588235
+25%        182.291667
+50%        244.644550
+75%        318.333333
+max        810.138889
+Name: price_sqft, dtype: float64
+Geo fields valid range check: lat 47.1559 - 47.7776 | long -122.519 - -121.315
+
+[  0.1s elapsed] PHASE 3.1 — Hypothesis table (filled)
+----------------------------------------------------------------------
+Q: Does location affect price?
+  H: If closer to water, price is higher
+  Indicators: waterfront, price
+
+Q: Does size affect price?
+  H: The larger sqft_living, the higher price
+  Indicators: sqft_living, price
+
+Q: Does zipcode explain price beyond size?
+  H: price_sqft varies significantly by zipcode even controlling for size
+  Indicators: zipcode, price_sqft
+
+
+[  0.1s elapsed] PHASE 3.3 — Relationship exploration
+----------------------------------------------------------------------
+Correlation with price:
+price          1.000000
+sqft_living    0.701917
+grade          0.667951
+bathrooms      0.525906
+bedrooms       0.308787
+floors         0.256804
+sqft_lot       0.089876
+condition      0.036056
+Name: price, dtype: float64
+
+Waterfront vs price (mean):
+waterfront
+0.0    5.327712e+05
+1.0    1.717215e+06
+Name: price, dtype: float64
+
+Top 5 zipcodes by price_sqft:
+               mean  count
+zipcode                   
+98039    568.241828     50
+98004    475.609615    317
+98112    438.877517    269
+98109    433.559416    109
+98119    432.352127    184
+
+Bottom 5 zipcodes by price_sqft:
+               mean  count
+zipcode                   
+98030    155.156221    256
+98032    154.219513    125
+98001    151.347966    361
+98002    151.174091    199
+98023    148.921543    499
+
+[  0.1s elapsed] PHASE 3.4 — Hypothesis verdicts
+----------------------------------------------------------------------
+H2 (size->price): corr=0.70 -> SUPPORTED
+H1 (waterfront->price): ratio=3.22x -> SUPPORTED
+H3 (zipcode->price_sqft): max/min ratio=3.82x -> SUPPORTED
+
+[  0.1s elapsed] PHASE 4 — Metric lock candidate
+----------------------------------------------------------------------
+Strongest hypothesis: H3 (zipcode/location explains price_sqft beyond size)
+Candidate metric: '$ premium per sqft a buyer pays for zipcode X vs. citywide median, at equivalent size band'
+Citywide median price_sqft: 244.6
+
+[  0.1s elapsed] DONE
+----------------------------------------------------------------------
+Total wall-clock (compute only): 0.1s
