@@ -150,6 +150,11 @@ export interface UserPreferences {
   noiseAirSensitive: boolean;
   parksImportant: boolean;
   hobbies: HobbiesCriteria;
+  /** Rooms needed, for the example-flat-listings feature (lib/listings.ts) —
+   *  not used anywhere in ranking/scoring, only to filter listings after a
+   *  Kiez is picked. Optional: omit it and getExampleListings just returns
+   *  whatever's available for that Kiez, unfiltered by size. */
+  roomsNeeded?: number;
   // commuteAddresses?: string[] — question 7, added once the commute script lands
 }
 
