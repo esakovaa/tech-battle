@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { findTopAlternatives, getPlanungsraumById, PRIMARY_SCHOOL_DATA_AVAILABLE } from "@/lib/rank";
 import { resolveAddressToPlanungsraum } from "@/lib/geocode";
-import { compareToCurrent } from "@/lib/compare";
+import { buildComparisonTable } from "@/lib/compare";
 import type { UserPreferences } from "@/lib/types";
 
 /**
  * Steps 2-4: resolve the user's current Kiez (geocoding an address if a
  * plr_id wasn't already resolved client-side), filter with graceful
- * degradation, score, rank top-3 in different ZIP codes, compare each to
- * the current Kiez. Deterministic, no LLM call in this route.
+ * degradation, score, rank top-3 in different ZIP codes, and build one
+ * comparison table (current + all 3 alternatives, pros/cons per
+ * alternative). Deterministic, no LLM call in this route.
  *
  * POST body: Partial<UserPreferences> with either currentPlrId or
  * currentAddress set.
@@ -63,11 +64,12 @@ export async function POST(req: NextRequest) {
   };
 
   const { results, secondBest, droppedFilters } = findTopAlternatives(currentPlrId!, prefs, 3);
-  const comparisons = compareToCurrent(current, results, prefs);
+  const comparisonTable = buildComparisonTable(current, results, prefs);
 
   return NextResponse.json({
     current,
-    comparisons,
+    alternatives: results,
+    comparisonTable,
     secondBest,
     droppedFilters,
     primarySchoolDataAvailable: PRIMARY_SCHOOL_DATA_AVAILABLE,

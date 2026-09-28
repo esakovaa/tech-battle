@@ -144,20 +144,58 @@ export function buildComparisonRows(
   return rows;
 }
 
-export interface KiezComparison {
-  current: PlanungsraumProfile;
-  alternative: RankedResult;
-  rows: FactorDelta[];
+export interface ComparisonTableRow {
+  factor: string;
+  current: string;
+  /** One value per alternative, in the same order as ComparisonTable.columns. */
+  alternatives: string[];
 }
 
-export function compareToCurrent(
+export interface ProsCons {
+  plrId: string;
+  plrName: string;
+  /** Factors where this alternative beats the current Kiez. */
+  pros: string[];
+  /** Factors where this alternative loses to the current Kiez. */
+  cons: string[];
+}
+
+export interface ComparisonTable {
+  currentLabel: string;
+  /** Alternative column labels, same order as ProsCons/alternatives arrays. */
+  columns: string[];
+  rows: ComparisonTableRow[];
+  prosCons: ProsCons[];
+}
+
+/** Single table — current Kiez plus all alternatives side by side, one row
+ *  per criterion the user actually selected — with a pros/cons summary per
+ *  alternative (which selected criteria it beats/loses to the current Kiez
+ *  on). "Same"/"unknown" rows count as neither a pro nor a con. */
+export function buildComparisonTable(
   current: PlanungsraumProfile,
   alternatives: RankedResult[],
   prefs: UserPreferences
-): KiezComparison[] {
-  return alternatives.map((alt) => ({
-    current,
-    alternative: alt,
-    rows: buildComparisonRows(current, alt.plr, prefs),
+): ComparisonTable {
+  const perAlt = alternatives.map((alt) => buildComparisonRows(current, alt.plr, prefs));
+
+  const rows: ComparisonTableRow[] = (perAlt[0] ?? []).map((row, i) => ({
+    factor: row.factor,
+    current: row.currentDisplay,
+    alternatives: perAlt.map((altRows) => altRows[i].alternativeDisplay),
   }));
+
+  const prosCons: ProsCons[] = alternatives.map((alt, i) => ({
+    plrId: alt.plr.plr_id,
+    plrName: alt.plr.plr_name,
+    pros: perAlt[i].filter((r) => r.direction === "better").map((r) => r.factor),
+    cons: perAlt[i].filter((r) => r.direction === "worse").map((r) => r.factor),
+  }));
+
+  return {
+    currentLabel: current.plr_name,
+    columns: alternatives.map((a) => a.plr.plr_name),
+    rows,
+    prosCons,
+  };
 }

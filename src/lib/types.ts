@@ -190,7 +190,8 @@ export interface RankedResult {
 
 export interface RankResponse {
   current: PlanungsraumProfile;
-  comparisons: unknown[]; // filled in by compare.ts's KiezComparison[]
+  alternatives: RankedResult[];
+  comparisonTable: unknown; // filled in by compare.ts's ComparisonTable
   secondBest: boolean;
   droppedFilters: string[];
   primarySchoolDataAvailable: false;
