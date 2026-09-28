@@ -31,6 +31,10 @@ curl -o kitas_wfs.geojson "https://gdi.berlin.de/services/wfs/kita?service=WFS&v
 
 Both are licensed **Datenlizenz Deutschland – Zero – Version 2.0** (public domain equivalent).
 
+## Kiez Profile Master Table
+
+`Kiez Profile Master Table/kiez_profile_by_plz.csv` — the derived, agent-facing table: one row per Berlin postal code (193 total), joining every source above (centroid, Wohnlage, Kitas, schools, crime, air quality, rents, buy prices, transit). **Read `Kiez Profile Master Table/README.md` before querying it** — several columns are spatial approximations or Bezirk-level inherited values, not true PLZ-precise data, and that file documents exactly which are which. Rebuild with `python3 "Kiez Profile Master Table/build_kiez_profile.py"`.
+
 ## Other files
 
 Analysis outputs live under `EDA on real estate listings/`:
