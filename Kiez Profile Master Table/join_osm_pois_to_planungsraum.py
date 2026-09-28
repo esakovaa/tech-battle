@@ -26,7 +26,7 @@ RAW_POIS = "osm_pois_raw.csv"
 BOUNDARIES = "planungsraum_boundaries.geojson"
 PROFILE = "planungsraum_profile.csv"
 
-CATEGORIES = ["n_yoga_studios", "n_kinderarzt"]
+CATEGORIES = ["n_yoga_studios", "n_kinderarzt", "n_gym", "n_bouldering"]
 
 
 def main():
@@ -69,7 +69,11 @@ def main():
     print(f"\nSaved osm_poi_counts_by_planungsraum.csv: {out.shape}")
     print(out[CATEGORIES].sum())
 
-    # Merge straight into the full Planungsraum table.
+    # Merge straight into the full Planungsraum table. Idempotent on re-run:
+    # drop any CATEGORIES columns already present (e.g. from an earlier run
+    # with fewer categories) before merging fresh, so re-running with new
+    # categories added doesn't create duplicate/suffixed columns.
+    profile = profile.drop(columns=[c for c in CATEGORIES if c in profile.columns])
     merged = profile.merge(out.drop(columns=["plr_name"]), on="plr_id", how="left")
     for col in CATEGORIES:
         merged[col] = merged[col].fillna(0).astype(int)

@@ -4,108 +4,14 @@ export interface FactorDelta {
   factor: string;
   currentDisplay: string;
   alternativeDisplay: string;
-  /** "better" | "worse" | "same" | "unknown" — direction-corrected, so
-   *  "better" always means better for the user, regardless of which raw
-   *  column direction that corresponds to. */
   direction: "better" | "worse" | "same" | "unknown";
 }
 
 function fmtPrice(v: number | null): string {
   return v == null ? "unknown" : `€${v.toFixed(2)}/m²`;
 }
-function fmtPct(v: number): string {
-  return `${v.toFixed(0)}%`;
-}
-function fmtKm(v: number | null): string {
-  return v == null ? "unknown" : `${(v * 1000).toFixed(0)}m`;
-}
-
-/** One row per factor, current vs. alternative, in plain display terms —
- *  not the normalized 0-1 scores, actual values a person can read. */
-export function buildComparisonRows(current: PlanungsraumProfile, alt: PlanungsraumProfile): FactorDelta[] {
-  const rows: FactorDelta[] = [];
-
-  const price = (p: PlanungsraumProfile) => p.rent_per_m2_kalt_avg_synthetic;
-  rows.push({
-    factor: "Rent",
-    currentDisplay: fmtPrice(price(current)),
-    alternativeDisplay: fmtPrice(price(alt)),
-    direction: dir(price(alt), price(current), false),
-  });
-
-  rows.push({
-    factor: "Location quality (Wohnlage gut)",
-    currentDisplay: fmtPct(current.pct_wohnlage_gut),
-    alternativeDisplay: fmtPct(alt.pct_wohnlage_gut),
-    direction: dir(alt.pct_wohnlage_gut, current.pct_wohnlage_gut, true),
-  });
-
-  rows.push({
-    factor: "Green space",
-    currentDisplay: current.ug_gruenversorgung ?? "unknown",
-    alternativeDisplay: alt.ug_gruenversorgung ?? "unknown",
-    direction: ordinalDir(alt.ug_gruenversorgung, current.ug_gruenversorgung, { gut: 2, mittel: 1, schlecht: 0 }),
-  });
-
-  rows.push({
-    factor: "Noise/air/heat burden (combined)",
-    currentDisplay: current.ug_mehrfachbelastung_umwelt ?? "unknown",
-    alternativeDisplay: alt.ug_mehrfachbelastung_umwelt ?? "unknown",
-    // "how many burden criteria stack up" scale, not gering/mittel/hoch —
-    // verified against actual data, see rank.ts's MEHRFACH_SCALE.
-    direction: ordinalDir(alt.ug_mehrfachbelastung_umwelt, current.ug_mehrfachbelastung_umwelt, {
-      "keine starke Belastung": 4,
-      einfach: 3,
-      zweifach: 2,
-      dreifach: 1,
-      vierfach: 0,
-    }),
-  });
-
-  const safetyRate = (p: PlanungsraumProfile) => (p.crime_total_avg_2017_2019 ?? 0) / p.n_addresses;
-  rows.push({
-    factor: "Safety (Bezirk-level, crime/address)",
-    currentDisplay: safetyRate(current).toFixed(1),
-    alternativeDisplay: safetyRate(alt).toFixed(1),
-    direction: dir(safetyRate(alt), safetyRate(current), false),
-  });
-
-  const grade = (p: PlanungsraumProfile) => p.abitur_mn_scls_plr_avg ?? p.abitur_mn_scls_bezirk_avg;
-  rows.push({
-    factor: "Schools (Abitur avg. grade)",
-    currentDisplay: grade(current)?.toFixed(2) ?? "unknown",
-    alternativeDisplay: grade(alt)?.toFixed(2) ?? "unknown",
-    direction: dir(grade(alt), grade(current), false), // lower grade = better
-  });
-
-  const kitaRate = (p: PlanungsraumProfile) => (p.total_kita_capacity ?? 0) / p.n_addresses;
-  rows.push({
-    factor: "Kita capacity per address",
-    currentDisplay: kitaRate(current).toFixed(3),
-    alternativeDisplay: kitaRate(alt).toFixed(3),
-    direction: dir(kitaRate(alt), kitaRate(current), true),
-  });
-
-  rows.push({
-    factor: "Nearest transit",
-    currentDisplay: `${current.nearest_transit_station ?? "unknown"} (${fmtKm(current.transit_distance_km)})`,
-    alternativeDisplay: `${alt.nearest_transit_station ?? "unknown"} (${fmtKm(alt.transit_distance_km)})`,
-    direction: dir(alt.transit_distance_km, current.transit_distance_km, false),
-  });
-
-  const familyScore = (p: PlanungsraumProfile) => p.has_kinderarzt_plz + p.has_yoga_studio_plz;
-  rows.push({
-    factor: "Kinderarzt / yoga studio in ZIP code",
-    currentDisplay: `${current.has_kinderarzt_plz ? "Kinderarzt" : ""}${
-      current.has_kinderarzt_plz && current.has_yoga_studio_plz ? " + " : ""
-    }${current.has_yoga_studio_plz ? "Yoga" : ""}` || "neither",
-    alternativeDisplay: `${alt.has_kinderarzt_plz ? "Kinderarzt" : ""}${
-      alt.has_kinderarzt_plz && alt.has_yoga_studio_plz ? " + " : ""
-    }${alt.has_yoga_studio_plz ? "Yoga" : ""}` || "neither",
-    direction: dir(familyScore(alt), familyScore(current), true),
-  });
-
-  return rows;
+function fmtBool(v: 0 | 1, label: string): string {
+  return v ? `Yes (${label})` : "No";
 }
 
 function dir(altVal: number | null | undefined, curVal: number | null | undefined, higherIsBetter: boolean): FactorDelta["direction"] {
@@ -115,13 +21,87 @@ function dir(altVal: number | null | undefined, curVal: number | null | undefine
   return altBetter ? "better" : "worse";
 }
 
-function ordinalDir(
-  altVal: string | null,
-  curVal: string | null,
-  scale: Record<string, number>
-): FactorDelta["direction"] {
+function ordinalDir(altVal: string | null, curVal: string | null, scale: Record<string, number>): FactorDelta["direction"] {
   if (altVal == null || curVal == null || !(altVal in scale) || !(curVal in scale)) return "unknown";
   return dir(scale[altVal], scale[curVal], true);
+}
+
+/** Human-readable comparison rows, current vs. one alternative. Covers both
+ *  the 4 soft-scored factors and the filter-derived criteria (kita,
+ *  Kinderarzt, hobbies) so the table shows everything the user asked
+ *  about, not just what's numerically scored. */
+export function buildComparisonRows(current: PlanungsraumProfile, alt: PlanungsraumProfile): FactorDelta[] {
+  const rows: FactorDelta[] = [];
+
+  rows.push({
+    factor: "Rent",
+    currentDisplay: fmtPrice(current.rent_per_m2_kalt_avg_synthetic),
+    alternativeDisplay: fmtPrice(alt.rent_per_m2_kalt_avg_synthetic),
+    direction: dir(alt.rent_per_m2_kalt_avg_synthetic, current.rent_per_m2_kalt_avg_synthetic, false),
+  });
+
+  rows.push({
+    factor: "Noise",
+    currentDisplay: current.ug_laerm ?? "unknown",
+    alternativeDisplay: alt.ug_laerm ?? "unknown",
+    direction: ordinalDir(alt.ug_laerm, current.ug_laerm, { gering: 2, mittel: 1, hoch: 0 }),
+  });
+  rows.push({
+    factor: "Air quality",
+    currentDisplay: current.ug_luft ?? "unknown",
+    alternativeDisplay: alt.ug_luft ?? "unknown",
+    direction: ordinalDir(alt.ug_luft, current.ug_luft, { gering: 2, mittel: 1, hoch: 0 }),
+  });
+
+  rows.push({
+    factor: "Green space / parks",
+    currentDisplay: current.ug_gruenversorgung ?? "unknown",
+    alternativeDisplay: alt.ug_gruenversorgung ?? "unknown",
+    direction: ordinalDir(alt.ug_gruenversorgung, current.ug_gruenversorgung, { gut: 2, mittel: 1, schlecht: 0 }),
+  });
+
+  const grade = (p: PlanungsraumProfile) => p.abitur_mn_scls_plr_avg ?? p.abitur_mn_scls_bezirk_avg;
+  rows.push({
+    factor: "High school (Abitur avg. grade)",
+    currentDisplay: grade(current)?.toFixed(2) ?? "unknown",
+    alternativeDisplay: grade(alt)?.toFixed(2) ?? "unknown",
+    direction: dir(grade(alt), grade(current), false), // lower grade = better
+  });
+
+  rows.push({
+    factor: "Kita",
+    currentDisplay: current.n_kitas > 0 ? `${current.n_kitas} nearby` : "None",
+    alternativeDisplay: alt.n_kitas > 0 ? `${alt.n_kitas} nearby` : "None",
+    direction: dir(alt.n_kitas, current.n_kitas, true),
+  });
+
+  rows.push({
+    factor: "Kinderarzt",
+    currentDisplay: fmtBool(current.has_kinderarzt_plz, "in ZIP code"),
+    alternativeDisplay: fmtBool(alt.has_kinderarzt_plz, "in ZIP code"),
+    direction: dir(alt.has_kinderarzt_plz, current.has_kinderarzt_plz, true),
+  });
+
+  rows.push({
+    factor: "Yoga studio",
+    currentDisplay: fmtBool(current.has_yoga_studios_plz, "in ZIP code"),
+    alternativeDisplay: fmtBool(alt.has_yoga_studios_plz, "in ZIP code"),
+    direction: dir(alt.has_yoga_studios_plz, current.has_yoga_studios_plz, true),
+  });
+  rows.push({
+    factor: "Gym",
+    currentDisplay: fmtBool(current.has_gym_plz, "in ZIP code"),
+    alternativeDisplay: fmtBool(alt.has_gym_plz, "in ZIP code"),
+    direction: dir(alt.has_gym_plz, current.has_gym_plz, true),
+  });
+  rows.push({
+    factor: "Bouldering",
+    currentDisplay: fmtBool(current.has_bouldering_plz, "in ZIP code"),
+    alternativeDisplay: fmtBool(alt.has_bouldering_plz, "in ZIP code"),
+    direction: dir(alt.has_bouldering_plz, current.has_bouldering_plz, true),
+  });
+
+  return rows;
 }
 
 export interface KiezComparison {

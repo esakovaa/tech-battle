@@ -1,85 +1,43 @@
 import planungsraumData from "@/data/planungsraum.json";
-import type { FactorWeights, PlanungsraumProfile, RankedResult } from "./types";
+import { SOFT_FACTOR_KEYS } from "./types";
+import type { FactorWeights, PlanungsraumProfile, RankedResult, UserPreferences } from "./types";
 
 const ALL: PlanungsraumProfile[] = planungsraumData as unknown as PlanungsraumProfile[];
 
-export const FACTOR_KEYS: (keyof FactorWeights)[] = [
-  "price",
-  "location_quality",
-  "green_space",
-  "environmental_comfort",
-  "safety",
-  "schools",
-  "kitas",
-  "transit",
-  "family_hobbies_access",
-];
+// No reliable data source exists for primary-school quality/presence yet
+// (only Abitur/Oberstufe data, which is high school). Never filter or score
+// on it — see KidsCriteria.primarySchool in types.ts.
+export const PRIMARY_SCHOOL_DATA_AVAILABLE = false;
 
 // ---------------------------------------------------------------
-// Ordinal encoders — map category strings onto 0-1, 1 = best.
-// Direction per column documented in Kiez Profile Master Table/README.md.
+// Ordinal encoders — 1 = best, verified against actual data (see Kiez
+// Profile Master Table/README.md for why these specific scales, not the
+// ones an earlier version of this code/README assumed).
 // ---------------------------------------------------------------
 const GRUEN_SCALE: Record<string, number> = { gut: 1, mittel: 0.5, schlecht: 0 };
+const BELASTUNG_3_SCALE: Record<string, number> = { gering: 1, mittel: 0.5, hoch: 0 }; // ug_laerm, ug_luft individually
 
-// ug_mehrfachbelastung_umwelt is NOT gering/mittel/hoch (that's the single
-// indicators like ug_laerm) — it's the "how many burden criteria stack up
-// simultaneously" scale, same family as ug_gesamt_umweltgerechtigkeitskarte.
-// Verified against the actual data (planungsraum_profile.csv), not assumed —
-// an earlier version of this file and the README got this wrong.
-const MEHRFACH_SCALE: Record<string, number> = {
-  "keine starke Belastung": 1,
-  einfach: 0.75,
-  zweifach: 0.5,
-  dreifach: 0.25,
-  vierfach: 0,
-  fünffach: 0,
-};
-
-// ---------------------------------------------------------------
-// Continuous fields need min-max normalization across the dataset.
-// Computed once from ALL 542 rows, direction-corrected so 1 = best.
-// ---------------------------------------------------------------
 function minMax(values: number[]): { min: number; max: number } {
   return { min: Math.min(...values), max: Math.max(...values) };
 }
-
 function normalize(value: number, min: number, max: number, higherIsBetter: boolean): number {
-  if (max === min) return 0.5; // no variance in the dataset for this factor — treat as neutral
+  if (max === min) return 0.5;
   const t = (value - min) / (max - min);
   return higherIsBetter ? t : 1 - t;
 }
 
-// safety = crime_total_avg_2017_2019 / n_addresses, a rough population-density
-// proxy per the user's explicit call — addresses aren't people, but it's the
-// only denominator we have, and it beats a raw count that just penalizes
-// bigger Planungsräume for being bigger.
-const safetyRates = ALL.map((p) => p.crime_total_avg_2017_2019! / p.n_addresses);
-const safetyRange = minMax(safetyRates);
-
-const priceValues = ALL.map((p) => p.rent_per_m2_kalt_avg_synthetic).filter(
-  (v): v is number => v != null
-);
+const priceValues = ALL.map((p) => p.rent_per_m2_kalt_avg_synthetic).filter((v): v is number => v != null);
 const priceRange = minMax(priceValues);
 
-const wohnlageRange = minMax(ALL.map((p) => p.pct_wohnlage_gut));
-
-// schools: PLR-exact value if present, else the complete Bezirk fallback —
-// per the explicit "silently fall back to Bezirk" decision.
 const schoolGrades = ALL.map((p) => p.abitur_mn_scls_plr_avg ?? p.abitur_mn_scls_bezirk_avg!);
 const schoolRange = minMax(schoolGrades);
 
-// kitas: capacity per address, same population-proxy reasoning as safety —
-// a raw capacity count otherwise just rewards bigger Planungsräume.
-const kitaRates = ALL.map((p) => (p.total_kita_capacity ?? 0) / p.n_addresses);
-const kitaRange = minMax(kitaRates);
-
-const transitRange = minMax(ALL.map((p) => p.transit_distance_km!));
-
 // ---------------------------------------------------------------
-// Per-factor score for one Planungsraum. Returns null if the underlying
-// data is genuinely missing (only price ~3% and green_space ~0.4% ever
-// are) — the caller excludes that factor and redistributes its weight
-// for that specific row, rather than guessing a value.
+// Soft (weighted, non-excluding) factors — only the 4 things actually
+// asked about in the intake. Everything else the earlier version of this
+// file scored (safety, transit, kita capacity, location quality) either
+// isn't asked about at all, or is handled as a hard filter instead (see
+// deriveFilters below), not a weighted score.
 // ---------------------------------------------------------------
 function factorScore(p: PlanungsraumProfile, key: keyof FactorWeights): number | null {
   switch (key) {
@@ -87,43 +45,53 @@ function factorScore(p: PlanungsraumProfile, key: keyof FactorWeights): number |
       if (p.rent_per_m2_kalt_avg_synthetic == null) return null;
       return normalize(p.rent_per_m2_kalt_avg_synthetic, priceRange.min, priceRange.max, false);
     }
-    case "location_quality":
-      return normalize(p.pct_wohnlage_gut, wohnlageRange.min, wohnlageRange.max, true);
     case "green_space": {
       const v = p.ug_gruenversorgung;
       if (v == null || !(v in GRUEN_SCALE)) return null;
       return GRUEN_SCALE[v];
     }
-    case "environmental_comfort": {
-      const v = p.ug_mehrfachbelastung_umwelt;
-      if (v == null || !(v in MEHRFACH_SCALE)) return null;
-      return MEHRFACH_SCALE[v];
-    }
-    case "safety": {
-      const rate = p.crime_total_avg_2017_2019! / p.n_addresses;
-      return normalize(rate, safetyRange.min, safetyRange.max, false);
+    case "noise_air": {
+      // Specifically noise + air, NOT the combined ug_mehrfachbelastung_umwelt
+      // (which also folds in heat/thermal stress — nobody asked about heat).
+      const laerm = p.ug_laerm != null && p.ug_laerm in BELASTUNG_3_SCALE ? BELASTUNG_3_SCALE[p.ug_laerm] : null;
+      const luft = p.ug_luft != null && p.ug_luft in BELASTUNG_3_SCALE ? BELASTUNG_3_SCALE[p.ug_luft] : null;
+      if (laerm == null && luft == null) return null;
+      if (laerm == null) return luft;
+      if (luft == null) return laerm;
+      return (laerm + luft) / 2;
     }
     case "schools": {
       const grade = p.abitur_mn_scls_plr_avg ?? p.abitur_mn_scls_bezirk_avg;
-      if (grade == null) return null; // shouldn't happen — Bezirk fallback is 100% complete
+      if (grade == null) return null; // shouldn't happen — Bezirk fallback is complete
       return normalize(grade, schoolRange.min, schoolRange.max, false); // lower grade = better
     }
-    case "kitas": {
-      const rate = (p.total_kita_capacity ?? 0) / p.n_addresses;
-      return normalize(rate, kitaRange.min, kitaRange.max, true);
-    }
-    case "transit": {
-      if (p.transit_distance_km == null) return null;
-      return normalize(p.transit_distance_km, transitRange.min, transitRange.max, false);
-    }
-    case "family_hobbies_access":
-      return (p.has_kinderarzt_plz + p.has_yoga_studio_plz) / 2; // already 0-1 each
   }
 }
 
-/** Weighted score, 0-1. Missing factors are excluded and the remaining
- *  weights renormalized for that row, rather than penalizing a Planungsraum
- *  for a gap in the data. */
+/** Fixed weight per answer tier — these are intake answers (minimal/flexible/
+ *  not_a_concern, yes/no), not a 1-5 slider, so weights are fixed constants
+ *  per tier rather than user-supplied numbers. */
+export function preferencesToWeights(prefs: UserPreferences): FactorWeights {
+  const raw: FactorWeights = {
+    price: prefs.rentBudget === "minimal" ? 3 : prefs.rentBudget === "flexible" ? 1.5 : 0,
+    green_space: prefs.parksImportant ? 3 : 0,
+    noise_air: prefs.noiseAirSensitive ? 3 : 0,
+    schools: prefs.kids.highSchool ? 3 : 0,
+  };
+  const total = SOFT_FACTOR_KEYS.reduce((s, k) => s + raw[k], 0);
+  // Safety net: if the user flagged nothing as important, don't degenerate
+  // to an all-zero score (which would make ranking a tie-break coin flip) —
+  // fall back to equal weight across all 4 soft factors.
+  if (total === 0) {
+    const w = {} as FactorWeights;
+    for (const k of SOFT_FACTOR_KEYS) w[k] = 1 / SOFT_FACTOR_KEYS.length;
+    return w;
+  }
+  const w = {} as FactorWeights;
+  for (const k of SOFT_FACTOR_KEYS) w[k] = raw[k] / total;
+  return w;
+}
+
 export function scorePlanungsraum(
   p: PlanungsraumProfile,
   weights: FactorWeights
@@ -131,8 +99,7 @@ export function scorePlanungsraum(
   const factorScores = {} as Record<keyof FactorWeights, number | null>;
   let weightedSum = 0;
   let weightUsed = 0;
-
-  for (const key of FACTOR_KEYS) {
+  for (const key of SOFT_FACTOR_KEYS) {
     const s = factorScore(p, key);
     factorScores[key] = s;
     if (s != null) {
@@ -140,23 +107,119 @@ export function scorePlanungsraum(
       weightUsed += weights[key];
     }
   }
-
-  const score = weightUsed > 0 ? weightedSum / weightUsed : 0;
-  return { score, factorScores };
+  return { score: weightUsed > 0 ? weightedSum / weightUsed : 0, factorScores };
 }
 
-/** Top 3 Planungsräume by score, no two sharing a PLZ, and none sharing
- *  the user's current PLZ either (per the explicit design decision). */
+// ---------------------------------------------------------------
+// Hard filters — excluding, not just score-affecting. Only kita and
+// kid-doctor presence and the selected hobbies work this way; everything
+// else the user rates is a soft weight (above).
+// ---------------------------------------------------------------
+export interface Filter {
+  key: string;
+  label: string;
+  test: (p: PlanungsraumProfile) => boolean;
+}
+
+export function deriveFilters(prefs: UserPreferences): Filter[] {
+  const filters: Filter[] = [];
+
+  if (prefs.kids.kita) {
+    filters.push({ key: "kita", label: "Has a Kita", test: (p) => p.n_kitas >= 1 });
+  }
+  if (prefs.kids.kidDoctor) {
+    filters.push({ key: "kidDoctor", label: "Has a Kinderarzt in the ZIP code", test: (p) => p.has_kinderarzt_plz === 1 });
+  }
+
+  const selectedHobbies: ("yoga" | "gym" | "bouldering")[] = [];
+  if (prefs.hobbies.yoga) selectedHobbies.push("yoga");
+  if (prefs.hobbies.gym) selectedHobbies.push("gym");
+  if (prefs.hobbies.bouldering) selectedHobbies.push("bouldering");
+  // OR across selected hobbies (at least one available), not AND — picking
+  // yoga+gym means "either is fine," not "both are required."
+  if (selectedHobbies.length > 0) {
+    filters.push({
+      key: "hobbies",
+      label: `Has at least one of: ${selectedHobbies.join(", ")} (in the ZIP code)`,
+      test: (p) =>
+        selectedHobbies.some((h) => {
+          if (h === "yoga") return p.has_yoga_studios_plz === 1;
+          if (h === "gym") return p.has_gym_plz === 1;
+          if (h === "bouldering") return p.has_bouldering_plz === 1;
+          return false;
+        }),
+    });
+  }
+
+  // kids.primarySchool and kids.highSchool are intentionally not filters —
+  // primarySchool has no data at all (see PRIMARY_SCHOOL_DATA_AVAILABLE),
+  // and highSchool's data (Abitur, Bezirk-fallback) is ~100% complete so a
+  // presence filter wouldn't exclude anything meaningful — it's a soft
+  // weight on the `schools` factor instead (see preferencesToWeights).
+
+  return filters;
+}
+
+/** Apply all active filters; if fewer than `minResults` distinct-PLZ
+ *  candidates remain, greedily drop whichever active filter unlocks the
+ *  most additional candidates, and repeat — until enough results or no
+ *  filters left. Returns which filters were dropped, if any, so the
+ *  caller can tell the user "couldn't find a match with X, here's the
+ *  next best without it." */
+function filterWithDegradation(
+  candidates: PlanungsraumProfile[],
+  filters: Filter[],
+  minResults: number
+): { filtered: PlanungsraumProfile[]; droppedFilters: string[] } {
+  let active = [...filters];
+  const apply = (fs: Filter[]) => candidates.filter((p) => fs.every((f) => f.test(p)));
+  const distinctPlz = (list: PlanungsraumProfile[]) => new Set(list.map((p) => p.dominant_plz)).size;
+
+  let filtered = apply(active);
+
+  while (distinctPlz(filtered) < minResults && active.length > 0) {
+    let bestDrop: Filter | null = null;
+    let bestGain = -1;
+    for (const f of active) {
+      const without = active.filter((x) => x.key !== f.key);
+      const gain = distinctPlz(apply(without)) - distinctPlz(filtered);
+      if (gain > bestGain) {
+        bestGain = gain;
+        bestDrop = f;
+      }
+    }
+    if (!bestDrop) break;
+    active = active.filter((x) => x.key !== bestDrop!.key);
+    filtered = apply(active);
+  }
+
+  const droppedFilters = filters.filter((f) => !active.some((a) => a.key === f.key)).map((f) => f.label);
+  return { filtered, droppedFilters };
+}
+
+export interface FindTopAlternativesResult {
+  results: RankedResult[];
+  secondBest: boolean;
+  droppedFilters: string[];
+}
+
+/** Steps 2-4: filter (with graceful degradation), score, and pick the top 3
+ *  in different ZIP codes, excluding the user's own current ZIP code too. */
 export function findTopAlternatives(
   currentPlrId: string,
-  weights: FactorWeights,
+  prefs: UserPreferences,
   count = 3
-): RankedResult[] {
+): FindTopAlternativesResult {
   const current = ALL.find((p) => p.plr_id === currentPlrId);
   if (!current) throw new Error(`Unknown plr_id: ${currentPlrId}`);
   const currentPlz = current.dominant_plz;
 
-  const ranked = ALL.filter((p) => p.plr_id !== currentPlrId && p.dominant_plz !== currentPlz)
+  const candidatePool = ALL.filter((p) => p.plr_id !== currentPlrId && p.dominant_plz !== currentPlz);
+  const filters = deriveFilters(prefs);
+  const { filtered, droppedFilters } = filterWithDegradation(candidatePool, filters, count);
+
+  const weights = preferencesToWeights(prefs);
+  const ranked = filtered
     .map((p) => {
       const { score, factorScores } = scorePlanungsraum(p, weights);
       return { plr: p, score, factorScores } as RankedResult;
@@ -171,7 +234,8 @@ export function findTopAlternatives(
     seenPlz.add(r.plr.dominant_plz);
     if (picked.length === count) break;
   }
-  return picked;
+
+  return { results: picked, secondBest: droppedFilters.length > 0, droppedFilters };
 }
 
 export function getPlanungsraumById(plrId: string): PlanungsraumProfile | undefined {
@@ -180,20 +244,4 @@ export function getPlanungsraumById(plrId: string): PlanungsraumProfile | undefi
 
 export function getAllPlanungsraeume(): PlanungsraumProfile[] {
   return ALL;
-}
-
-/** Default weights: all factors equal (1/9 each after normalization). Used
- *  only as a fallback — real weights come from the intake form's 1-5 ratings. */
-export function equalWeights(): FactorWeights {
-  const w = {} as FactorWeights;
-  for (const key of FACTOR_KEYS) w[key] = 1 / FACTOR_KEYS.length;
-  return w;
-}
-
-/** Convert 1-5 ratings per factor into normalized weights summing to 1. */
-export function ratingsToWeights(ratings: Record<keyof FactorWeights, number>): FactorWeights {
-  const total = FACTOR_KEYS.reduce((sum, k) => sum + ratings[k], 0);
-  const w = {} as FactorWeights;
-  for (const key of FACTOR_KEYS) w[key] = total > 0 ? ratings[key] / total : 1 / FACTOR_KEYS.length;
-  return w;
 }

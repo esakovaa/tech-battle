@@ -77,33 +77,83 @@ export interface PlanungsraumProfile {
   // Crime — Bezirk-level only, raw count (not per-capita)
   crime_total_avg_2017_2019: number | null;
 
-  // Yoga / Kinderarzt — real (OSM/Overpass). PLR-level counts are heavily
-  // zero-inflated; the _plz fields are "does this ZIP code have one at all"
-  // and are what ranking should use (see README).
+  // Yoga / Kinderarzt / gym / bouldering — real (OSM/Overpass). PLR-level
+  // counts are zero-inflated to varying degrees; the _plz fields ("does
+  // this ZIP code have one at all") are what filtering/ranking should use
+  // — see Kiez Profile Master Table/README.md.
   n_yoga_studios: number;
   n_kinderarzt: number;
+  n_gym: number;
+  n_bouldering: number;
   n_yoga_studios_plz: number;
   n_kinderarzt_plz: number;
-  has_yoga_studio_plz: 0 | 1;
+  n_gym_plz: number;
+  n_bouldering_plz: number;
+  has_yoga_studios_plz: 0 | 1;
   has_kinderarzt_plz: 0 | 1;
+  has_gym_plz: 0 | 1;
+  has_bouldering_plz: 0 | 1;
 }
 
-// The 9 user-facing ranking factors. Weights come from a 1-5 rating each,
-// normalized to sum to 1 before scoring.
+// ---------------------------------------------------------------
+// User intake — mirrors the actual 6 questions currently being asked
+// (question 7, commute, is deferred; accepted but not yet used).
+// ---------------------------------------------------------------
+export interface KidsCriteria {
+  kita: boolean;
+  /** No reliable data source exists for this yet (only Abitur/Oberstufe
+   *  data, which is high school). Never used as a filter or score input —
+   *  see PRIMARY_SCHOOL_DATA_AVAILABLE in rank.ts. Kept in the schema so
+   *  the frontend can still show the checkbox and an honest "no data yet"
+   *  note rather than silently dropping the question. */
+  primarySchool: boolean;
+  highSchool: boolean;
+  kidDoctor: boolean;
+}
+
+export interface HobbiesCriteria {
+  yoga: boolean;
+  gym: boolean;
+  bouldering: boolean;
+}
+
+export type RentBudget = "minimal" | "flexible" | "not_a_concern";
+
+export interface UserPreferences {
+  /** Either pass a resolved plr_id directly, or a free-text address to be
+   *  geocoded server-side (see lib/geocode.ts). */
+  currentPlrId?: string;
+  currentAddress?: string;
+  kids: KidsCriteria;
+  rentBudget: RentBudget;
+  noiseAirSensitive: boolean;
+  parksImportant: boolean;
+  hobbies: HobbiesCriteria;
+  // commuteAddresses?: string[] — question 7, added once the commute script lands
+}
+
+// The soft-weighted (non-filter) scoring factors, derived from the intake
+// above. Filters (kids.kita/kidDoctor, hobbies) are handled separately in
+// rank.ts, not scored — see findTopAlternatives' filter/degrade step.
 export interface FactorWeights {
   price: number;
-  location_quality: number;
   green_space: number;
-  environmental_comfort: number; // noise+air+heat combined (ug_mehrfachbelastung_umwelt)
-  safety: number;
+  noise_air: number;
   schools: number;
-  kitas: number;
-  transit: number;
-  family_hobbies_access: number; // has_kinderarzt_plz + has_yoga_studio_plz combined
 }
+
+export const SOFT_FACTOR_KEYS: (keyof FactorWeights)[] = ["price", "green_space", "noise_air", "schools"];
 
 export interface RankedResult {
   plr: PlanungsraumProfile;
   score: number;
-  factorScores: Record<keyof FactorWeights, number>; // each 0-1, direction-corrected
+  factorScores: Record<keyof FactorWeights, number | null>;
+}
+
+export interface RankResponse {
+  current: PlanungsraumProfile;
+  comparisons: unknown[]; // filled in by compare.ts's KiezComparison[]
+  secondBest: boolean;
+  droppedFilters: string[];
+  primarySchoolDataAvailable: false;
 }
