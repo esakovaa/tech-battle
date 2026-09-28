@@ -55,6 +55,24 @@ QUERIES = {
         nwr["amenity"="doctors"]["healthcare:speciality"~"pädiatrie|kinder",i]({bbox});
         out center;""",
     ],
+    # gym: standard OSM tag for fitness studios/gyms
+    "n_gym": [
+        """[out:json][timeout:60];
+        nwr["leisure"="fitness_centre"]({bbox});
+        out center;""",
+    ],
+    # bouldering: dedicated boulder gyms (climbing=boulder) plus general
+    # climbing gyms (sport=climbing at a sports centre) — two clauses,
+    # same reason as the Kinderarzt regex split: a union times out here,
+    # separate requests don't.
+    "n_bouldering": [
+        """[out:json][timeout:60];
+        nwr["climbing"="boulder"]({bbox});
+        out center;""",
+        """[out:json][timeout:60];
+        nwr["sport"="climbing"]["leisure"="sports_centre"]({bbox});
+        out center;""",
+    ],
 }
 
 
