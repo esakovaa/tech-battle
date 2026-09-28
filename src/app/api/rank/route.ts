@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
   };
 
   const { results, secondBest, droppedFilters } = findTopAlternatives(currentPlrId!, prefs, 3);
-  const comparisons = compareToCurrent(current, results);
+  const comparisons = compareToCurrent(current, results, prefs);
 
   return NextResponse.json({
     current,
