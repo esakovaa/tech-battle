@@ -35,6 +35,8 @@ Both are licensed **Datenlizenz Deutschland – Zero – Version 2.0** (public d
 
 `Kiez Profile Master Table/kiez_profile_by_plz.csv` — the derived, agent-facing table: one row per Berlin postal code (193 total), joining every source above (centroid, Wohnlage, Kitas, schools, crime, air quality, rents, buy prices, transit). **Read `Kiez Profile Master Table/README.md` before querying it** — several columns are spatial approximations or Bezirk-level inherited values, not true PLZ-precise data, and that file documents exactly which are which. Rebuild with `python3 "Kiez Profile Master Table/build_kiez_profile.py"`.
 
+`Kiez Profile Master Table/planungsraum_profile.csv` — a second, finer table (542 rows, one per Planungsraum — Berlin's own official planning geography, not PLZ) built via real point-in-polygon spatial joins, with `planungsraum_boundaries.geojson` holding the actual polygons. Doesn't replace the PLZ table as the agent-facing unit; several sources (Wohnlage, Kitas, Umweltgerechtigkeit, synthetic listings) are genuinely more precise here. See that folder's README for exactly what improved and what didn't.
+
 ## Other files
 
 Analysis outputs live under `EDA on real estate listings/`:

@@ -17,6 +17,7 @@
 - **Buy price:** `buy_price_per_m2_avg_REAL`, `n_real_listings`, `buy_price_per_m2_avg_synthetic`, `n_synthetic_sales_listings`
 - **New housing supply:** `new_construction_price_per_m2_avg`, `n_new_construction_listings`
 - **Commute:** `nearest_transit_station`, `nearest_transit_line`, `transit_distance_km`
+- **Noise, green space, heat, socioeconomic status (Planungsraum-level, real):** `ug_laerm`, `ug_gruenversorgung`, `ug_thermisch`, `ug_soziale_benachteiligung` (⚠️ higher = more advantaged, see below), `ug_mehrfachbelastung_umwelt`, `ug_gesamt_umweltgerechtigkeitskarte`
 
 ## Column-by-column data quality
 
@@ -31,6 +32,21 @@
 | `rent_per_m2_kalt_avg_synthetic`, `buy_price_per_m2_avg_synthetic`, `new_construction_price_per_m2_avg`, plus their `n_*_listings` counts | **Synthetic** (Kaggle hedonic-model dataset), assigned to PLZ via nearest-centroid spatial join (no real PLZ field in the source) | Low for absolute €, useful for relative structure (which areas rank where) — see the main business EDA report for why the synthetic price level runs ~25–40% below real listings |
 | `nearest_transit_station`, `nearest_transit_line`, `transit_distance_km` | From the synthetic dataset's 135-station list (Berlin only), nearest-station join | Medium — real station names/lines, but not the full VBB network |
 | `abitur_mn_scls_bezirk_avg`, `abitur_performance_vs_peer_bezirk_avg`, `n_abitur_schools_in_bezirk`, `abitur_tier_bezirk` | **Bezirk-level only**, inherited (same reason as crime — see `abitur_by_school.csv` for the school-level detail this is built from) | Real, official 2025 results. **Lower `mn.scls` = better** (German grading, 1.0 is best) |
+| `ug_planungsraum_nr`, `ug_planungsraum_name`, `ug_laerm`, `ug_luft`, `ug_gruenversorgung`, `ug_thermisch`, `ug_soziale_benachteiligung`, `ug_mehrfachbelastung_umwelt`, `ug_mehrfachbelastung_umwelt_sozial`, `ug_gesamt_umweltgerechtigkeitskarte` | **Planungsraum-level** (finer than Bezirk, matched at the PLZ's centroid point via live WMS query — not an area-weighted average across the whole PLZ) | Real, official 2023/24 Umweltatlas data — see "Umweltgerechtigkeit" section below, **especially the Status-Index direction warning** |
+
+## Umweltgerechtigkeit (environmental justice) — real, Planungsraum-level
+
+Source: [Umweltgerechtigkeit 2023/2024 (Umweltatlas)](https://daten.berlin.de/datensaetze/umweltgerechtigkeit-2023-2024-umweltatlas-wms-c4a4e505), Senatsverwaltung für Mobilität, Verkehr, Klimaschutz und Umwelt. The daten.berlin.de page only links WMS resources, but a **WFS exists at the same service name** (`https://gdi.berlin.de/services/wfs/ua_umweltgerechtigkeit2023`, undocumented on the metadata page — found by testing the naming convention) — see `planungsraum_profile.csv` below for the full 542-Planungsraum bulk pull via that WFS. The columns in *this* PLZ table were pulled earlier via 193 individual `GetFeatureInfo` point queries against the WMS (before the WFS was found), one per PLZ centroid.
+
+Columns (all ordinal categories, not numbers):
+- `ug_laerm` — noise burden: gering / mittel / hoch
+- `ug_luft` — air pollution burden (Umweltatlas's own modeled layer, independent of the Kaggle station data elsewhere in this table): gering / mittel / hoch
+- `ug_gruenversorgung` — green space supply: gut / mittel / schlecht
+- `ug_thermisch` — heat/thermal stress: gering / mittel / hoch
+- `ug_mehrfachbelastung_umwelt` — combined score across the 4 environmental indicators above: gering / mittel / hoch
+- `ug_gesamt_umweltgerechtigkeitskarte` — **correction:** an earlier version of this doc described this as a binary hotspot flag. That was wrong — it's actually a real 6-level ordinal scale (`keine starke Belastung` → `einfach` → `zweifach` → `dreifach` → `vierfach` → `fünffach`, counting how many burden criteria stack up simultaneously), only fully visible once pulled via WFS. The point-query version in this PLZ table only ever surfaced the flagged-hotspot cases because of how GetFeatureInfo happened to render that specific layer — use `planungsraum_profile.csv`'s version of this column instead if you need the full gradation
+
+**Read this before using `ug_soziale_benachteiligung` or `ug_mehrfachbelastung_umwelt_sozial` — the direction is counter-intuitive:** despite the layer being named "Kernindikator Soziale Benachteiligung" (social disadvantage), the value returned is framed as a **Status-Index where HIGHER = MORE ADVANTAGED** (`hoher Status-Index` = high socioeconomic status = *less* disadvantaged; `niedriger/sehr niedriger Status-Index` = *more* disadvantaged). This is the opposite of what the indicator's own name suggests. Verified directly against Berlin's Monitoring Soziale Stadtentwicklung (MSS) convention, where Status-Index has always meant this.
 
 ## Abitur / school-quality signal
 
@@ -44,6 +60,23 @@ Coverage limits, both real:
 - Only 63 of 185 Abitur schools (34%) have a real PLZ, via a crosswalk to `schulbaumassnahmen-2026.xlsx` — Berlin doesn't appear to publish an open, downloadable directory of every school's address (checked; nothing found under "Schulverzeichnis"/"Schulliste"). The other 122 schools are Bezirk-located only.
 - The Abitur dataset itself suppresses any school with fewer than 16 candidates — those schools simply don't appear anywhere in this data, at any tier.
 - Abitur only exists at schools with an Oberstufe (Gymnasien, ISS, vocational, private, Kollegs) — **this signal says nothing about Grundschulen**, which is what most families with young kids actually care about first.
+
+## Planungsraum Profile — a second, finer table
+
+`planungsraum_profile.csv` — one row per **Planungsraum** (Berlin's official urban-planning geography, finer than Bezirk and independent of PLZ boundaries), **542 areas**, not the 447 an older 2012 boundaries dataset suggested — the LOR system has apparently been revised since then, worth knowing if you cite a Planungsraum count elsewhere. Built by `build_planungsraum_profile.py`. `planungsraum_boundaries.geojson` has the real polygon geometry for all 542, reusable for mapping.
+
+**This does not replace the PLZ table.** PLZ stays the agent-facing "kiez recommendation unit" (people search by postal code, not by Planungsraum name). This exists because several sources are exact at Planungsraum grain and get meaningfully more precise here than they were as PLZ approximations:
+
+| What got more precise | How |
+|---|---|
+| Umweltgerechtigkeit (all 8 indicators) | Native grain now — bulk WFS pull with real polygons, not a single centroid point query per area. Also revealed `ug_gesamt_umweltgerechtigkeitskarte` is a real 6-level scale, not the binary flag the PLZ table's docs used to say (see correction above) |
+| Wohnlage mix, Kitas, school-construction projects | Real point-in-polygon spatial join (100% address match rate on Wohnlage, 400,505/400,505) instead of nearest-centroid guessing |
+| secondary_sales / rentals / new_construction (synthetic) | Same — real polygon containment, 96–98% match rate (the rest fall just outside city-boundary gaps) |
+| Abitur | **Partially** — the 63 schools with known coordinates now get an exact Planungsraum match (`abitur_mn_scls_plr_avg` etc., covering 61/542 areas directly); every area also carries the Bezirk-level fallback (`abitur_mn_scls_bezirk_avg`, 542/542) so coverage doesn't regress versus the PLZ table |
+
+**What did NOT get more precise, and can't:**
+- `buy_price_per_m2_avg_REAL` (dataset2) — still PLZ-only at the source (no lat/lon in that file at all). Linked in via `dominant_plz`, which is the *majority PLZ of real Wohnlage addresses actually inside that Planungsraum* — a real ground-truth crosswalk, not a centroid-distance guess, but still inherits one PLZ's price across every Planungsraum within it
+- Crime — still Bezirk-level only. A Prognoseraum-level crosswalk (Prognoseraum is Planungsraum's direct parent in the LOR hierarchy, so this should in principle be decodable from the code structure) was considered but not verified — flagging as unresolved rather than guessing at a mapping
 
 ## Source-file audit
 
