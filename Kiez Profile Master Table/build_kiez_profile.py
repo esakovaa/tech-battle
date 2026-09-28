@@ -6,6 +6,7 @@ import urllib.request
 import time
 
 SRC = "/Users/annaesakova/Hackahon26/DATA  SOURCES"
+out_path_placeholder = "/Users/annaesakova/Hackahon26/Kiez Profile Master Table"
 
 # =================================================================
 # 1. PLZ master index + centroids, from Wohnlage (real, address-level)
@@ -180,6 +181,64 @@ master = master.merge(ext_agg, on="plz", how="left")
 master = master.merge(sec_agg, on="plz", how="left")
 master = master.merge(newc_agg, on="plz", how="left")
 master = master.merge(plz_transit.drop(columns=["plz"]).assign(plz=plz_transit["plz"]), on="plz", how="left")
+
+# =================================================================
+# 10. Abitur results — real, school-level, Bezirk-inherited (like crime)
+# =================================================================
+BEZIRK_BY_NR = {
+    1: "Mitte", 2: "Friedrichshain-Kreuzberg", 3: "Pankow", 4: "Charlottenburg-Wilmersdorf",
+    5: "Spandau", 6: "Steglitz-Zehlendorf", 7: "Tempelhof-Schöneberg", 8: "Neukölln",
+    9: "Treptow-Köpenick", 10: "Marzahn-Hellersdorf", 11: "Lichtenberg", 12: "Reinickendorf",
+}
+SCHULFORM = {1: "berufliche Schulen", 2: "Gymnasien", 3: "ISS/Gemeinschaftsschulen",
+             4: "privat", 5: "Kollegs/Abendgymnasien"}
+
+abi = pd.read_excel(f"{SRC}/abitur-2025.xlsx", sheet_name="Schuldaten|Gesamt")
+vgl = pd.read_excel(f"{SRC}/abitur-2025.xlsx", sheet_name="Vergleichsdaten|Gesamt")
+vgl_by_form = vgl[vgl["Bezirksnummer"] == "-"].copy()
+vgl_by_form = vgl_by_form[vgl_by_form["Schulform"] != "-"]
+vgl_by_form["Schulform"] = vgl_by_form["Schulform"].astype(int)
+vgl_map = dict(zip(vgl_by_form["Schulform"], vgl_by_form["mn.vgl"]))
+
+abi["bezirk"] = abi["Bezirksnummer"].map(BEZIRK_BY_NR)
+abi["schulform_name"] = abi["Schulform"].map(SCHULFORM)
+abi["peer_benchmark_mn_vgl"] = abi["Schulform"].map(vgl_map)
+# lower grade = better; positive = school beats its own school-type's state average
+abi["performance_vs_peer"] = abi["peer_benchmark_mn_vgl"] - abi["mn.scls"]
+
+# school-level PLZ crosswalk, where available (only ~34% coverage — see README)
+sch_lookup = schools.dropna(subset=["Berliner Schulnummer"]).drop_duplicates("Berliner Schulnummer")
+sch_lookup = sch_lookup.set_index("Berliner Schulnummer")[["Schulname", "PLZ"]]
+abi = abi.join(sch_lookup, on="BSN")
+
+# quartile tiers — computed on the real 185-school distribution, not arbitrary cutoffs
+# raw: lower mn.scls = better grade, so quartiles are reversed for labeling
+abi["tier_raw_grade"] = pd.qcut(abi["mn.scls"], 4, labels=["AMAZING", "GOOD", "OK", "BAD"])
+abi["tier_vs_peer"] = pd.qcut(abi["performance_vs_peer"], 4, labels=["BAD", "OK", "GOOD", "AMAZING"])
+
+abi_detail_cols = ["BSN", "Schulname", "PLZ", "bezirk", "schulform_name", "n", "n.best", "n.scls",
+                    "mn.scls", "peer_benchmark_mn_vgl", "performance_vs_peer", "tier_raw_grade", "tier_vs_peer"]
+abi[abi_detail_cols].to_csv(f"{out_path_placeholder}/abitur_by_school.csv", index=False)
+print(f"[10a] Abitur school-level detail: {len(abi)} schools "
+      f"({abi['PLZ'].notna().sum()} with a real PLZ via schulbaumassnahmen crosswalk)")
+
+# Bezirk-level aggregate (weighted by n.scls), for the main master table — same
+# methodology as crime: every PLZ in a Bezirk inherits the identical value.
+def wavg(vals, weights):
+    return np.average(vals, weights=weights)
+
+abi_bez = abi.groupby("bezirk").apply(
+    lambda d: pd.Series({
+        "abitur_mn_scls_bezirk_avg": wavg(d["mn.scls"], d["n.scls"]),
+        "abitur_performance_vs_peer_bezirk_avg": wavg(d["performance_vs_peer"], d["n.scls"]),
+        "n_abitur_schools_in_bezirk": len(d),
+    }), include_groups=False
+).reset_index()
+abi_bez["abitur_tier_bezirk"] = pd.qcut(
+    abi_bez["abitur_mn_scls_bezirk_avg"], 4, labels=["AMAZING", "GOOD", "OK", "BAD"])
+print(f"[10b] Abitur aggregated to {len(abi_bez)} Bezirke")
+
+master = master.merge(abi_bez, on="bezirk", how="left")
 
 # fill count columns with 0 (no listings found there, not missing data)
 for col in ["n_kitas", "total_kita_capacity", "n_school_construction_projects",
