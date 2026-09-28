@@ -22,8 +22,8 @@ plt.rcParams.update({
     "font.size": 9.5,
 })
 
-SRC1 = 'DATA  SOURCES/Berlin Real Estate Sales Rentals 2020-2026'
-SRC2 = 'DATA  SOURCES/Real Estate Listings Berlin (DE) April 2023'
+SRC1 = '../DATA  SOURCES/Berlin Real Estate Sales Rentals 2020-2026'
+SRC2 = '../DATA  SOURCES/Real Estate Listings Berlin (DE) April 2023'
 
 sec = pd.read_csv(f'{SRC1}/secondary_sales.csv', parse_dates=['date_listed'])
 newc = pd.read_csv(f'{SRC1}/new_construction.csv', parse_dates=['date_listed'])

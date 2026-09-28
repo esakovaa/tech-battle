@@ -14,6 +14,10 @@ All raw data lives under `DATA  SOURCES/`. Government WFS geodata is **not commi
 | `Kita Standorte (WFS)/` | daten.berlin.de: [Kindertagesstätten — WFS](https://daten.berlin.de/datensaetze/kindertagesstatten-wfs-d03b94d2) | Real, 2,905 Kitas citywide, incl. capacity (`e_platz`) and Träger |
 | `kitaliste-nov-2025.xlsx` | daten.berlin.de: [Kitas in Berlin](https://daten.berlin.de/datensaetze/kitas-in-berlin) | Real, official directory (XLSX), alternative/cross-check to the WFS above |
 | `schulbaumassnahmen-2026.xlsx` | daten.berlin.de: [Schulbaumaßnahmen](https://daten.berlin.de/datensaetze/schulbaumassnahmen) | Real, all Berlin school locations 2013/14–2029/30, tagged existing/planned/under construction |
+| `Berlin_crimes.csv` | Kaggle: [Crime in Berlin 2012–2019](https://www.kaggle.com/datasets/danilzyryanov/crime-in-berlin-2012-2019) | Real, official Kriminalitätsatlas-style data — 8 years × 12 Bezirke × 150 Prognosträume, 20 crime-type columns. **Dated**: ends 2019, 7 years old — use for relative area comparison, not as a current safety claim |
+| `berlin_air_quality_feb_2026_kaggle.csv` | Kaggle: [Berlin Air Quality Hourly Measurements](https://www.kaggle.com/datasets/edinnn0/berlin-air-quality-hourly-measurements) | Real, hourly readings from 15 official Berlin monitoring stations, 5 pollutants (CO/NO2/O3/PM10/PM2.5). Only covers 1–19 Feb 2026 (partial month, not a full year) |
+
+Both new sources, like everything else here, are **Berlin-only** — no Brandenburg coverage, consistent with every other government/Kaggle source checked so far.
 
 ### Re-fetching the WFS sources
 
@@ -29,8 +33,10 @@ Both are licensed **Datenlizenz Deutschland – Zero – Version 2.0** (public d
 
 ## Other files
 
+Analysis outputs live under `EDA on real estate listings/`:
+
 - `EDA_protocol.md` — the EDA/data-cleaning protocol used to validate the datasets above before building on them
 - `business_eda_report.html` — full business-focused EDA + data-reliability findings on the Kaggle datasets, cross-validated against the real Wohnlage/listings data
 - `dry_run_report.html` — protocol dry-run on the King County housing dataset (methodology validation only, not Berlin findings)
 - `charts/` — all generated chart images referenced by the two reports above
-- `business_eda.py` — script that generates the business EDA charts
+- `business_eda.py` — script that generates the business EDA charts (paths are relative to this subfolder, i.e. `../DATA  SOURCES/...`)
