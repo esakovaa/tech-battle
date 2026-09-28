@@ -13,3 +13,13 @@ __pycache__/
 
 # Local tooling state
 .claude/
+
+# Node / Next.js
+/node_modules
+/.next/
+/out/
+/build
+*.tsbuildinfo
+next-env.d.ts
+.env*
+npm-debug.log*
