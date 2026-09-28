@@ -1,9 +1,10 @@
 # macOS
 .DS_Store
 
-# Raw geodata — 146MB, exceeds GitHub's 100MB limit.
-# Regenerate with: see README / data/wohnlagen_2026.csv is the lightweight equivalent.
-data/wohnlagen_2026.geojson
+# Raw WFS geodata exports — regenerated on demand, not committed.
+# See README.md "Data sources" for the exact fetch command per file.
+# The flattened .csv next to each one IS committed (small, git-friendly).
+DATA  SOURCES/**/*.geojson
 
 # Python
 __pycache__/

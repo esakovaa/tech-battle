@@ -22,13 +22,16 @@ plt.rcParams.update({
     "font.size": 9.5,
 })
 
-sec = pd.read_csv('dataset1/secondary_sales.csv', parse_dates=['date_listed'])
-newc = pd.read_csv('dataset1/new_construction.csv', parse_dates=['date_listed'])
-rent = pd.read_csv('dataset1/rentals.csv', parse_dates=['date_listed'])
-kiez = pd.read_csv('dataset1/kiez_prices_monthly.csv')
+SRC1 = 'DATA  SOURCES/Berlin Real Estate Sales Rentals 2020-2026'
+SRC2 = 'DATA  SOURCES/Real Estate Listings Berlin (DE) April 2023'
+
+sec = pd.read_csv(f'{SRC1}/secondary_sales.csv', parse_dates=['date_listed'])
+newc = pd.read_csv(f'{SRC1}/new_construction.csv', parse_dates=['date_listed'])
+rent = pd.read_csv(f'{SRC1}/rentals.csv', parse_dates=['date_listed'])
+kiez = pd.read_csv(f'{SRC1}/kiez_prices_monthly.csv')
 kiez['ym'] = pd.to_datetime(kiez['year_month'])
-transit = pd.read_csv('dataset1/transit_stations.csv')
-ext = pd.read_csv('dataset2/real_estate_listings_clean.csv')
+transit = pd.read_csv(f'{SRC1}/transit_stations.csv')
+ext = pd.read_csv(f'{SRC2}/real_estate_listings_clean.csv')
 out = 'charts'
 
 print("kiez_premium unique:", sec.kiez_premium.unique())
