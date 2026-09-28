@@ -10,3 +10,6 @@ DATA  SOURCES/**/*.geojson
 __pycache__/
 *.pyc
 .venv/
+
+# Local tooling state
+.claude/

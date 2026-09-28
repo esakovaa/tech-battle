@@ -1,0 +1,194 @@
+plz,ug_planungsraum_nr,ug_planungsraum_name,ug_laerm,ug_luft,ug_gruenversorgung,ug_thermisch,ug_soziale_benachteiligung,ug_mehrfachbelastung_umwelt,ug_mehrfachbelastung_umwelt_sozial,ug_gesamt_umweltgerechtigkeitskarte
+10115,01100415,Invalidenstraße,mittel,hoch,schlecht,hoch,hoher Status-Index,hoch,hoher Status-Index,
+10117,01100206,Unter den Linden,hoch,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10119,01100416,Arkonaplatz,mittel,hoch,schlecht,hoch,hoher Status-Index,hoch,hoher Status-Index,
+10178,01100310,Alexanderplatzviertel,hoch,hoch,mittel,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10179,01100312,Heine-Viertel West,hoch,hoch,gut,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10243,02400624,Weberwiese,mittel,hoch,mittel,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10245,02500835,Stralauer Kiez,hoch,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10247,02500728,Samariterviertel,gering,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10249,02400522,Richard-Sorge-Viertel,mittel,hoch,schlecht,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10315,11400931,Massower Straße,mittel,hoch,mittel,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10317,11400929,Weitlingkiez,gering,hoch,mittel,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10318,11501340,Karlshorst Nord,mittel,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+10319,11401136,Volkradstraße,mittel,hoch,gut,gering,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10365,11300725,Nibelungenviertel,mittel,hoch,schlecht,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10367,11300722,Rathaus Lichtenberg,mittel,hoch,gut,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10369,11300617,Fennpfuhlpark,hoch,hoch,mittel,gering,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+10405,03701659,Immanuelkirchstraße,mittel,hoch,mittel,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10407,03601451,Anton-Saefkow-Park,mittel,hoch,mittel,mittel,,,,
+10409,03601245,Ostseestraße,mittel,hoch,schlecht,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10435,03701554,Teutoburger Platz,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10437,03601346,Gethsemanekirche,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10439,03601243,Rodenbergstraße,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10551,01200520,Bremer Straße,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+10553,01200517,Huttenkiez,hoch,hoch,schlecht,hoch,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+10555,01200522,Elberfelder Straße,mittel,mittel,schlecht,hoch,mittlerer Status-Index,mittel,mittlerer Status-Index,
+10557,01200627,Zillesiedlung,hoch,hoch,mittel,mittel,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+10559,01200623,Stephankiez,mittel,mittel,schlecht,hoch,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+10585,04300621,Richard-Wagner-Straße,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10587,04300619,Alt-Lietzow,mittel,hoch,mittel,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10589,04300517,Tegeler Weg,mittel,mittel,mittel,hoch,mittlerer Status-Index,mittel,mittlerer Status-Index,
+10623,04300624,Savignyplatz,hoch,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10625,04300623,Karl-August-Platz,mittel,mittel,schlecht,hoch,,,,
+10627,04300623,Karl-August-Platz,mittel,mittel,schlecht,hoch,mittlerer Status-Index,mittel,mittlerer Status-Index,
+10629,04501040,Hindemithplatz,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10707,04501043,Preußenpark,mittel,mittel,schlecht,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+10709,04500939,Eisenzahnstraße,hoch,hoch,mittel,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10711,04500937,Halensee,hoch,mittel,schlecht,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+10713,04501146,Barstraße,hoch,hoch,gut,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10715,04501151,Hildegardstraße,hoch,hoch,mittel,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10717,04501149,Nikolsburger Platz,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10719,04501045,Schaperstraße,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10777,07100101,Wittenbergplatz,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10779,07200307,Bayerischer Platz,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10781,07100204,Barbarossaplatz,gering,mittel,schlecht,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+10783,07100205,Alvenslebenstraße,hoch,hoch,mittel,mittel,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+10785,01100103,Lützowstraße,mittel,hoch,schlecht,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10787,01100101,Stülerstraße,hoch,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10789,04501042,Breitscheidplatz,mittel,hoch,schlecht,hoch,,,,
+10823,07200409,Belziger Straße,mittel,mittel,schlecht,hoch,mittlerer Status-Index,mittel,mittlerer Status-Index,
+10825,07200308,Volkspark (Rudolph-Wilde-Park),mittel,hoch,mittel,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10827,07200410,Feurigstraße,mittel,hoch,schlecht,hoch,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+10829,07200413,Cheruskerstraße,mittel,mittel,mittel,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+10961,02200210,Urbanstraße,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10963,02100101,Askanischer Platz,hoch,hoch,gut,mittel,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+10965,02200209,Viktoriapark,mittel,hoch,gut,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+10967,02200213,Graefekiez Nord,gering,mittel,mittel,hoch,mittlerer Status-Index,mittel,mittlerer Status-Index,
+10969,02100103,Am Berlin Museum,mittel,mittel,schlecht,mittel,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+10997,02300315,Lausitzer Platz,gering,hoch,mittel,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+10999,02300417,Reichenberger Straße West,mittel,mittel,gut,hoch,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12043,08100415,Ganghoferstraße,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12045,08100312,Weichselplatz,gering,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12047,08100311,Reuterplatz,gering,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+12049,08100102,Schillerpromenade Nord,gering,mittel,gut,hoch,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12051,08100209,Glasower Straße,mittel,hoch,schlecht,hoch,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12053,08100207,Rollberg,gering,hoch,mittel,mittel,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12055,08100417,Braunschweiger Straße,mittel,hoch,schlecht,hoch,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12057,08100521,Schulenburgpark,hoch,hoch,gut,hoch,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12059,08100418,Hertzbergplatz,gering,mittel,schlecht,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12099,07400927,Rathaus Tempelhof,hoch,hoch,mittel,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+12101,07400721,Paradestraße,hoch,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12103,07400823,Wittekindstraße,mittel,hoch,schlecht,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+12105,07400826,Marienhöhe,hoch,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12107,07501134,Hundsteinweg,mittel,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12109,07501031,Eisenacher Straße,mittel,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12157,07300619,Grazer Platz,hoch,mittel,schlecht,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12159,07300517,Perelsplatz,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+12161,07300516,Odenwaldstraße,gering,hoch,schlecht,hoch,hoher Status-Index,hoch,hoher Status-Index,
+12163,06100102,Schloßstraße,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,
+12165,06100101,Fichtenberg,mittel,mittel,gut,mittel,hoher Status-Index,mittel,hoher Status-Index,
+12167,06100206,Stadtpark,mittel,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12169,06100204,Munsterdamm,mittel,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12203,06300633,Augustaplatz,mittel,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12205,06300634,Lichterfelde West,mittel,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+12207,06200421,Königsberger Straße,mittel,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12209,06200423,Schütte-Lanz-Straße,gering,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12247,06200313,Lankwitz Kirche,mittel,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12249,06200315,Gallwitzallee,gering,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12277,07601237,Kirchstraße,mittel,mittel,gut,mittel,hoher Status-Index,mittel,hoher Status-Index,
+12279,07601340,Tirschenreuther Ring Ost,mittel,hoch,mittel,gering,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12305,07601442,Kettinger Straße,mittel,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12307,07601546,Franziusweg,gering,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+12309,07601545,Nahariyastraße,gering,mittel,gut,gering,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12347,08200725,Mohriner Allee Nord,gering,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12349,08200832,Buckow Mitte,gering,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12351,08401139,Vogelviertel Süd,mittel,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12353,08200833,Buckow Ost,gering,mittel,mittel,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12355,08401244,Waßmannsdorfer Chaussee,gering,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+12357,08401241,Blumenviertel,mittel,hoch,gut,gering,mittlerer Status-Index,hoch,mittlerer Status-Index,
+12359,08200726,Hufeisensiedlung,mittel,hoch,gut,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12435,09100202,Plänterwald West,hoch,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12437,09100304,Baumschulenweg West,mittel,mittel,mittel,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12439,09200613,Bahnhof Schöneweide,hoch,hoch,mittel,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+12459,09200511,Griechischer Park,gering,mittel,mittel,hoch,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12487,09100408,Johannisthal Ost,mittel,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12489,09200716,Dörpfeldstraße West,hoch,mittel,mittel,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12524,09300920,Dorf Altglienicke,mittel,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12526,09301025,Alt-Bohnsdorf,hoch,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12527,09301126,Grünau,mittel,gering,gut,gering,mittlerer Status-Index,gering,mittlerer Status-Index,
+12555,09502043,Dammheide,mittel,gering,gut,gering,mittlerer Status-Index,gering,mittlerer Status-Index,
+12557,09401329,Kietzer Feld/Nachtheide,gering,gering,gut,gering,mittlerer Status-Index,gering,mittlerer Status-Index,
+12559,09401329,Kietzer Feld/Nachtheide,gering,gering,gut,gering,mittlerer Status-Index,gering,mittlerer Status-Index,
+12587,09501737,Alt-Friedrichshagen,gering,gering,mittel,gering,mittlerer Status-Index,gering,mittlerer Status-Index,
+12589,09501838,Rahnsdorf,gering,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12619,10200630,Cecilienplatz,gering,hoch,mittel,gering,mittlerer Status-Index,hoch,mittlerer Status-Index,
+12621,10400836,Alt-Kaulsdorf,mittel,mittel,gut,gering,,,,
+12623,10400941,Pilgramer Straße,gering,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+12627,10200524,Adele-Sandrock-Straße,gering,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+12629,10200418,Kyritzer Straße,gering,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12679,10100209,Lea-Grundig-Straße,mittel,hoch,mittel,gering,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12681,10100311,Marzahner Chaussee,hoch,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12683,10300733,Alt-Biesdorf,hoch,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+12685,10100314,Auersbergstraße,mittel,hoch,gut,gering,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12687,10100206,Wuhletalstraße,mittel,hoch,gut,gering,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+12689,10100103,Wittenberger Straße,gering,hoch,gut,gering,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13051,11100308,Zingster Straße West,gering,mittel,gut,gering,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13053,11200410,Malchower Weg,mittel,hoch,gut,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13055,11200513,Große-Leege-Straße,gering,hoch,schlecht,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+13057,11100102,Dorf Falkenberg,gering,gering,gut,gering,mittlerer Status-Index,gering,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13059,11100101,Dörfer Malchow-Wartenberg,gering,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+13086,03500932,Bühringstraße,gering,mittel,mittel,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+13088,03501037,Rathaus Weißensee,mittel,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+13089,03300516,Heinersdorf,mittel,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+13125,03300411,Karow Nord,mittel,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+13127,03200310,Krugpfuhl,mittel,gering,gut,mittel,mittlerer Status-Index,gering,mittlerer Status-Index,
+13129,03300514,Blankenburg,hoch,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+13156,03200206,Pastor-Niemöller-Platz,mittel,hoch,mittel,gering,mittlerer Status-Index,hoch,mittlerer Status-Index,
+13158,03400618,Rosenthal,mittel,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+13159,03200204,Blankenfelde,mittel,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+13187,03400723,Garbátyplatz,hoch,hoch,schlecht,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+13189,03400829,Arnold-Zweig-Straße,gering,hoch,schlecht,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+13347,01401043,Antonstraße,mittel,hoch,schlecht,mittel,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13349,01400940,Schillerpark,mittel,mittel,gut,mittel,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13351,01400937,Afrikanische Straße,mittel,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13353,01401046,Nordufer,mittel,hoch,schlecht,hoch,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13355,01300835,Humboldthain Süd,gering,mittel,mittel,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13357,01300836,Humboldthain Nordwest,hoch,hoch,schlecht,hoch,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13359,01300731,Koloniestraße,gering,mittel,mittel,mittel,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13403,12200308,Meller Bogen,gering,mittel,mittel,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13405,12200411,Schumacher-Quartier,hoch,hoch,mittel,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13407,12100205,Teichstraße,mittel,mittel,mittel,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13409,12100102,Hausotterplatz,gering,mittel,schlecht,mittel,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13435,12601031,Lübarser Straße,hoch,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13437,12500926,Wittenau Mitte,hoch,hoch,gut,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13439,12601235,Dannenwalder Weg,hoch,hoch,schlecht,gering,,,,
+13465,12400721,Frohnau Ost,gering,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+13467,12400722,Hermsdorf West,gering,gering,gut,gering,,,,
+13469,12601032,Rollbergesiedlung,gering,mittel,gut,mittel,,,,
+13503,12400619,Heiligensee,gering,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+13505,12400616,Konradshöhe/Tegelort,gering,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+13507,12200515,Alt-Tegel,gering,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+13509,12500824,Ziekowstraße/Freie Scholle,mittel,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+13581,05200420,Staakener Straße,mittel,gering,gut,mittel,mittlerer Status-Index,gering,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13583,05100209,Westerwaldstraße,gering,mittel,mittel,gering,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13585,05100314,Kurstraße,mittel,hoch,schlecht,mittel,niedriger/sehr niedriger Status-Index,hoch,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13587,05100103,Mertensstraße,gering,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,
+13589,05100208,Im Spektefeld,gering,gering,gut,gering,niedriger/sehr niedriger Status-Index,gering,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13591,05200421,Spandauer Straße,mittel,gering,gut,gering,mittlerer Status-Index,gering,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13593,05200528,Weinmeisterhornweg,mittel,gering,gut,gering,mittlerer Status-Index,gering,mittlerer Status-Index,
+13595,05200633,Graetschelsteig,hoch,mittel,gut,mittel,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13597,05100317,Freiheit,hoch,mittel,mittel,mittel,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13599,05300736,Zitadellenweg,gering,mittel,gut,mittel,mittlerer Status-Index,mittel,mittlerer Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13627,04100101,Jungfernheide/Plötzensee,hoch,mittel,gut,mittel,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+13629,05300839,Rohrdamm,gering,mittel,gut,gering,niedriger/sehr niedriger Status-Index,mittel,niedriger/sehr niedriger Status-Index,
+14050,04200308,Branitzer Platz,mittel,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+14052,04200309,Neu Westend,hoch,mittel,gut,gering,mittlerer Status-Index,mittel,mittlerer Status-Index,
+14053,04200203,Olympiagelände,hoch,gering,gut,mittel,mittlerer Status-Index,gering,mittlerer Status-Index,
+14055,04200207,Eichkamp,hoch,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+14057,04300415,Lietzensee,hoch,hoch,mittel,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+14059,04300413,Klausenerplatz,mittel,hoch,mittel,mittel,mittlerer Status-Index,hoch,mittlerer Status-Index,
+14089,05400944,Kladower Damm,gering,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+14109,06400735,Wannsee,mittel,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+14129,06400737,Nikolassee,hoch,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+14163,06400839,Fischerhüttenstraße,mittel,mittel,gut,gering,hoher Status-Index,mittel,hoher Status-Index,
+14165,06300528,Teltower Damm,gering,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+14167,06300528,Teltower Damm,gering,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+14169,06400840,Fischtal,gering,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+14193,04400726,Bismarckallee,hoch,mittel,gut,gering,,,,
+14195,06400844,Dahlem,mittel,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,
+14197,04400834,Binger Straße,mittel,mittel,mittel,mittel,hoher Status-Index,mittel,hoher Status-Index,
+14199,04400832,Breite Straße,gering,mittel,schlecht,mittel,hoher Status-Index,mittel,hoher Status-Index,
+15537,09301228,Schmöckwitz/Rauchfangswerder,mittel,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+15566,09501838,Rahnsdorf,gering,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung
+15569,09501838,Rahnsdorf,gering,gering,gut,gering,hoher Status-Index,gering,hoher Status-Index,Anteil der Adressen mit einfacher Wohnlage größer 66% und hoher Lärm- und/oder hoher Luftbelastung

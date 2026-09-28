@@ -17,6 +17,7 @@
 - **Buy price:** `buy_price_per_m2_avg_REAL`, `n_real_listings`, `buy_price_per_m2_avg_synthetic`, `n_synthetic_sales_listings`
 - **New housing supply:** `new_construction_price_per_m2_avg`, `n_new_construction_listings`
 - **Commute:** `nearest_transit_station`, `nearest_transit_line`, `transit_distance_km`
+- **Noise, green space, heat, socioeconomic status (Planungsraum-level, real):** `ug_laerm`, `ug_gruenversorgung`, `ug_thermisch`, `ug_soziale_benachteiligung` (⚠️ higher = more advantaged, see below), `ug_mehrfachbelastung_umwelt`, `ug_gesamt_umweltgerechtigkeitskarte`
 
 ## Column-by-column data quality
 
@@ -31,6 +32,21 @@
 | `rent_per_m2_kalt_avg_synthetic`, `buy_price_per_m2_avg_synthetic`, `new_construction_price_per_m2_avg`, plus their `n_*_listings` counts | **Synthetic** (Kaggle hedonic-model dataset), assigned to PLZ via nearest-centroid spatial join (no real PLZ field in the source) | Low for absolute €, useful for relative structure (which areas rank where) — see the main business EDA report for why the synthetic price level runs ~25–40% below real listings |
 | `nearest_transit_station`, `nearest_transit_line`, `transit_distance_km` | From the synthetic dataset's 135-station list (Berlin only), nearest-station join | Medium — real station names/lines, but not the full VBB network |
 | `abitur_mn_scls_bezirk_avg`, `abitur_performance_vs_peer_bezirk_avg`, `n_abitur_schools_in_bezirk`, `abitur_tier_bezirk` | **Bezirk-level only**, inherited (same reason as crime — see `abitur_by_school.csv` for the school-level detail this is built from) | Real, official 2025 results. **Lower `mn.scls` = better** (German grading, 1.0 is best) |
+| `ug_planungsraum_nr`, `ug_planungsraum_name`, `ug_laerm`, `ug_luft`, `ug_gruenversorgung`, `ug_thermisch`, `ug_soziale_benachteiligung`, `ug_mehrfachbelastung_umwelt`, `ug_mehrfachbelastung_umwelt_sozial`, `ug_gesamt_umweltgerechtigkeitskarte` | **Planungsraum-level** (finer than Bezirk, matched at the PLZ's centroid point via live WMS query — not an area-weighted average across the whole PLZ) | Real, official 2023/24 Umweltatlas data — see "Umweltgerechtigkeit" section below, **especially the Status-Index direction warning** |
+
+## Umweltgerechtigkeit (environmental justice) — real, Planungsraum-level
+
+Source: [Umweltgerechtigkeit 2023/2024 (Umweltatlas)](https://daten.berlin.de/datensaetze/umweltgerechtigkeit-2023-2024-umweltatlas-wms-c4a4e505), Senatsverwaltung für Mobilität, Verkehr, Klimaschutz und Umwelt. Published as **WMS only** — no WFS/bulk download exists — so this was pulled with 193 live `GetFeatureInfo` point queries (one per PLZ centroid) against the underlying `PLR_2021_*` (Planungsraum) layers, not scraped or estimated.
+
+Columns (all ordinal categories, not numbers):
+- `ug_laerm` — noise burden: gering / mittel / hoch
+- `ug_luft` — air pollution burden (Umweltatlas's own modeled layer, independent of the Kaggle station data elsewhere in this table): gering / mittel / hoch
+- `ug_gruenversorgung` — green space supply: gut / mittel / schlecht
+- `ug_thermisch` — heat/thermal stress: gering / mittel / hoch
+- `ug_mehrfachbelastung_umwelt` — combined score across the 4 environmental indicators above: gering / mittel / hoch
+- `ug_gesamt_umweltgerechtigkeitskarte` — **not a graded scale.** Only present where an area meets a specific severe-multi-burden threshold ("simple Wohnlage >66% AND high noise and/or air burden"); present = flagged hotspot, absent = not flagged (61 of 193 PLZ flagged) — do not treat a blank here as missing data
+
+**Read this before using `ug_soziale_benachteiligung` or `ug_mehrfachbelastung_umwelt_sozial` — the direction is counter-intuitive:** despite the layer being named "Kernindikator Soziale Benachteiligung" (social disadvantage), the value returned is framed as a **Status-Index where HIGHER = MORE ADVANTAGED** (`hoher Status-Index` = high socioeconomic status = *less* disadvantaged; `niedriger/sehr niedriger Status-Index` = *more* disadvantaged). This is the opposite of what the indicator's own name suggests. Verified directly against Berlin's Monitoring Soziale Stadtentwicklung (MSS) convention, where Status-Index has always meant this.
 
 ## Abitur / school-quality signal
 

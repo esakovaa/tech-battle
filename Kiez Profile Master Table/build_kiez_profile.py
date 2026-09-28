@@ -243,6 +243,85 @@ print(f"[10b] Abitur aggregated to {len(abi_bez)} Bezirke")
 
 master = master.merge(abi_bez, on="bezirk", how="left")
 
+# =================================================================
+# 11. Umweltgerechtigkeit (environmental justice) — real, Planungsraum-level,
+#     queried live via WMS GetFeatureInfo per PLZ centroid (no WFS/bulk export
+#     exists for this dataset). ~193 point queries, one per PLZ.
+# =================================================================
+import urllib.parse
+
+UG_WMS = "https://gdi.berlin.de/services/wms/ua_umweltgerechtigkeit2023"
+UG_LAYERS = ["a_laerm2023", "b_luft2023", "c_gruen2023", "d_bioklima2023", "e_sozial2023",
+             "f_mehrfach4_2023", "g_mehrfach5_2023", "z_gesamt_umwelt2023"]
+UG_LABELS = {
+    "a_laerm2023": "ug_laerm", "b_luft2023": "ug_luft", "c_gruen2023": "ug_gruenversorgung",
+    "d_bioklima2023": "ug_thermisch", "e_sozial2023": "ug_soziale_benachteiligung",
+    "f_mehrfach4_2023": "ug_mehrfachbelastung_umwelt",
+    "g_mehrfach5_2023": "ug_mehrfachbelastung_umwelt_sozial",
+    "z_gesamt_umwelt2023": "ug_gesamt_umweltgerechtigkeitskarte",
+}
+
+def ug_query_point(lat, lon, retries=3):
+    d = 0.001
+    params = {
+        "SERVICE": "WMS", "VERSION": "1.3.0", "REQUEST": "GetFeatureInfo",
+        "LAYERS": ",".join(UG_LAYERS), "STYLES": "," * (len(UG_LAYERS) - 1),
+        "QUERY_LAYERS": ",".join(UG_LAYERS), "CRS": "EPSG:4326",
+        "BBOX": f"{lat-d},{lon-d},{lat+d},{lon+d}",
+        "WIDTH": "101", "HEIGHT": "101", "I": "50", "J": "50",
+        "INFO_FORMAT": "application/json", "FEATURE_COUNT": str(len(UG_LAYERS)),
+    }
+    url = UG_WMS + "?" + urllib.parse.urlencode(params)
+    text = None
+    for attempt in range(retries):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": "hackathon-kiez-concierge/1.0"})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                text = resp.read().decode("utf-8")
+            break
+        except Exception:
+            if attempt == retries - 1:
+                return {}
+            time.sleep(1)
+    # response is multiple concatenated FeatureCollection JSON objects, not one
+    # valid document -> decode them one at a time with raw_decode
+    decoder = json.JSONDecoder()
+    pos, result = 0, {}
+    while pos < len(text):
+        while pos < len(text) and text[pos] in " \t\r\n,":
+            pos += 1
+        if pos >= len(text):
+            break
+        try:
+            obj, end = decoder.raw_decode(text, pos)
+        except json.JSONDecodeError:
+            break
+        pos = end
+        feats = obj.get("features", [])
+        if feats:
+            fid = feats[0].get("id", "")
+            layer = fid.rsplit(".", 1)[0] if "." in fid else fid
+            props = feats[0].get("properties", {})
+            if layer in UG_LABELS:
+                result[UG_LABELS[layer]] = list(props.values())[-1] if props else None
+                result["ug_planungsraum_name"] = props.get("Planungsraum-Name")
+                result["ug_planungsraum_nr"] = props.get("Planungsraum-Nummer")
+    return result
+
+ug_rows = []
+for i, r in master[["plz", "lat", "lon"]].iterrows():
+    res = ug_query_point(r["lat"], r["lon"])
+    res["plz"] = r["plz"]
+    ug_rows.append(res)
+    time.sleep(0.15)
+ug = pd.DataFrame(ug_rows)
+ug_cols = ["plz", "ug_planungsraum_nr", "ug_planungsraum_name"] + list(UG_LABELS.values())
+ug = ug[[c for c in ug_cols if c in ug.columns]]
+ug.to_csv(f"{out_path_placeholder}/umweltgerechtigkeit_by_plz.csv", index=False)
+print(f"[11] Umweltgerechtigkeit: {ug['ug_laerm'].notna().sum()}/{len(ug)} PLZ matched to a Planungsraum")
+
+master = master.merge(ug, on="plz", how="left")
+
 # fill count columns with 0 (no listings found there, not missing data)
 for col in ["n_kitas", "total_kita_capacity", "n_school_construction_projects",
             "n_unique_schools_with_projects", "n_rental_listings_synthetic",
