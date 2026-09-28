@@ -32,6 +32,18 @@ const priceRange = minMax(priceValues);
 const schoolGrades = ALL.map((p) => p.abitur_mn_scls_plr_avg ?? p.abitur_mn_scls_bezirk_avg!);
 const schoolRange = minMax(schoolGrades);
 
+const crimeValues = ALL.map((p) => p.crime_rate_per_10k_2017_2019).filter((v): v is number => v != null);
+const crimeRange = minMax(crimeValues);
+
+// Two precomputed ranges for the kids-population score, since the formula
+// itself changes (under-6 counted once vs. twice) depending on whether
+// kita was marked relevant — each needs its own min/max to normalize against.
+function kidsUnder18Weighted(p: PlanungsraumProfile, under6Multiplier: number): number {
+  return p.n_population_under6 * under6Multiplier + p.n_population_6_15 + p.n_population_15_18;
+}
+const kidsPopRange = minMax(ALL.map((p) => kidsUnder18Weighted(p, 1)));
+const kidsPopKitaRange = minMax(ALL.map((p) => kidsUnder18Weighted(p, 2)));
+
 // ---------------------------------------------------------------
 // Soft (weighted, non-excluding) factors — only the 4 things actually
 // asked about in the intake. Everything else the earlier version of this
@@ -70,6 +82,18 @@ function factorScore(p: PlanungsraumProfile, key: keyof FactorWeights): number |
       // scope — see selectedHobbiesScore below, called from scorePlanungsraum.
       return null;
     }
+    case "crime": {
+      // Always on, for every user — crime is bad regardless of what anyone
+      // selected in the intake (see preferencesToWeights).
+      const v = p.crime_rate_per_10k_2017_2019;
+      if (v == null) return null;
+      return normalize(v, crimeRange.min, crimeRange.max, false); // lower crime rate = better
+    }
+    case "kids_population": {
+      // Formula depends on whether kita was marked relevant (double-counts
+      // under-6) — see kidsPopulationScore below, called from scorePlanungsraum.
+      return null;
+    }
   }
 }
 
@@ -90,6 +114,16 @@ function selectedHobbiesScore(p: PlanungsraumProfile, hobbies: UserPreferences["
   return hits / selected.length;
 }
 
+/** More kids under 18 = higher score, for every user (family-density is a
+ *  general neighborhood signal, not gated behind having kids yourself).
+ *  When kita is marked relevant, the under-6 slice counts twice — kita
+ *  access matters most where there are actually a lot of under-6s. */
+function kidsPopulationScore(p: PlanungsraumProfile, kitaRelevant: boolean): number {
+  const multiplier = kitaRelevant ? 2 : 1;
+  const range = kitaRelevant ? kidsPopKitaRange : kidsPopRange;
+  return normalize(kidsUnder18Weighted(p, multiplier), range.min, range.max, true);
+}
+
 /** Fixed weight per answer tier — these are intake answers (minimal/flexible/
  *  not_a_concern, yes/no), not a 1-5 slider, so weights are fixed constants
  *  per tier rather than user-supplied numbers. */
@@ -103,6 +137,9 @@ export function preferencesToWeights(prefs: UserPreferences): FactorWeights {
     // Deliberately much lighter than the other tiers (max 3) — a missing
     // hobby should nudge the score down a little, not act as a gate.
     hobbies: anyHobbySelected ? 1 : 0,
+    // Always-on baseline factors — not conditional on an intake answer.
+    crime: 2,
+    kids_population: 2,
   };
   const total = SOFT_FACTOR_KEYS.reduce((s, k) => s + raw[k], 0);
   // Safety net: if the user flagged nothing as important, don't degenerate
@@ -121,13 +158,18 @@ export function preferencesToWeights(prefs: UserPreferences): FactorWeights {
 export function scorePlanungsraum(
   p: PlanungsraumProfile,
   weights: FactorWeights,
-  hobbies: UserPreferences["hobbies"]
+  prefs: Pick<UserPreferences, "hobbies" | "kids">
 ): { score: number; factorScores: Record<keyof FactorWeights, number | null> } {
   const factorScores = {} as Record<keyof FactorWeights, number | null>;
   let weightedSum = 0;
   let weightUsed = 0;
   for (const key of SOFT_FACTOR_KEYS) {
-    const s = key === "hobbies" ? selectedHobbiesScore(p, hobbies) : factorScore(p, key);
+    const s =
+      key === "hobbies"
+        ? selectedHobbiesScore(p, prefs.hobbies)
+        : key === "kids_population"
+          ? kidsPopulationScore(p, prefs.kids.kita)
+          : factorScore(p, key);
     factorScores[key] = s;
     if (s != null) {
       weightedSum += s * weights[key];
@@ -229,7 +271,7 @@ export function findTopAlternatives(
   const weights = preferencesToWeights(prefs);
   const ranked = filtered
     .map((p) => {
-      const { score, factorScores } = scorePlanungsraum(p, weights, prefs.hobbies);
+      const { score, factorScores } = scorePlanungsraum(p, weights, prefs);
       return { plr: p, score, factorScores } as RankedResult;
     })
     .sort((a, b) => b.score - a.score);

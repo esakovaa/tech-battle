@@ -157,16 +157,30 @@ export interface UserPreferences {
 // above. Only kids.kita/kidDoctor are hard filters (see deriveFilters in
 // rank.ts) — hobbies are a soft, deliberately lightly-weighted factor
 // (see preferencesToWeights): a missing hobby shouldn't exclude an
-// otherwise-great Kiez, just nudge it down a little.
+// otherwise-great Kiez, just nudge it down a little. crime and
+// kids_population are always-on baseline factors, not gated behind an
+// intake answer — crime is bad for everyone, and family-with-kids density
+// is scored for every user "in general" (kids.kita additionally
+// double-weights the under-6 slice of it — see kidsPopulationScore).
 export interface FactorWeights {
   price: number;
   green_space: number;
   noise_air: number;
   schools: number;
   hobbies: number;
+  crime: number;
+  kids_population: number;
 }
 
-export const SOFT_FACTOR_KEYS: (keyof FactorWeights)[] = ["price", "green_space", "noise_air", "schools", "hobbies"];
+export const SOFT_FACTOR_KEYS: (keyof FactorWeights)[] = [
+  "price",
+  "green_space",
+  "noise_air",
+  "schools",
+  "hobbies",
+  "crime",
+  "kids_population",
+];
 
 export interface RankedResult {
   plr: PlanungsraumProfile;

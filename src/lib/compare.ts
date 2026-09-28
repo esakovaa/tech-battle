@@ -37,6 +37,24 @@ export function buildComparisonRows(
 ): FactorDelta[] {
   const rows: FactorDelta[] = [];
 
+  // Crime and kids-population are always-on baseline scoring factors (see
+  // preferencesToWeights in rank.ts) — shown unconditionally, unlike the
+  // rows below which only appear when the user actually selected them.
+  rows.push({
+    factor: "Crime rate (per 10k residents)",
+    currentDisplay: current.crime_rate_per_10k_2017_2019?.toFixed(1) ?? "unknown",
+    alternativeDisplay: alt.crime_rate_per_10k_2017_2019?.toFixed(1) ?? "unknown",
+    direction: dir(alt.crime_rate_per_10k_2017_2019, current.crime_rate_per_10k_2017_2019, false),
+  });
+
+  const kidsUnder18 = (p: PlanungsraumProfile) => p.n_population_under6 + p.n_population_6_15 + p.n_population_15_18;
+  rows.push({
+    factor: prefs.kids.kita ? "Kids population (under 18, under-6s weighted double)" : "Kids population (under 18)",
+    currentDisplay: `${kidsUnder18(current).toLocaleString()}${prefs.kids.kita ? ` (${current.n_population_under6.toLocaleString()} under 6)` : ""}`,
+    alternativeDisplay: `${kidsUnder18(alt).toLocaleString()}${prefs.kids.kita ? ` (${alt.n_population_under6.toLocaleString()} under 6)` : ""}`,
+    direction: dir(kidsUnder18(alt), kidsUnder18(current), true),
+  });
+
   if (prefs.rentBudget !== "not_a_concern") {
     rows.push({
       factor: "Rent",
