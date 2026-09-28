@@ -1,0 +1,259 @@
+osm_type,osm_id,lat,lon,name,osm_postcode,category
+node,428142496,52.532929,13.350192,Rocket Station,10559,n_yoga_studios
+node,673611600,52.5021593,13.3080794,Viva Studio,10629,n_yoga_studios
+node,932651529,52.5110587,13.4488022,SunYoga,10243,n_yoga_studios
+node,958096426,52.4927563,13.4142438,Yoga im Graefekiez,10967,n_yoga_studios
+node,1218312075,52.5293516,13.425576,Yoga Hub Berlin,10405,n_yoga_studios
+node,1333143675,52.470673,13.3310663,Sivananda Yoga,12161,n_yoga_studios
+node,1470020226,52.4934118,13.3886695,SunYoga,10961,n_yoga_studios
+node,1471968739,52.5489078,13.4079903,Bewegungsstudio,,n_yoga_studios
+node,1576962361,52.4884122,13.4298633,Sacred Space,,n_yoga_studios
+node,1610111889,52.4897726,13.3930155,Yoga-Institut Berlin,10961,n_yoga_studios
+node,1718478056,52.4764214,13.3294195,myoga,12159,n_yoga_studios
+node,1918474939,52.477839,13.286039,Zentrum für Yoga & Qigong,,n_yoga_studios
+node,2059798815,52.4879655,13.3567272,Yoga in der Schwangerschaft Frauke Stadali,10823,n_yoga_studios
+node,2334538079,52.5000857,13.3105829,Three Boons Yoga,10707,n_yoga_studios
+node,2477046562,52.4774666,13.4242905,Tagtigall,12049,n_yoga_studios
+node,2489837401,52.5471967,13.4094238,Mindful Life Berlin,10437,n_yoga_studios
+node,3442698430,52.4901185,13.4488498,Yoga und Körperarbeit,12435,n_yoga_studios
+node,3464981113,52.5529857,13.4083022,Yoga am Arnimplatz,10439,n_yoga_studios
+node,3819522964,52.5037245,13.3252108,Lagoa Yoga,,n_yoga_studios
+node,4008966374,52.3700201,13.6235694,Sankalpa-Yoga,,n_yoga_studios
+node,4315470224,52.5486824,13.3513758,Yoga Stübchen,13353,n_yoga_studios
+node,4520986013,52.5185242,13.4520872,Yogastudio Körperklang,10249,n_yoga_studios
+node,4530197498,52.5085055,13.4599359,Green Yoga,10245,n_yoga_studios
+node,4611801889,52.5123551,13.4594528,Yogibar,10245,n_yoga_studios
+node,4614154589,52.5345204,13.398546,Three Boons Yoga,10119,n_yoga_studios
+node,4673478561,52.4846716,13.4352226,Studio Sonne,12045,n_yoga_studios
+node,4812222804,52.5680064,13.3984173,Ki-Haus,13187,n_yoga_studios
+node,4819499443,52.4919236,13.4366613,Peace Yoga Berlin,10999,n_yoga_studios
+node,4836677035,52.5654361,13.3939889,SprachCafe,,n_yoga_studios
+node,4849302124,52.5248995,13.3957917,Bikram Yoga Berlin-Mitte,10115,n_yoga_studios
+node,5082292600,52.4894447,13.3213517,Yoga Vidya Center Berlin-Wilmersdorf,10717,n_yoga_studios
+node,5321891322,52.4669622,13.3820053,Tayopi,12103,n_yoga_studios
+node,5339159802,52.5530222,13.4017754,Yoga,,n_yoga_studios
+node,5348822589,52.505358,13.4889231,Yoga Barn,10317,n_yoga_studios
+node,5659022957,52.5079023,13.4695348,Berlin Hot Yoga,,n_yoga_studios
+node,5730290887,52.5080622,13.295478,Casa Flow Studios,14057,n_yoga_studios
+node,5935458555,52.5020331,13.3914436,Luft,10969,n_yoga_studios
+node,5980998064,52.4989674,13.437719,Kreuzberg Yoga,10997,n_yoga_studios
+node,5981095822,52.4955816,13.426096,Zentrum für Yoga und Stimme,10999,n_yoga_studios
+node,6027199452,52.5217464,13.4465225,iyengaryoga,,n_yoga_studios
+node,6245373115,52.4905624,13.3694456,Iyengar Yoga Zentrum,10829,n_yoga_studios
+node,6249985337,52.4937501,13.3172922,taohealth,10707,n_yoga_studios
+node,6269985404,52.5007181,13.4239752,Gelber Raum,10997,n_yoga_studios
+node,6287061378,52.5484219,13.4096666,Yoga Pankow,,n_yoga_studios
+node,6339499872,52.5530718,13.4037515,Afra Senter,,n_yoga_studios
+node,6357893262,52.5136199,13.4627564,Lotos Yoga,,n_yoga_studios
+node,6451531078,52.4763605,13.4254971,Dharma Yoga,12049,n_yoga_studios
+node,6469985311,52.4927896,13.3268218,Aum Yoga Studio,10717,n_yoga_studios
+node,6693475018,52.5379127,13.4213383,Green Yoga,10405,n_yoga_studios
+node,6757633586,52.5858073,13.4027986,Green Yoga,13156,n_yoga_studios
+node,6841151512,52.5000182,13.4263004,Sportetage,10997,n_yoga_studios
+node,6853266785,52.5350799,13.4222794,Casa FLOW,10405,n_yoga_studios
+node,6899045752,52.5094167,13.3097604,Iyengar Yoga,10627,n_yoga_studios
+node,7057578051,52.4790244,13.4518778,Yoga im Gartenstudio,,n_yoga_studios
+node,7095755738,52.5331143,13.4340409,Makeda,10407,n_yoga_studios
+node,7115476085,52.4861692,13.3587153,Soul Yoga Berlin,10827,n_yoga_studios
+node,7231134046,52.4758032,13.4467666,yogaraum Am Richardplatz,,n_yoga_studios
+node,7279178744,52.5450586,13.4228163,House of Healing,10437,n_yoga_studios
+node,7279405008,52.5445551,13.4207853,YogaCircle,10437,n_yoga_studios
+node,7279495026,52.544994,13.4208589,Sotantar,10437,n_yoga_studios
+node,7553701884,52.4734928,13.4452931,Oma Om Yoga,12055,n_yoga_studios
+node,7623775571,52.5527066,13.3424248,Blue Panta,13351,n_yoga_studios
+node,7640755748,52.4758116,13.3401936,Yogazeit Stråla,12159,n_yoga_studios
+node,7680118565,52.4670632,13.3396573,Entspannt mit Yoga,12157,n_yoga_studios
+node,7749923385,52.4726648,13.3259026,Akademie für Yoga Berlin,12161,n_yoga_studios
+node,7821177808,52.4822505,13.329427,Sarasvati Yoga Berlin,10715,n_yoga_studios
+node,7850361039,52.4945812,13.3577898,Ashtanga Yoga Schule,,n_yoga_studios
+node,7888120846,52.5219701,13.3785398,Pour la danse,10117,n_yoga_studios
+node,7904323385,52.488156,13.3491473,Flowsol,10823,n_yoga_studios
+node,7931581679,52.4941125,13.3829359,Honigseele,,n_yoga_studios
+node,8222836706,52.4697929,13.3289566,Praxis für die Seele,12161,n_yoga_studios
+node,8231100116,52.4395292,13.5479174,Yoga Glück,12489,n_yoga_studios
+node,8558365378,52.5535695,13.4052242,Centerline Pilates,,n_yoga_studios
+node,8626109382,52.5110332,13.2913584,Iyengar Yoga,,n_yoga_studios
+node,8637655134,52.4872648,13.3407554,Schule für Yoga und Prana,10825,n_yoga_studios
+node,8744170510,52.4555537,13.3298931,Yoga für alle,,n_yoga_studios
+node,8989690901,52.4825358,13.3816579,Iyengar,,n_yoga_studios
+node,9105794918,52.6647995,13.308013,lifeStyle Yoga,,n_yoga_studios
+node,9250071835,52.3907175,13.0996395,Yoga Praxis Potsdam,14482,n_yoga_studios
+node,9402426708,52.5478641,13.4534306,BiSee Yoga,13088,n_yoga_studios
+node,9504311194,52.5476997,13.4572285,Sonne Mond & Sterne,13088,n_yoga_studios
+node,9563056748,52.4798838,13.4359448,Middendorf Yoga,12043,n_yoga_studios
+node,9632071018,52.462798,13.3408491,MO.VE,12157,n_yoga_studios
+node,9662767223,52.5016941,13.432989,Peace Yoga Berlin,10997,n_yoga_studios
+node,9775820813,52.515338,13.4656869,yogafürdich Berlin,,n_yoga_studios
+node,9809316129,52.360776,13.4118747,shambo maya,15831,n_yoga_studios
+node,9846635117,52.5133709,13.4633274,Lotos Yoga Berlin - YOGA LOFT,,n_yoga_studios
+node,10056214905,52.544723,13.4111529,Arcoverde Pilates Zentrum,10437,n_yoga_studios
+node,10100682968,52.5313866,13.4215563,Marion Röhrig Pilates,10405,n_yoga_studios
+node,10100813297,52.5335247,13.4247709,Pantarei Approach,10405,n_yoga_studios
+node,10162590418,52.4907384,13.353034,Little Yoga Store,10781,n_yoga_studios
+node,10314370066,52.6317384,13.2884156,Hatha-Yoga,13465,n_yoga_studios
+node,10648363519,52.5057198,13.2963353,Warias Kosmetik & Yoga,,n_yoga_studios
+node,10780033147,52.5084656,13.3115118,Feldenkrais & QiGong,,n_yoga_studios
+node,10802968151,52.5311208,13.4306675,yogibar,,n_yoga_studios
+node,10936515611,52.5218757,13.3367913,Yogaschule Petersen,10555,n_yoga_studios
+node,11026581858,52.5673491,13.3983889,Studio 108,,n_yoga_studios
+node,11061882780,52.6402199,13.295109,B-touched Yoga by Bianca,13465,n_yoga_studios
+node,11109294278,52.5509589,13.3611178,Sensing Yoga,,n_yoga_studios
+node,11143206743,52.4069695,13.6509908,Nature Womb,12559,n_yoga_studios
+node,11181712344,52.5244747,13.3991704,Yogatribe,,n_yoga_studios
+node,11350686359,52.5165806,13.332008,House of Healing,10587,n_yoga_studios
+node,11645105928,52.3854987,13.1051328,Jasa - Dein Kraft- & Entspannungszentrum,14482,n_yoga_studios
+node,11649758184,52.5055523,13.4620033,Every Damn Day Yoga,,n_yoga_studios
+node,11668641549,52.5301373,13.4145278,Astānga Yoga,,n_yoga_studios
+node,11745362202,52.5042907,13.313386,Casa Flow Studios,,n_yoga_studios
+node,11772015162,52.4739737,13.4255688,,,n_yoga_studios
+node,12054497889,52.5118274,13.4660189,Saccinanda Yoga,,n_yoga_studios
+node,12061024993,52.5174967,13.4717572,Ashtanga Yoga Friedrichshain,,n_yoga_studios
+node,12081380958,52.5246353,13.3477956,Abityoga,10559,n_yoga_studios
+node,12118950894,52.4875465,13.4224539,Yoga School Berlin,,n_yoga_studios
+node,12180080938,52.5381705,13.4216494,yogalila,,n_yoga_studios
+node,12180104519,52.5382095,13.4222244,Boaré,,n_yoga_studios
+node,12261125503,52.4559706,13.5122716,Yoga Bär Studio,,n_yoga_studios
+node,12287922533,52.5297496,13.3925007,Yoga Rebellion,10115,n_yoga_studios
+node,12329220489,52.5442828,13.4179605,Kalaa Yoga Berlin,,n_yoga_studios
+node,12367443606,52.5050261,13.3423099,Aura Berlin Studio,,n_yoga_studios
+node,12556828335,52.4879664,13.3621517,Die Yogapraxis,10827,n_yoga_studios
+node,12630500002,52.4934119,13.3553739,O-Yoga,,n_yoga_studios
+node,12712890928,52.4583235,13.3277669,OMNI Yoga,12169,n_yoga_studios
+node,12766386912,52.530454,13.3928668,,,n_yoga_studios
+node,13141288538,52.5291118,13.3855839,Casa Flow,,n_yoga_studios
+node,13147385872,52.6771664,13.593615,Dojo Spielraum,16321,n_yoga_studios
+node,13261388258,52.4970918,13.4232898,Beyond,,n_yoga_studios
+node,13287274963,52.5384263,13.4056087,Remedy,,n_yoga_studios
+node,13473174683,52.5583776,13.3747635,The Room,,n_yoga_studios
+node,13543419184,52.3905948,13.0989233,Yoga Wege,,n_yoga_studios
+node,13591585101,52.4829262,13.4468737,Yoga Futura,12059,n_yoga_studios
+node,13724727247,52.396169,13.119005,Iyengar Yoga,14482,n_yoga_studios
+node,13931442173,52.5266034,13.402035,momax Reformer Pilates,,n_yoga_studios
+node,14056818950,52.4179174,13.3058161,Studio27,,n_yoga_studios
+node,14089720001,52.4973425,13.4303016,Yellow Yoga Studio Berg,10999,n_yoga_studios
+node,14112265302,52.5550072,13.4660698,Yoga im Garten,,n_yoga_studios
+node,14174760539,52.4865962,13.3547712,Yogafürdich,10823,n_yoga_studios
+way,471110880,52.4268207,13.704439,Rialtoring 74,12589,n_yoga_studios
+way,1413458990,52.5089222,13.3236498,Spirit Joga,10623,n_yoga_studios
+node,362631112,52.5221737,13.1663149,Medizinisches Versorgungszentrum Heerstraße Nord,13593,n_kinderarzt
+node,443669345,52.4391996,13.2142934,Kinderarztpraxis am Schlachtensee,14129,n_kinderarzt
+node,514483770,52.4097245,13.2184918,,14532,n_kinderarzt
+node,567148666,52.542169,13.3741752,Kinderpraxis Denise Bosch Rosa,13347,n_kinderarzt
+node,1027011938,52.3902365,13.1009342,Cornelia Reibis,14482,n_kinderarzt
+node,1246879559,52.363849,13.0932816,Hausarztpraxis List,14478,n_kinderarzt
+node,1272323910,52.5169788,13.4388926,familycare Berlin,10243,n_kinderarzt
+node,1283595011,52.5112738,13.4704979,Kinderarztpraxis am Traveplatz,10247,n_kinderarzt
+node,1401087611,52.5370175,13.4284632,Sabine Pohlentz,10405,n_kinderarzt
+node,1948871670,52.5182056,13.2899845,Dr. med. Beate Blank-Knaut;Wolf-Dieter Knaut,14059,n_kinderarzt
+node,2354523816,52.4370295,13.3454693,Andre Baumgartner,12247,n_kinderarzt
+node,2470100411,52.3858628,13.3986527,Kinderarztpraxis - Dr. Wilke,12307,n_kinderarzt
+node,2542741215,52.4893295,13.388927,Praxis für Kinderheilkunde Dr. Berns,10961,n_kinderarzt
+node,2631985291,52.5213832,13.5847957,Kinderärztliche Praxisgemeinschaft,12619,n_kinderarzt
+node,2867705809,52.4180859,13.4360267,Kinderärztin Inys-Marika Parera Carbonero,,n_kinderarzt
+node,2877328152,52.5190597,13.1975813,Dres. Christian Thies & Meike Günther,,n_kinderarzt
+node,2938074459,52.4580723,13.3733839,Kinderarztpraxis Tempelhof,12103,n_kinderarzt
+node,3300157793,52.6162986,13.4854052,Kinderarztpraxis Karow,13125,n_kinderarzt
+node,3644421193,52.5122902,13.4478409,Kinderarzt Dr. Busch,10243,n_kinderarzt
+node,3811492221,52.5418894,13.4180473,Kinderarztpraxis Hubermann & Kollegen,10437,n_kinderarzt
+node,4365488599,52.3936042,13.2121544,Kinderarzt Dr. med. Thorsten Schramm,14532,n_kinderarzt
+node,4485201592,52.3943893,13.4102727,Andreas Groß,12309,n_kinderarzt
+node,4552427089,52.5021657,13.4292134,Praxis für Kinder- und Jugendmedizin,,n_kinderarzt
+node,4608665240,52.4194353,13.5424461,Dr. Ramona Grygas,12524,n_kinderarzt
+node,4686722631,52.5250215,13.3375691,Kinderarztpraxis Berlin - Dr. med. Boris Griebenow & Refka El-Rasatmi,10555,n_kinderarzt
+node,4809449233,52.5159781,13.3036074,Dr. med. Eva Laufs,10585,n_kinderarzt
+node,4944997007,52.4859662,13.3568792,Gemeinschaftspraxis Kaiser-Wilhelm-Passage,10827,n_kinderarzt
+node,5056974015,52.4566259,13.3194581,Praxis für Kinderheilkunde Dr. Brand & Dr. Weiten,,n_kinderarzt
+node,5180885687,52.5675058,13.4116241,Kinderärztin Bartholomäus,13187,n_kinderarzt
+node,5337880425,52.5521986,13.4060832,Maria Wauer und Marianne Liepe,,n_kinderarzt
+node,5484599123,52.3619072,13.1361012,Dipl.-Med. Kerstin Müller - Alexander Tauchnitz,14480,n_kinderarzt
+node,5665844814,52.3618763,13.1361597,Dipl.-Med. Sabine Schwochow,14480,n_kinderarzt
+node,5720615545,52.4942642,13.3634803,Praxis für Kinder- und Jugendmedizin,10783,n_kinderarzt
+node,5954179409,52.5127157,13.4957951,Gemeinschaftspraxis für Kinderchirurgie,10365,n_kinderarzt
+node,6221638936,52.4978889,13.509816,Deborah Thomas,,n_kinderarzt
+node,6403150188,52.5522894,13.4060914,Oliver Bartelt & Antje Haller,,n_kinderarzt
+node,6603762795,52.549169,13.3534617,"Dr.med. Jürgen Cremer, Dr.med. Ingo Scheinhütte",,n_kinderarzt
+node,6652912243,52.426811,13.3285787,Dr. med. Dorothea Budde,12209,n_kinderarzt
+node,6869974716,52.5306392,13.4318966,Kinderarztpraxis am Volkspark Friedrichshain,10407,n_kinderarzt
+node,6898176787,52.5613007,13.093504,Kinderarztpraxis Claudia Wolf Falkensee,,n_kinderarzt
+node,7052620851,52.4798287,13.4315812,Berghafenpraxis,12053,n_kinderarzt
+node,7105754508,52.5316133,13.4294915,Sirid Sturm,10407,n_kinderarzt
+node,7238341081,52.4885072,13.4095434,Kinderarztpraxis am Südstern,,n_kinderarzt
+node,7280619242,52.5447282,13.4189288,Kinderarztpraxis Dr. Susann Krause,10437,n_kinderarzt
+node,7283442342,52.3856825,13.1081501,Familienpraxis Potsdam,14482,n_kinderarzt
+node,7297187779,52.4774322,13.438193,Familienpraxis Berlin,12043,n_kinderarzt
+node,7297187783,52.4772813,13.4385166,S. Masri Zada,12043,n_kinderarzt
+node,7411086256,52.4707567,13.3267348,Caroline Uhrig & Frank Lütgert,12161,n_kinderarzt
+node,7612750907,52.4666678,13.5854026,Kinder- und Jugendarztpraxis,12555,n_kinderarzt
+node,7656560652,52.4884879,13.425211,"Praxis für Kinder-, Jugend- und Familienmedizin am Hermannplatz",10967,n_kinderarzt
+node,7656560653,52.4885399,13.4251777,Medizinisches Versorgungs Zentrum für Familien Senger,10967,n_kinderarzt
+node,7656560654,52.4885919,13.4251444,Praxis Hermannplatz,10967,n_kinderarzt
+node,7703054716,52.4815835,13.3245632,Kinderarztpraxis Sohela Seyyedi,10715,n_kinderarzt
+node,7773837712,52.4819075,13.3281684,Ilona Ziethen-Bockhorni,10715,n_kinderarzt
+node,7844240265,52.4748648,13.3138789,Dr. med. Martin Karsten;Dr. med. Evelyn Rugo;Dr. med Matthias Wagner,14197,n_kinderarzt
+node,8068408240,52.4812032,13.3213903,Gemeinschaftspraxis für Kinder- und Jugendmedizin,10715,n_kinderarzt
+node,8167432945,52.4599819,13.5234267,Kinder- und Jugendarzt,12459,n_kinderarzt
+node,8177206747,52.4582191,13.3222936,Bianca Baykan und Abdallah Karajoli,12163,n_kinderarzt
+node,8223127037,52.4844062,13.3535631,Praxis für Kinder- und Jugendmedizin,10827,n_kinderarzt
+node,8357507504,52.4801536,13.3427802,Dr. med. Susanne Reibel;Dr. med. Sarah Schnittert-Hübener,10825,n_kinderarzt
+node,8423496194,52.4888846,13.3419228,Kalus Brunnemann,10825,n_kinderarzt
+node,8463875433,52.5206654,13.601967,,12619,n_kinderarzt
+node,8486926090,52.4698065,13.348346,Praxis für Kinderchirurgie und Kinderurologie,12157,n_kinderarzt
+node,8486926091,52.4697642,13.34835,Antje Brumby,12157,n_kinderarzt
+node,8567917077,52.4675031,13.3081817,Dr. med. Sigrid Schründer,14199,n_kinderarzt
+node,8822168240,52.5604713,13.4127157,Dr. Susanne Herrmann,13189,n_kinderarzt
+node,8857312842,52.485862,13.4245507,Kinder- und Jugendmedizin MVZ am Hermannplatz,12049,n_kinderarzt
+node,9063915564,52.4479866,13.3160489,Kinder- und Jugendärzte Flotowstraße,,n_kinderarzt
+node,9352471240,52.4517378,13.5215332,Kinderarzt Torben Zimmermann,,n_kinderarzt
+node,9420324070,52.5492553,13.4562135,Dr. med. Alfred Freund,13088,n_kinderarzt
+node,9461256712,52.4803463,13.4336667,Sana Ayade,12053,n_kinderarzt
+node,9461377531,52.479773,13.431732,Stadtteil-Gesundheits-Zentrum,12053,n_kinderarzt
+node,9548281681,52.458859,13.322221,Dr. Susanne Hoffmann & Dietlind Jähn,12163,n_kinderarzt
+node,9592884389,52.5094728,13.3061742,Dr. med Mahnaz Shirazi,10627,n_kinderarzt
+node,9732197417,52.5075321,13.3062069,Dr.med Mechthild Vocks-Hauck,10627,n_kinderarzt
+node,9772392224,52.5698959,13.3646466,Dr. Ellen Kaschluhn,,n_kinderarzt
+node,9772395982,52.5643032,13.3284945,Sanela Simikic,,n_kinderarzt
+node,9772404867,52.5517688,13.3892583,Dr. Martin Reetz,,n_kinderarzt
+node,9772409777,52.5539477,13.3464515,Dr. Ulrike Merkel/Gerlinde Vieweg,,n_kinderarzt
+node,9772448719,52.549802,13.3495359,Dr. Carlotta von Berghes / Dr. Annabel Freifrau von Arnim-Baas / Dr. Meike Heesen,,n_kinderarzt
+node,9772466504,52.5610271,13.40919,Jörg Sommer,,n_kinderarzt
+node,9810989889,52.5316949,13.3508605,Kinderarztpraxis Dr. Andreas Mühmer,10559,n_kinderarzt
+node,9888540741,52.5300419,13.6189071,Dipl.-Med. Gundra Harnisch,12627,n_kinderarzt
+node,9930321733,52.4797743,13.4315076,Therapie GeKo,12053,n_kinderarzt
+node,10124884267,52.4893908,13.3503351,Kinderarzt Steffen Kuhn,10823,n_kinderarzt
+node,10197888982,52.4590926,13.3208835,Elke Guthmann,12163,n_kinderarzt
+node,10226121705,52.6314362,13.2898991,Dr. med. Holger Kaiser,,n_kinderarzt
+node,10688867129,52.5213173,13.7032839,Kinderarztpraxis Andrea Meine,15366,n_kinderarzt
+node,10709821974,52.5146506,13.6669651,Facharzt für Kinder- und Jugendmedizin,15366,n_kinderarzt
+node,10764529129,52.4828349,13.5251069,,10318,n_kinderarzt
+node,10769528676,52.5613401,13.0935305,,,n_kinderarzt
+node,10963056123,52.4555244,13.5767072,Kinderarztpraxis Martin Schuldt,12555,n_kinderarzt
+node,10995087332,52.5981201,13.3557064,Dipl.-Med. Alexander Kutscherskij,,n_kinderarzt
+node,11166827105,52.4942699,13.3336221,Thomas Boeckel & Guido Haverkämper,10779,n_kinderarzt
+node,11227862159,52.5321669,13.3928056,Schönbeck & Marggraf,10115,n_kinderarzt
+node,11358734527,52.4662825,13.4857736,Dr. med. Josepha Schmidt,,n_kinderarzt
+node,11649282065,52.6133923,13.3147831,Marina Decker,,n_kinderarzt
+node,11818369255,52.4318763,13.5830195,Kinderarzt Köpenick,12557,n_kinderarzt
+node,11828745704,52.4119181,13.573724,Praxis für Kinder- und Jugendmedizin,12526,n_kinderarzt
+node,11829238608,52.5092986,13.6138673,Kinderarztpraxis Dipl.med.Ulrike Kröber,12623,n_kinderarzt
+node,11876011644,52.5142445,13.467222,Dipl.-Med. Cornelia Berthold,10247,n_kinderarzt
+node,11892812623,52.5384471,13.4179498,Dr. Euler,,n_kinderarzt
+node,12070558228,52.4997011,13.4224707,Kinderarztpraxis,10999,n_kinderarzt
+node,12144935637,52.5301986,13.3358603,Familienpraxis Moabit Fachärzte für Kinder-/Jugend- und Allgemeinmedizin,10551,n_kinderarzt
+node,12153278239,52.5016138,13.3147819,Dr. med. Rolf Uhlig,,n_kinderarzt
+node,12158159252,52.4281627,13.3246528,Kinderarztpraxis Elke Köchy,,n_kinderarzt
+node,12208748974,52.4610804,13.157024,Praxis für Kinder- und Jugendmedizin im MVZ Havelhöhe,14089,n_kinderarzt
+node,12208900481,52.5405245,13.393816,Kinderarztpraxis Dr. Dietmar Busch,13355,n_kinderarzt
+node,12306933225,52.570835,13.410657,Dipl.-Med. Manuela Ossowski,,n_kinderarzt
+node,12377186379,52.4667488,13.3851923,Jacob/Dr. Carp,12099,n_kinderarzt
+node,12404712185,52.4096516,13.4045298,Dr. Portack,,n_kinderarzt
+node,12680769061,52.6115314,13.2505473,Kinderarztpraxis Dr. Svehla,13503,n_kinderarzt
+node,12714479161,52.6491502,13.5176157,Dipl. Med. Marianne Kreibig,16341,n_kinderarzt
+node,12989094694,52.6585459,13.5335245,Dr. Stephanie Lehmann,,n_kinderarzt
+node,13169316975,52.4510906,13.1466479,Dr. med. Anna Bohmeyer,,n_kinderarzt
+node,13176528774,52.4276696,13.3217032,Dr. med. Uta Stolzenberg und Dr. med. Susanne Schwidergall,12207,n_kinderarzt
+node,13589694998,52.4319227,13.5374735,,,n_kinderarzt
+node,13634569252,52.4772955,13.3851577,Reinhard Hoffmann,12101,n_kinderarzt
+node,14031289272,52.5653408,13.4137798,Dr. med. Thomas Schinkel,,n_kinderarzt
+way,123399164,52.4237911,13.4380887,MVZ VITALIS kinderXexperts,12351,n_kinderarzt
+way,298434881,52.472059,13.6936537,Kinder- und Jugendmedizin Sabine Kutschan,15566,n_kinderarzt
+way,393029819,52.3737634,13.6329336,"Dr. med. Siegrun Mebus, Kinderärztin",15732,n_kinderarzt

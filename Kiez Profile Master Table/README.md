@@ -78,6 +78,15 @@ Coverage limits, both real:
 - `buy_price_per_m2_avg_REAL` (dataset2) — still PLZ-only at the source (no lat/lon in that file at all). Linked in via `dominant_plz`, which is the *majority PLZ of real Wohnlage addresses actually inside that Planungsraum* — a real ground-truth crosswalk, not a centroid-distance guess, but still inherits one PLZ's price across every Planungsraum within it
 - Crime — still Bezirk-level only. A Prognoseraum-level crosswalk (Prognoseraum is Planungsraum's direct parent in the LOR hierarchy, so this should in principle be decodable from the code structure) was considered but not verified — flagging as unresolved rather than guessing at a mapping
 
+### `n_yoga_studios`, `n_kinderarzt` — new, live OSM data (Overpass API)
+
+Pulled from OpenStreetMap via the public Overpass API — `fetch_osm_pois.py` fetches raw POIs (yoga studios: `sport=yoga`; paediatricians: `amenity=doctors` + a `healthcare:speciality` regex covering both English and German tagging variants) and caches them unaggregated in `osm_pois_raw.csv`. `join_osm_pois_to_planungsraum.py` then does a real point-in-polygon spatial join against `planungsraum_boundaries.geojson` (same `gpd.sjoin(..., predicate="within")` convention as the rest of this table) and merges the two count columns straight into `planungsraum_profile.csv`.
+
+- 136 yoga studios, 122 Kinderarzt practices found citywide (Berlin bbox query, not filtered further).
+- Most matched by real polygon containment (128/136 yoga, 107/122 Kinderarzt); the rest fell back to nearest-Planungsraum-centroid — same edge case as the other joins in this table (a POI mapped just outside every polygon, e.g. near a city-boundary gap).
+- Not yet joined into `kiez_profile_by_plz.csv` (the PLZ-level table) — `osm_poi_counts_by_plz.csv` has the same counts pre-aggregated to PLZ (nearest-centroid join, since that table has no real polygons) if that merge is wanted later.
+- Coverage caveat: this is whatever's mapped in OSM, not a licensed business directory — completeness varies by neighborhood the way OSM contributor density does, and the Kinderarzt regex may miss practices tagged without a `healthcare:speciality` value at all (e.g. just named "Kinderarztpraxis X" with no structured specialty tag).
+
 ## Source-file audit
 
 Before merging, each input file was checked individually — shape, dtypes, duplicates, missingness, cardinality, value-range sanity — rather than trusting the join to surface problems on its own. `secondary_sales`/`rentals`/`new_construction`/`kiez_prices_monthly` already got this treatment in the main business EDA report; the five sources unique to this table were audited separately.

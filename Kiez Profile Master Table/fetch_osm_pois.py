@@ -9,10 +9,14 @@ already uses for rentals/secondary_sales/transit_stations.
 Usage:
     python3 fetch_osm_pois.py
 Produces:
-    osm_poi_counts_by_plz.csv  (plz, n_yoga_studios, n_kinderarzt, ...)
-Merge this into kiez_profile_by_plz.csv the same way build_kiez_profile.py
-merges kita_agg / schools_agg (pd.merge on "plz", how="left", then fillna(0)
-on the count columns).
+    osm_pois_raw.csv          (every fetched POI, unaggregated: category, osm
+                                id/type, lat, lon, name, osm_postcode — reuse
+                                this for any other geography's join instead of
+                                re-hitting Overpass, e.g. Planungsraum grain)
+    osm_poi_counts_by_plz.csv (plz, n_yoga_studios, n_kinderarzt, ...)
+Merge the PLZ file into kiez_profile_by_plz.csv the same way
+build_kiez_profile.py merges kita_agg / schools_agg (pd.merge on "plz",
+how="left", then fillna(0) on the count columns).
 """
 import time
 import urllib.parse
@@ -99,7 +103,26 @@ def fetch_pois(query_template: str, retries: int = 8) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def main():
+def fetch_all_categories() -> pd.DataFrame:
+    """Fetch + dedupe every category in QUERIES, tagged with a 'category'
+    column (e.g. 'n_yoga_studios'). Grain-independent — no PLZ/Planungsraum
+    join happens here, so this result can be reused for any geography."""
+    parts = []
+    for count_col, query_templates in QUERIES.items():
+        cat_parts = []
+        for query_template in query_templates:
+            cat_parts.append(fetch_pois(query_template))
+            time.sleep(2)  # be polite to the public Overpass instance between requests
+        pois = pd.concat(cat_parts, ignore_index=True).drop_duplicates(subset=["osm_type", "osm_id"])
+        pois["category"] = count_col
+        print(f"[{count_col}] fetched {len(pois)} unique POIs from Overpass "
+              f"({len(query_templates)} request(s))")
+        parts.append(pois)
+        time.sleep(2)
+    return pd.concat(parts, ignore_index=True)
+
+
+def join_to_plz(raw_pois: pd.DataFrame) -> pd.DataFrame:
     plz_base = pd.read_csv(MASTER_TABLE, dtype={"plz": str})[["plz", "lat", "lon"]].dropna()
     plz_tree = cKDTree(plz_base[["lon", "lat"]].values)
     plz_list = plz_base["plz"].values
@@ -107,14 +130,8 @@ def main():
 
     out = plz_base[["plz"]].copy()
 
-    for count_col, query_templates in QUERIES.items():
-        parts = []
-        for query_template in query_templates:
-            parts.append(fetch_pois(query_template))
-            time.sleep(2)  # be polite to the public Overpass instance between requests
-        pois = pd.concat(parts, ignore_index=True).drop_duplicates(subset=["osm_type", "osm_id"])
-        print(f"[{count_col}] fetched {len(pois)} unique POIs from Overpass "
-              f"({len(query_templates)} request(s))")
+    for count_col in QUERIES:
+        pois = raw_pois[raw_pois["category"] == count_col].copy()
 
         if len(pois):
             # Prefer the POI's own addr:postcode when it's a real Berlin PLZ;
@@ -135,8 +152,16 @@ def main():
             out[count_col] = 0
 
         out[count_col] = out[count_col].fillna(0).astype(int)
-        time.sleep(2)  # be polite to the public Overpass instance between queries
 
+    return out
+
+
+def main():
+    raw_pois = fetch_all_categories()
+    raw_pois.to_csv("osm_pois_raw.csv", index=False)
+    print(f"\nSaved osm_pois_raw.csv: {raw_pois.shape}")
+
+    out = join_to_plz(raw_pois)
     out.to_csv("osm_poi_counts_by_plz.csv", index=False)
     print(f"\nSaved osm_poi_counts_by_plz.csv: {out.shape}")
     print(out.sum(numeric_only=True))
