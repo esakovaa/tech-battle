@@ -4,6 +4,20 @@
 
 **Not every column has the same grain or trustworthiness.** Read this before querying, especially before quoting a number to judges.
 
+## Quick reference — factors by theme
+
+- **Location:** `plz`, `lat`, `lon`, `bezirk`, `n_addresses`
+- **Location quality (Wohnlage):** `pct_wohnlage_einfach`, `pct_wohnlage_mittel`, `pct_wohnlage_gut`, `dominant_wohnlage`
+- **Kitas:** `n_kitas`, `total_kita_capacity`
+- **Schools — existing, quality rating:** `abitur_tier_bezirk`, `abitur_mn_scls_bezirk_avg`, `abitur_performance_vs_peer_bezirk_avg`, `n_abitur_schools_in_bezirk` (Oberstufe schools only — no Grundschule quality signal exists)
+- **Schools — being built/expanded:** `n_school_construction_projects`, `n_unique_schools_with_projects`, `total_planned_school_capacity` (covers all school types, including Grundschulen — this is capacity, not quality)
+- **Safety:** `crime_total_avg_2017_2019`
+- **Air quality:** `nearest_air_station`, `air_station_distance_km`, `air_co_avg`, `air_no2_avg`, `air_o3_avg`, `air_pm10_avg`, `air_pm25_avg`
+- **Rent:** `rent_per_m2_kalt_avg_synthetic`, `n_rental_listings_synthetic`
+- **Buy price:** `buy_price_per_m2_avg_REAL`, `n_real_listings`, `buy_price_per_m2_avg_synthetic`, `n_synthetic_sales_listings`
+- **New housing supply:** `new_construction_price_per_m2_avg`, `n_new_construction_listings`
+- **Commute:** `nearest_transit_station`, `nearest_transit_line`, `transit_distance_km`
+
 ## Column-by-column data quality
 
 | Columns | Grain | Trust level |
