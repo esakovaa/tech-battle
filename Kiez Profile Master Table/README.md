@@ -76,7 +76,7 @@ Coverage limits, both real:
 
 **What did NOT get more precise, and can't:**
 - `buy_price_per_m2_avg_REAL` (dataset2) — still PLZ-only at the source (no lat/lon in that file at all). Linked in via `dominant_plz`, which is the *majority PLZ of real Wohnlage addresses actually inside that Planungsraum* — a real ground-truth crosswalk, not a centroid-distance guess, but still inherits one PLZ's price across every Planungsraum within it
-- Crime — still Bezirk-level only. A Prognoseraum-level crosswalk (Prognoseraum is Planungsraum's direct parent in the LOR hierarchy, so this should in principle be decodable from the code structure) was considered but not verified — flagging as unresolved rather than guessing at a mapping
+- Crime — the raw count (`crime_total_avg_2017_2019`) is still Bezirk-level only, inherited. A Prognoseraum-level crosswalk (Prognoseraum is Planungsraum's direct parent in the LOR hierarchy, so this should in principle be decodable from the code structure) was considered but not verified — flagging as unresolved rather than guessing at a mapping. **`crime_rate_per_10k_2017_2019` is new** — see the Population section below, which is what made a real rate possible instead of the raw count
 
 ### `n_yoga_studios`, `n_kinderarzt`, `n_gym`, `n_bouldering` — live OSM data (Overpass API)
 
@@ -94,6 +94,20 @@ Pulled from OpenStreetMap via the public Overpass API — `fetch_osm_pois.py` fe
 - **Soft weights** (affect ranking, never exclude): rent, noise+air (specifically `ug_laerm`+`ug_luft`, not the combined multi-burden score which also folds in heat), green space, and schools (Abitur, Bezirk-fallback).
 - **Not used at all**: crime/safety, transit, and primary-school quality — none of these are in the actual 6-question intake this app asks. Primary school specifically has no real data source yet (only Abitur/Oberstufe, which is high school) — see `PRIMARY_SCHOOL_DATA_AVAILABLE` in `rank.ts`.
 
+### `n_population`, `n_population_<age band>`, `n_population_female`, `pct_population_coverage` — population by age (Planungsraum-only, allocated)
+
+Previously flagged as a known gap (the daten.berlin.de link for Amt für Statistik population-by-age data was dead). Resolved via a different source: [Berlin District Population (Kaggle)](https://www.kaggle.com/datasets/shreejahoskerenatesh/berlin-district-population), saved locally as `DATA  SOURCES/berlin_population_by_plz_bezirk.csv`. Real population counts, `unter 6 / 6–15 / 15–18 / 18–27 / 27–45 / 45–55 / 55–65 / 65 und mehr` age bands plus a female count — but **only at PLZ × Bezirk grain** (218 rows covering 190 PLZ; 28 PLZ split across two Bezirke each get their own row), not Planungsraum. The source file's exact vintage year isn't stated in the data itself; cite the Kaggle page if that matters for a claim. (The raw upload used Mac-style `\r` line endings and Mac-Roman encoding — umlauts and Bezirk abbreviations like `Tempelh.-Schöneb.` decode incorrectly under UTF-8/cp1252; the cleaned copy fixes both and maps abbreviations to this table's full Bezirk names.)
+
+No Planungsraum-level population source exists, so `enrich_population_and_crime_rate.py` allocates each PLZ × Bezirk population figure down to Planungsraum by **real address-count share within that (PLZ, Bezirk) cell** — using the same 400k-address Wohnlage dataset every other point-in-polygon join in this table already relies on (each address carries its own `plz`, `bezname`, and `plr_name`). This is a real, address-weighted split, not a uniform or area-based guess — but it is still an *estimate*, not an independently measured Planungsraum figure.
+
+- Columns: `n_population` (total), `n_population_under6`, `n_population_6_15`, `n_population_15_18`, `n_population_18_27`, `n_population_27_45`, `n_population_45_55`, `n_population_55_65`, `n_population_65plus`, `n_population_female`.
+- Sums to 3,710,938 across all 542 Planungsräume vs. 3,710,929 in the source file — the 9-person gap is rounding drift from rounding each Planungsraum's fractional allocation independently, not an error.
+- **`pct_population_coverage`** — what share of this Planungsraum's own addresses actually landed in a matched (PLZ, Bezirk) population cell. 503/542 areas are at 100%. The other 39 are partial (as low as 86.6%, e.g. `Nonnendammallee`) because a small number of addresses sit in a (PLZ, Bezirk) combination the population source doesn't break out separately — city-boundary slivers where a PLZ mostly belongs to one Bezirk but a handful of addresses fall in a neighboring one. Those addresses contribute 0 to the population figures, not a guess, and it affects a tiny share of the city overall (272/400,505 addresses, 0.07%). **No Planungsraum has 0% coverage** — every area's population estimate is at least partially real. Treat `n_population*` as directional in the 39 partial-coverage areas, and check this column before quoting an exact number for one of them.
+
+### `crime_rate_per_10k_2017_2019` — the first population-normalized crime metric in this table
+
+`crime_total_avg_2017_2019` (the existing Bezirk-level absolute count) has no per-capita form anywhere in this project until now — the only per-area denominator available before this dataset existed would have been `n_addresses`, a real but imperfect population proxy (address count tracks housing density, not household size or non-residential population). With real Bezirk population now available (summed directly from `berlin_population_by_plz_bezirk.csv`, no allocation needed since this is a straight sum, not a Planungsraum split), `crime_rate_per_10k_2017_2019 = crime_total_avg_2017_2019 / (bezirk_population / 10,000)` replaces that gap with a real rate. Still Bezirk-level and inherited (same caveat as the raw count) — every Planungsraum in a Bezirk shows the identical rate. `bezirk_population` is included alongside it for transparency. Directionally sane on inspection: inner-city Bezirke (e.g. Neukölln, Friedrichshain-Kreuzberg) run roughly 2× the rate of outer, more suburban ones (e.g. Steglitz-Zehlendorf).
+
 ## Source-file audit
 
 Before merging, each input file was checked individually — shape, dtypes, duplicates, missingness, cardinality, value-range sanity — rather than trusting the join to surface problems on its own. `secondary_sales`/`rentals`/`new_construction`/`kiez_prices_monthly` already got this treatment in the main business EDA report; the five sources unique to this table were audited separately.
@@ -104,14 +118,15 @@ Before merging, each input file was checked individually — shape, dtypes, dupl
 1. `n_school_construction_projects` was counted via the `BSO-Tranche` column, which is 17% null — real construction-project rows with no tranche label were silently excluded, undercounting activity. Fixed by counting on `Adresse` instead (100% populated). Verified: the column now sums to exactly 370 across all PLZ, matching the source file's row count.
 2. One school (`09K07`, Sophie-Brahe-Gemeinschaftsschule) has two campuses listed as one field, `"12435, 12437"` — this failed the 5-digit PLZ format check entirely and the whole row silently dropped out of the PLZ join. Fixed by taking the first PLZ as primary; the second campus still isn't independently represented, a remaining minor gap for that one school.
 
-## Known gap: population by age
-
-Not included. Real data exists in principle (Amt für Statistik Berlin-Brandenburg publishes population-by-age at Ortsteil/Planungsraum level), but the link daten.berlin.de points to is dead — their `/opendata` path 404s, the site was restructured. Needs either finding the current URL on their site directly, or an archive.org snapshot of the old CSV. Flagging rather than faking it.
-
 ## Reproducing
 
 ```bash
-python3 build_kiez_profile.py
+python3 build_kiez_profile.py             # PLZ table
+python3 build_planungsraum_profile.py     # Planungsraum table (needs geopandas, shapely; live WFS pull)
+python3 fetch_osm_pois.py                 # live Overpass pull -> osm_pois_raw.csv, osm_poi_counts_by_plz.csv
+python3 join_osm_pois_to_planungsraum.py  # merges Planungsraum-level POI counts into planungsraum_profile.csv
+python3 add_poi_zipcode_flags.py          # adds PLZ-level POI presence flags (has_<category>_plz) on top
+python3 enrich_population_and_crime_rate.py  # merges population + crime rate into planungsraum_profile.csv
 ```
 
-Requires `pandas`, `numpy`, `scipy`. Makes one live call per air-quality station to Nominatim for geocoding (15 calls, rate-limited to 1/sec per their usage policy) — everything else runs on local files in `DATA  SOURCES/`.
+Requires `pandas`, `numpy`, `scipy`, `requests`; `build_planungsraum_profile.py` and `join_osm_pois_to_planungsraum.py` also need `geopandas`/`shapely` for real point-in-polygon joins. `build_kiez_profile.py` makes one live call per air-quality station to Nominatim for geocoding (15 calls, rate-limited to 1/sec per their usage policy). `build_planungsraum_profile.py` pulls the Umweltgerechtigkeit layers live via WFS. `fetch_osm_pois.py` hits the public Overpass API — expect it to need several retries with backoff even on a good connection, that's normal for the public instance, not a bug in the script. The last three scripts (`join_osm_pois_to_planungsraum.py`, `add_poi_zipcode_flags.py`, `enrich_population_and_crime_rate.py`) only need to be re-run after `build_planungsraum_profile.py`, since they all modify `planungsraum_profile.csv` in place — order matters (each expects the columns the previous one added).

@@ -74,8 +74,29 @@ export interface PlanungsraumProfile {
   nearest_transit_line: string | null;
   transit_distance_km: number | null;
 
-  // Crime — Bezirk-level only, raw count (not per-capita)
+  // Crime — Bezirk-level only. crime_total_avg_2017_2019 is the raw count
+  // (not per-capita); crime_rate_per_10k_2017_2019 (below) normalizes it by
+  // real Bezirk population and is the one to use for comparisons.
   crime_total_avg_2017_2019: number | null;
+
+  // Population by age band (real; Kaggle "Berlin District Population",
+  // real at PLZ x Bezirk grain only — allocated down to Planungsraum by
+  // real address-count share within that cell, not a uniform guess).
+  // pct_population_coverage < 100 means some of this Planungsraum's
+  // addresses fell outside a matched population cell (never 0/no-data).
+  n_population: number;
+  n_population_under6: number;
+  n_population_6_15: number;
+  n_population_15_18: number;
+  n_population_18_27: number;
+  n_population_27_45: number;
+  n_population_45_55: number;
+  n_population_55_65: number;
+  n_population_65plus: number;
+  n_population_female: number;
+  pct_population_coverage: number;
+  bezirk_population: number;
+  crime_rate_per_10k_2017_2019: number | null;
 
   // Yoga / Kinderarzt / gym / bouldering — real (OSM/Overpass). PLR-level
   // counts are zero-inflated to varying degrees; the _plz fields ("does
