@@ -1,11 +1,10 @@
 """
 Pull POI counts (yoga studios, Kinderarzt practices, etc.) from the Overpass
-API and aggregate them to PLZ, using the same nearest-centroid join pattern
-build_kiez_profile.py uses for rentals/secondary_sales/transit_stations.
+API and aggregate them to PLZ.
 
-Overpass has no reliable addr:postcode on most POIs, so we don't try to read
-PLZ off the OSM tags — we join each POI to the nearest PLZ centroid from the
-already-built master table instead.
+Many OSM POIs do carry a real addr:postcode — we use that when present. For
+the rest, we fall back to the nearest-PLZ-centroid join build_kiez_profile.py
+already uses for rentals/secondary_sales/transit_stations.
 
 Usage:
     python3 fetch_osm_pois.py
@@ -16,43 +15,71 @@ merges kita_agg / schools_agg (pd.merge on "plz", how="left", then fillna(0)
 on the count columns).
 """
 import time
+import urllib.parse
 import requests
 import pandas as pd
 from scipy.spatial import cKDTree
 
 MASTER_TABLE = "kiez_profile_by_plz.csv"
 OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+HEADERS = {"User-Agent": "kiez-research/1.0"}
 
 # Berlin bounding box (south, west, north, east) — a rough box is fine, we
 # filter to real PLZ coverage via the nearest-centroid join afterward.
 BERLIN_BBOX = (52.33, 13.09, 52.68, 13.76)
 
-# One Overpass query per POI category. `nwr` = node/way/relation, catches
-# POIs mapped as points, buildings, or areas. `out center;` collapses
+# One or more Overpass queries per POI category. `nwr` = node/way/relation,
+# catches POIs mapped as points, buildings, or areas. `out center;` collapses
 # ways/relations to a representative point so every result is lat/lon.
+#
+# Each query is kept to a single filter clause, not an Overpass union (...);
+# — a union of two nwr clauses reliably timed out through this environment's
+# proxy/gateway path even though each clause alone runs fine. Categories that
+# need multiple filters (like paediatrician tagging variants) run as separate
+# requests here and get merged + deduped in Python instead.
 QUERIES = {
-    "n_yoga_studios": """
-        [out:json][timeout:60];
+    "n_yoga_studios": [
+        """[out:json][timeout:60];
         nwr["sport"="yoga"]({bbox});
-        out center;
-    """,
-    "n_kinderarzt": """
-        [out:json][timeout:60];
-        (
-          nwr["amenity"="doctors"]["healthcare:speciality"~"paediatric|child_health"]({bbox});
-          nwr["amenity"="doctors"]["healthcare:speciality"~"pädiatrie|kinder", i]({bbox});
-        );
-        out center;
-    """,
+        out center;""",
+    ],
+    "n_kinderarzt": [
+        """[out:json][timeout:60];
+        nwr["amenity"="doctors"]["healthcare:speciality"~"paediatric|child_health"]({bbox});
+        out center;""",
+        """[out:json][timeout:60];
+        nwr["amenity"="doctors"]["healthcare:speciality"~"pädiatrie|kinder",i]({bbox});
+        out center;""",
+    ],
 }
 
 
-def fetch_pois(query_template: str) -> pd.DataFrame:
+def fetch_pois(query_template: str, retries: int = 8) -> pd.DataFrame:
     bbox_str = ",".join(str(v) for v in BERLIN_BBOX)
     query = query_template.format(bbox=bbox_str)
-    resp = requests.post(OVERPASS_URL, data={"data": query}, timeout=90)
-    resp.raise_for_status()
-    elements = resp.json()["elements"]
+    # GET with the query as a URL param, not POST — POST bodies get reset by
+    # some proxies in front of this API; GET works reliably.
+    url = OVERPASS_URL + "?data=" + urllib.parse.quote(query)
+
+    # The public Overpass instance (and some proxy paths to it) drop
+    # connections intermittently — retry with backoff rather than fail once.
+    last_exc = None
+    for attempt in range(retries):
+        try:
+            resp = requests.get(url, headers=HEADERS, timeout=90)
+            if resp.status_code in (429, 502, 503, 504):
+                raise requests.exceptions.HTTPError(f"{resp.status_code} from Overpass", response=resp)
+            resp.raise_for_status()
+            elements = resp.json()["elements"]
+            break
+        except (requests.exceptions.ConnectionError, requests.exceptions.Timeout,
+                requests.exceptions.HTTPError) as exc:
+            last_exc = exc
+            wait = min(2 ** (attempt + 1), 30)
+            print(f"  retry {attempt + 1}/{retries} after {type(exc).__name__} ({exc}), waiting {wait}s")
+            time.sleep(wait)
+    else:
+        raise RuntimeError(f"Overpass request failed after {retries} attempts") from last_exc
 
     rows = []
     for el in elements:
@@ -63,7 +90,12 @@ def fetch_pois(query_template: str) -> pd.DataFrame:
             if not center:
                 continue
             lat, lon = center["lat"], center["lon"]
-        rows.append({"lat": lat, "lon": lon, "name": el.get("tags", {}).get("name")})
+        tags = el.get("tags", {})
+        rows.append({
+            "osm_type": el["type"], "osm_id": el["id"],
+            "lat": lat, "lon": lon, "name": tags.get("name"),
+            "osm_postcode": tags.get("addr:postcode"),
+        })
     return pd.DataFrame(rows)
 
 
@@ -71,16 +103,32 @@ def main():
     plz_base = pd.read_csv(MASTER_TABLE, dtype={"plz": str})[["plz", "lat", "lon"]].dropna()
     plz_tree = cKDTree(plz_base[["lon", "lat"]].values)
     plz_list = plz_base["plz"].values
+    valid_plz = set(plz_base["plz"])
 
     out = plz_base[["plz"]].copy()
 
-    for count_col, query_template in QUERIES.items():
-        pois = fetch_pois(query_template)
-        print(f"[{count_col}] fetched {len(pois)} POIs from Overpass")
+    for count_col, query_templates in QUERIES.items():
+        parts = []
+        for query_template in query_templates:
+            parts.append(fetch_pois(query_template))
+            time.sleep(2)  # be polite to the public Overpass instance between requests
+        pois = pd.concat(parts, ignore_index=True).drop_duplicates(subset=["osm_type", "osm_id"])
+        print(f"[{count_col}] fetched {len(pois)} unique POIs from Overpass "
+              f"({len(query_templates)} request(s))")
 
         if len(pois):
-            _, idx = plz_tree.query(pois[["lon", "lat"]].values, k=1)
-            pois["plz"] = plz_list[idx]
+            # Prefer the POI's own addr:postcode when it's a real Berlin PLZ;
+            # fall back to nearest-centroid join for everything else.
+            has_real_plz = pois["osm_postcode"].isin(valid_plz)
+            pois["plz"] = pois["osm_postcode"].where(has_real_plz)
+
+            missing = pois["plz"].isna()
+            if missing.any():
+                _, idx = plz_tree.query(pois.loc[missing, ["lon", "lat"]].values, k=1)
+                pois.loc[missing, "plz"] = plz_list[idx]
+            print(f"  -> {has_real_plz.sum()} used real addr:postcode, "
+                  f"{missing.sum()} used nearest-centroid fallback")
+
             agg = pois.groupby("plz").size().rename(count_col).reset_index()
             out = out.merge(agg, on="plz", how="left")
         else:
