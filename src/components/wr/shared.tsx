@@ -68,7 +68,8 @@ export async function streamAgent(
   preferences: unknown,
   history: ChatTurn[],
   onText: (full: string) => void,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  onMock?: () => void
 ): Promise<string> {
   const messages = history.map((m, i) => ({ id: `m${i}`, role: m.role, parts: [{ type: "text", text: m.text }] }));
   const res = await fetch("/api/agent", {
@@ -79,6 +80,7 @@ export async function streamAgent(
   });
   if (res.status === 501) throw new AgentNotConfigured();
   if (!res.ok || !res.body) throw new Error(`Agent request failed (${res.status})`);
+  if (res.headers.get("x-wurzelraum-agent") === "mock") onMock?.();
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();

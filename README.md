@@ -19,6 +19,10 @@ npm run dev          # then open http://localhost:3000
   `.env.local` and fill in `LLM_PROVIDER`, the matching API key and model id (optionally `TAVILY_API_KEY` for web
   search). Without a key, the write-up is composed from the ranking data and the chat answers data questions
   (transport without a car, rent, noise, parks, safety, Kitas, schools, hobbies).
+- **Mock AI mode (no key needed):** put `AGENT_MOCK=1` in `.env.local` (or run `AGENT_MOCK=1 npm run dev`). The
+  write-up and chat then stream pre-written replies filled in from the real ranking (`src/lib/agent-mock.ts`), in
+  the same stream format as a real model, and the page labels them as mock. Good for demos and UI testing; it
+  matches follow-ups by keyword and doesn't reason. Remove it to use the real model.
 - Photos come from `photos/` (Unsplash), resized into `public/photos/`. Kiez and flat photos are illustrative —
   there are no per-Kiez photos in the data — and are labelled as such in the UI.
 

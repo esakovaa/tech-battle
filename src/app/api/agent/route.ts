@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { streamText, stepCountIs, convertToModelMessages } from "ai";
+import { streamText, stepCountIs, convertToModelMessages, createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import type { UIMessage, ModelMessage } from "ai";
 import { getModel, isLlmConfigured } from "@/lib/llm";
 import { agentTools } from "@/lib/agent-tools";
 import type { UserPreferences } from "@/lib/types";
+import { mockAgentReply } from "@/lib/agent-mock";
 
 /**
  * Steps 5-7: the orchestration layer. A single ongoing agent conversation —
@@ -108,7 +109,41 @@ Concrete and specific, not a corporate summary. Lead with what actually changes 
 every column in the table.`;
 }
 
+/** AGENT_MOCK=1: stream pre-written, data-filled replies (lib/agent-mock.ts)
+ *  in the same UI message stream format as a real model — for demos and
+ *  UI testing without an API key. Takes precedence over a configured LLM. */
+function mockResponse(preferences: UserPreferences, messages: UIMessage[]): Response {
+  const stream = createUIMessageStream({
+    execute: async ({ writer }) => {
+      const text = await mockAgentReply(preferences, messages);
+      const id = "mock-text";
+      writer.write({ type: "text-start", id });
+      // Word-sized chunks at a model-like pace, so the UI's streaming
+      // behaviour (caret, progressive paragraphs) is exercised for real.
+      for (const chunk of text.match(/\S+\s*|\s+/g) ?? []) {
+        writer.write({ type: "text-delta", id, delta: chunk });
+        await new Promise((r) => setTimeout(r, 28));
+      }
+      writer.write({ type: "text-end", id });
+    },
+  });
+  return createUIMessageStreamResponse({ stream, headers: { "x-wurzelraum-agent": "mock" } });
+}
+
 export async function POST(req: NextRequest) {
+  if (process.env.AGENT_MOCK === "1") {
+    let mockBody: { preferences?: UserPreferences; messages?: UIMessage[] };
+    try {
+      mockBody = await req.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+    if (!mockBody.preferences || (!mockBody.preferences.currentPlrId && !mockBody.preferences.currentAddress)) {
+      return NextResponse.json({ error: "preferences with currentPlrId or currentAddress is required" }, { status: 400 });
+    }
+    return mockResponse(mockBody.preferences, mockBody.messages ?? []);
+  }
+
   if (!isLlmConfigured()) {
     return NextResponse.json(
       {

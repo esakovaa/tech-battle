@@ -274,6 +274,7 @@ type Mode = "checking" | "agent" | "offline";
 
 function Conversation({ data, prefs, agentPrefs }: { data: RankApiResponse; prefs: UserPreferences; agentPrefs: UserPreferences }) {
   const [mode, setMode] = useState<Mode>("checking");
+  const [isMock, setIsMock] = useState(false);
   const [narrative, setNarrative] = useState("");
   const [narrativeDone, setNarrativeDone] = useState(false);
   const [turns, setTurns] = useState<ChatTurn[]>([]);
@@ -286,7 +287,7 @@ function Conversation({ data, prefs, agentPrefs }: { data: RankApiResponse; pref
     streamAgent(agentPrefs, [], (t) => {
       setMode("agent");
       setNarrative(t);
-    }, ctrl.signal)
+    }, ctrl.signal, () => setIsMock(true))
       .then((t) => {
         if (!t) throw new Error("empty");
         setNarrative(t);
@@ -334,7 +335,7 @@ function Conversation({ data, prefs, agentPrefs }: { data: RankApiResponse; pref
           <span className="wr-eyebrow">A note from Wurzelraum</span>
           <h2 id="note-title" className="wr-h2" style={{ fontSize: 40 }}>What would actually change</h2>
           <span className="wr-source">
-            {mode === "agent" ? "Written live by the AI agent from the ranking data." : mode === "offline" ? "Composed from the ranking data. Connect an LLM key for a live AI write-up." : "Writing…"}
+            {mode === "agent" && isMock ? "Mock AI mode (AGENT_MOCK=1): pre-written replies filled in from your ranking data." : mode === "agent" ? "Written live by the AI agent from the ranking data." : mode === "offline" ? "Composed from the ranking data. Connect an LLM key for a live AI write-up." : "Writing…"}
           </span>
         </div>
         <div className="wr-narrative-text" aria-live="polite">
