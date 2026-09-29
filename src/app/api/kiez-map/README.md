@@ -35,12 +35,21 @@ Screenshotted `/map-test` with Playwright + the pre-installed Chromium: real bou
 correctly, POI markers land in genuinely correct positions and colors, legend only lists categories
 actually present. Zero page/console errors from the component itself.
 
-## Known gap: two OpenStreetMap domains are blocked in this sandbox
+## Tile skin
 
-- **`tile.openstreetmap.org`** (the actual map background imagery) — confirmed blocked via the
-  agent-proxy's own `recentRelayFailures` log (`connect_rejected`, policy denial). The map renders
-  correctly *without* tiles (gray background, boundary + markers still fully correct) but needs this
-  domain allowed to show real street/satellite imagery underneath.
+Base tiles are CARTO Positron (`basemaps.cartocdn.com`), not raw OpenStreetMap tiles — a cleaner,
+muted light style that stays out of the way of the boundary/POI colors, closer to the Wurzelraum
+brand than the default OSM look. No API key required. Swap `TileLayer`'s `url`/`attribution` in
+`KiezMap.tsx` to try alternatives (CARTO Voyager, OpenTopoMap, or a Thunderforest style once you
+have a free API key for one closer to a hand-drawn cottagecore look).
+
+## Known gap: one OpenStreetMap domain is blocked in this sandbox
+
+- **`basemaps.cartocdn.com`** (the actual map background imagery) — same class of gap as the old
+  `tile.openstreetmap.org`: confirmed blocked via the agent-proxy's own `recentRelayFailures` log
+  (`connect_rejected`, policy denial) in this sandbox. The map renders correctly *without* tiles
+  (gray background, boundary + markers still fully correct) but needs this domain allowlisted to
+  show real street imagery underneath. Not an issue on a real machine outside this sandbox.
 - **`nominatim.openstreetmap.org`** (address → coordinates geocoding, used for `currentAddress` /
   `commuteAddress` and also `/api/rank`'s existing `currentAddress` fallback) — this one is stranger:
   a direct `curl` to it returns `200`, but **every Node `fetch()` call to the exact same URL — including
