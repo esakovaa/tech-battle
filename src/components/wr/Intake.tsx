@@ -384,6 +384,18 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
         <button type="submit" hidden aria-hidden tabIndex={-1} />
       </form>
 
+      <div className="wr-wrap" style={{ margin: "0 0 60px" }}>
+        <div className="wr-landlord-cta">
+          <div className="wr-landlord-cta-text">
+            <h3>Own a flat in Berlin?</h3>
+            <p>Screen hundreds of applications fairly — affordability, security and fit checked, protected characteristics never used.</p>
+          </div>
+          <a className="wr-landlord-cta-btn" href="/landlord">
+            I want to list my apartment →
+          </a>
+        </div>
+      </div>
+
       <section className="wr-dark">
         <div className="wr-cta wr-wrap">
           <h2>Ready when you are.</h2>

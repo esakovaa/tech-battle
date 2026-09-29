@@ -1343,3 +1343,43 @@ body {
     font-size: 19px;
   }
 }
+
+/* ---------- landlord CTA (KiezKiss look, standalone here since the
+   homepage doesn't load landlord.css) ---------- */
+.wr-landlord-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  background: #1e3a2c;
+  color: #f2ede2;
+  border-radius: 16px;
+  padding: 28px 32px;
+  flex-wrap: wrap;
+}
+.wr-landlord-cta-text h3 {
+  font-family: var(--font-fraunces, Georgia, serif);
+  font-weight: 400;
+  font-size: 24px;
+  margin: 0 0 6px;
+}
+.wr-landlord-cta-text p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.8;
+  max-width: 46ch;
+}
+.wr-landlord-cta-btn {
+  background: #c85a2e;
+  color: #fff;
+  border-radius: 999px;
+  padding: 14px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.wr-landlord-cta-btn:hover {
+  background: #a8451f;
+}

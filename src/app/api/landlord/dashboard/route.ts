@@ -76,6 +76,7 @@ export async function POST(req: NextRequest) {
     const f = factsById.get(e.applicantId)!;
     const incomeMultiple = f.netIncomeMonthlyDeclared / listing.kaltmiete_eur_monthly;
     return {
+      id: e.applicantId,
       anonLabel: anonLabelById.get(e.applicantId),
       household: e.shownNotScored.find((s) => s.label === "Household")?.value,
       incomeToRentRatio: `${incomeMultiple.toFixed(1)}×`,
