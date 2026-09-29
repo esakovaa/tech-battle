@@ -13,8 +13,9 @@ import { mockAgentReply } from "@/lib/agent-mock";
  * step boundary is just what the user says next and which tools the agent
  * reaches for, same conversation throughout.
  *
- * Deliberately NOT built: an image_search tool (skipped for tonight — see
- * README.md in this folder) and any frontend wiring (page.tsx untouched).
+ * The first-turn response is shown in the personalized-research section on
+ * the results page; follow-up turns power the question-and-answer panel.
+ * Deliberately NOT built: an image_search tool (see README.md in this folder).
  *
  * POST body:
  *   {
@@ -48,10 +49,12 @@ ${JSON.stringify(preferences, null, 2)}
 3. If the user later says something that changes what matters to them (e.g. "actually price matters a lot"),
    call getTopKiezRecommendations again with updated preferences rather than just reasoning in prose about it —
    the ranking should actually reflect the new priority, not just your description of it.
-4. If the user raises an objection or asks something the database doesn't cover (e.g. "but I don't have a car,
-   is X reachable without one?", "what's Y actually like to live in?"), use webSearch to find a real answer
-   instead of guessing. If webSearch isn't configured, say plainly that you can't look it up right now — never
-   fabricate a source.
+4. If the user raises an objection OR their additionalContext asks about something the database doesn't cover
+   (e.g. cafes, wheelchair access, internet speed, nightlife), proactively use webSearch to find current,
+   neighborhood-specific evidence instead of stopping at "we don't track that." Research the most relevant
+   alternative Kieze, and include the current Kiez when a comparison is useful. Search separately for distinct
+   topics when one query would blur them together. If webSearch isn't configured, say plainly that current web
+   research isn't available — never fabricate a source.
 
 ## Handling preferences.additionalContext ("anything else important to you?")
 If this field is non-empty, treat it as a signal to look beyond the 7 core questions — but ground everything, in
@@ -60,14 +63,20 @@ two steps:
    night" implies topics: internet speed, crime). For each topic, silently match it against
    getContextualCriteria's tool description (the list of available criteria keys) — do NOT ask the user to
    rephrase or pick from a menu.
-2. For topics that match an available key, call getContextualCriteria (once per Kiez you're discussing — current
-   plus each alternative) to get the real value and city-wide notability. For topics with no matching key (the
-   tool description also lists common unavailable ones), say plainly in your narrative that it isn't something
-   this data tracks — never substitute a plausible-sounding guess.
+2. For topics that match an available key, call getContextualCriteria for the current Kiez and each alternative
+   you compare, to get the real value and city-wide notability. For topics with no matching key, use webSearch
+   to research useful local evidence for the alternative Kieze instead of only repeating that the project data
+   doesn't cover them. Be clear that web research is a separate, potentially incomplete snapshot.
 When deciding what to actually mention per Kiez: prefer criteria that are both (a) tied to something the user
 actually said and (b) genuinely notable (getContextualCriteria returns notability: null for anything broadly
 average — don't manufacture a reason to mention those). Cap it at 2-3 extra criteria per Kiez; this is meant to
 surface the most meaningful additional facts, not append every available data point.
+
+## Research and sources
+For webSearch findings, cite the supporting result inline as a Markdown link: [Source title](https://...). Use
+the exact title and URL returned by webSearch. Keep web findings distinct from the project's statistical data.
+Explain why a finding matters to this user's stated need; don't turn snippets into certainty or imply a complete
+directory.
 
 ## Recommendation philosophy — explain this, don't just apply it silently
 getTopKiezRecommendations deliberately only recommends Planungsräume FURTHER from Alexanderplatz (the city

@@ -2,14 +2,13 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AGENT_KICKOFF, AgentNotConfigured, Emblem, LandlordBand, Typed, streamAgent, type ChatTurn } from "./shared";
 import {
   assignKiezPhotos,
   cellDirection,
   composeNarrative,
   conditionLabel,
-  contextLabel,
   displayValue,
   eraLabel,
   euro,
@@ -24,7 +23,6 @@ import {
   type RankApiResponse,
 } from "@/lib/wurzelraum";
 import type { UserPreferences } from "@/lib/types";
-import { matchContextTopics } from "@/lib/context-match";
 
 const KiezMap = dynamic(() => import("@/components/KiezMap"), {
   ssr: false,
@@ -46,7 +44,11 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
   const photos = useMemo(() => assignKiezPhotos(alternatives.map((a) => a.plr)), [alternatives]);
   const bestIdx = alternatives.reduce((bi, a, i) => (a.score > alternatives[bi].score ? i : bi), 0);
   const [selected, setSelected] = useState<number | null>(null);
+  const [contextResearch, setContextResearch] = useState({ status: "researching" as ResearchStatus, text: "" });
   const flatsRef = useRef<HTMLElement>(null);
+  const reportContextResearch = useCallback((status: ResearchStatus, text: string) => {
+    setContextResearch({ status, text });
+  }, []);
 
   // Agent-facing preferences: pin the already-resolved Kiez so the agent
   // never has to re-geocode the address.
@@ -191,9 +193,15 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
         </p>
       </section>
 
-      {prefs.additionalContext && <ExtraContext data={data} text={prefs.additionalContext} />}
+      {prefs.additionalContext && (
+        <ExtraContext
+          text={prefs.additionalContext}
+          status={contextResearch.status}
+          research={contextResearch.text}
+        />
+      )}
 
-      <Conversation data={data} prefs={prefs} agentPrefs={agentPrefs} />
+      <Conversation data={data} prefs={prefs} agentPrefs={agentPrefs} onResearchUpdate={reportContextResearch} />
       <LandlordBand />
     </div>
   );
@@ -293,107 +301,66 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
   );
 }
 
-interface ContextRow {
-  key: string;
-  label: string;
-  values: { plrId: string; value: string; notability: string | null }[];
-}
+type ResearchStatus = "researching" | "ready" | "offline" | "demo";
 
-const NOTABILITY_SHORT: Record<string, { text: string; good: boolean }> = {
-  "one of the best citywide (top 10%)": { text: "Top 10% in Berlin", good: true },
-  "well above average (top quarter)": { text: "Top quarter", good: true },
-  "one of the worst citywide (bottom 10%)": { text: "Bottom 10% in Berlin", good: false },
-  "well below average (bottom quarter)": { text: "Bottom quarter", good: false },
-};
-
-/** The user's free-text answers (other hobby + "anything else"), matched to
- *  the grounded extra criteria and shown for every Kiez — so they visibly
- *  count, with or without the AI agent. */
-function ExtraContext({ data, text }: { data: RankApiResponse; text: string }) {
-  const match = useMemo(() => matchContextTopics(text), [text]);
-  const plrs = [data.current, ...data.alternatives.map((a) => a.plr)];
-  const [rows, setRows] = useState<ContextRow[] | null>(null);
-
-  const plrKey = plrs.map((p) => p.plr_id).join(",");
-  useEffect(() => {
-    if (!match.keys.length) return;
-    let cancelled = false;
-    const q = new URLSearchParams({ keys: match.keys.join(",") });
-    plrKey.split(",").forEach((id) => q.append("plrId", id));
-    fetch(`/api/context-criteria?${q}`)
-      .then((r) => (r.ok ? r.json() : { rows: [] }))
-      .then((d: { rows: ContextRow[] }) => !cancelled && setRows(d.rows))
-      .catch(() => !cancelled && setRows([]));
-    return () => {
-      cancelled = true;
-    };
-  }, [match.keys, plrKey]);
-
-  const quote = text.split("\n");
-
+/** Show the first-turn agent research in the place the user asked for it. */
+function ExtraContext({ text, status, research }: { text: string; status: ResearchStatus; research: string }) {
   return (
     <section className="wr-section wr-wrap" aria-labelledby="extra-title" style={{ paddingTop: 0 }}>
       <div className="wr-extra">
         <div className="wr-extra-side">
-          <span className="wr-eyebrow">You also told us</span>
-          <h2 id="extra-title" className="wr-h2" style={{ fontSize: 36 }}>What else you mentioned</h2>
+          <span className="wr-eyebrow">Your request, researched</span>
+          <h2 id="extra-title" className="wr-h2" style={{ fontSize: 36 }}>How these Kieze fit what matters to you</h2>
           <blockquote className="wr-quote">
-            {quote.map((line, i) => (
-              <p key={i}>“{line}”</p>
-            ))}
+            {text.split("\n").map((line, i) => <p key={i}>“{line}”</p>)}
           </blockquote>
-          <span className="wr-source">These answers don’t change the ranking — we look up what the data can say about them.</span>
+          <span className="wr-source">Your extra preferences don’t change the ranking. They guide this separate research and explanation.</span>
         </div>
-        <div>
-          {match.keys.length > 0 && (
-            <div className="wr-table-scroll">
-              <div className="wr-table" role="table" aria-labelledby="extra-title">
-                <div className="wr-tr is-head" role="row">
-                  <div className="wr-th" role="columnheader" style={{ paddingLeft: 0 }}><small>From the data</small></div>
-                  {plrs.map((p, i) => (
-                    <div key={p.plr_id} className={`wr-th${i === 0 ? " is-current" : ""}`} role="columnheader" style={{ fontSize: 18 }}>
-                      {i === 0 && <small>You are here</small>}
-                      {p.plr_name}
-                    </div>
-                  ))}
-                </div>
-                {(rows ?? match.keys.map((k) => ({ key: k, label: "…", values: [] }))).map((row) => (
-                  <div key={row.key} className="wr-tr" role="row">
-                    <div className="wr-rh" role="rowheader" style={{ fontSize: 15, paddingRight: 12 }}>{contextLabel(row.key, row.label)}</div>
-                    {plrs.map((p, i) => {
-                      const v = row.values.find((x) => x.plrId === p.plr_id);
-                      const n = v?.notability ? NOTABILITY_SHORT[v.notability] : null;
-                      return (
-                        <div key={p.plr_id} className={`wr-td${i === 0 ? " is-current" : ""}`} role="cell" style={{ flexDirection: "column", alignItems: "flex-start", gap: 6 }}>
-                          <span>{v ? displayValue(v.value) : "…"}</span>
-                          {n && <span className={`wr-notable${n.good ? " is-good" : ""}`}>{n.text}</span>}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {match.unavailable.length > 0 && (
-            <p className="wr-extra-note">
-              We don’t have data on <strong>{match.unavailable.join(", ")}</strong>, so we can’t compare Kieze on {match.unavailable.length === 1 ? "it" : "those"} — worth asking locals or a quick search.
-            </p>
-          )}
-          {match.keys.length === 0 && match.unavailable.length === 0 && (
-            <p className="wr-extra-note">
-              Nothing in what you wrote maps onto our data directly — ask about it in the chat below and we’ll tell you what we can.
-            </p>
-          )}
+        <div className="wr-personal-research" aria-live="polite" aria-busy={status === "researching"}>
+          {status === "researching" && <p className="wr-research-status">Matching your priorities to Kiez data and checking current local sources…</p>}
+          {status === "offline" && <p className="wr-research-status">Live research isn’t available right now. Here’s what the project’s neighborhood data can tell us; current web sources weren’t checked.</p>}
+          {status === "demo" && <p className="wr-research-status">Demo mode: this is prepared example text based on local data, not live AI research or a web search.</p>}
+          {research
+            ? research.split(/\n{2,}/).map((paragraph, i) => <p key={i}>{renderSourceLinks(paragraph)}</p>)
+            : status === "researching" && <span className="wr-caret" aria-hidden />}
         </div>
       </div>
     </section>
   );
 }
 
+function renderSourceLinks(text: string) {
+  const pattern = /(\[([^\]]+)\]\((https?:\/\/[^)]+)\)|https?:\/\/[^\s)]+)/g;
+  const nodes: React.ReactNode[] = [];
+  let cursor = 0;
+  for (const match of text.matchAll(pattern)) {
+    const full = match[0];
+    const index = match.index ?? 0;
+    if (index > cursor) nodes.push(text.slice(cursor, index));
+    const markdown = full.startsWith("[");
+    const url = markdown ? match[3]! : full.replace(/[.,;!?]+$/, "");
+    const label = markdown ? match[2]! : url;
+    nodes.push(<a key={`${index}-${url}`} href={url} target="_blank" rel="noreferrer">{label}</a>);
+    if (!markdown && url.length < full.length) nodes.push(full.slice(url.length));
+    cursor = index + full.length;
+  }
+  if (cursor < text.length) nodes.push(text.slice(cursor));
+  return nodes;
+}
+
 type Mode = "checking" | "agent" | "offline";
 
-function Conversation({ data, prefs, agentPrefs }: { data: RankApiResponse; prefs: UserPreferences; agentPrefs: UserPreferences }) {
+function Conversation({
+  data,
+  prefs,
+  agentPrefs,
+  onResearchUpdate,
+}: {
+  data: RankApiResponse;
+  prefs: UserPreferences;
+  agentPrefs: UserPreferences;
+  onResearchUpdate: (status: ResearchStatus, text: string) => void;
+}) {
   const [mode, setMode] = useState<Mode>("checking");
   const [isMock, setIsMock] = useState(false);
   const [narrative, setNarrative] = useState("");
@@ -405,23 +372,31 @@ function Conversation({ data, prefs, agentPrefs }: { data: RankApiResponse; pref
 
   useEffect(() => {
     const ctrl = new AbortController();
+    let mocked = false;
+    onResearchUpdate("researching", "");
     streamAgent(agentPrefs, [], (t) => {
       setMode("agent");
       setNarrative(t);
-    }, ctrl.signal, () => setIsMock(true))
+      if (prefs.additionalContext) onResearchUpdate(mocked ? "demo" : "researching", t);
+    }, ctrl.signal, () => {
+      mocked = true;
+      setIsMock(true);
+    })
       .then((t) => {
         if (!t) throw new Error("empty");
         setNarrative(t);
         setNarrativeDone(true);
+        if (prefs.additionalContext) onResearchUpdate(mocked ? "demo" : "ready", t);
       })
       .catch((err) => {
         if (ctrl.signal.aborted) return;
         if (!(err instanceof AgentNotConfigured)) console.warn("Agent unavailable, using data-only write-up:", err);
         setMode("offline");
         setNarrative(fallback);
+        if (prefs.additionalContext) onResearchUpdate("offline", fallback);
       });
     return () => ctrl.abort();
-  }, [agentPrefs, fallback]);
+  }, [agentPrefs, fallback, onResearchUpdate, prefs.additionalContext]);
 
   const busy = pending != null;
 
@@ -450,7 +425,7 @@ function Conversation({ data, prefs, agentPrefs }: { data: RankApiResponse; pref
 
   return (
     <>
-      <section className="wr-narrative wr-wrap" aria-labelledby="note-title">
+      {!prefs.additionalContext && <section className="wr-narrative wr-wrap" aria-labelledby="note-title">
         <div className="wr-narrative-side">
           <Emblem size={72} color="var(--wr-yellow-deep)" />
           <span className="wr-eyebrow">A note from Wurzelraum</span>
@@ -470,7 +445,7 @@ function Conversation({ data, prefs, agentPrefs }: { data: RankApiResponse; pref
             ))}
           {mode === "offline" && <TypedParagraphs text={fallback} onDone={() => setNarrativeDone(true)} />}
         </div>
-      </section>
+      </section>}
 
       <section className="wr-dark" aria-labelledby="chat-title">
         <div className="wr-chat wr-wrap">

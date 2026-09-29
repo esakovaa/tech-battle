@@ -146,10 +146,10 @@ export const getTopKiezRecommendations = tool({
 
 export const webSearch = tool({
   description:
-    "Search the web for a fact not present in the Kiez database — e.g. car-free accessibility of a specific " +
-    "amenity, recent local news, or anything else needed to answer a user's objection. Not for general Berlin " +
-    "real-estate facts already covered by getTopKiezRecommendations' data (price, crime, schools, etc.) — prefer " +
-    "that tool's data first, since it's grounded in this project's audited sources.",
+    "Search the web for a specific local fact the Kiez database doesn't contain. Use proactively when a user's " +
+    "additionalContext asks for something like cafes, wheelchair access, internet speed, or nightlife, and when " +
+    "a follow-up asks for current local details. Search for the named Kieze and return sources. Don't use web " +
+    "search for facts already covered by getTopKiezRecommendations; prefer this project's audited data.",
   inputSchema: z.object({
     query: z.string().describe("The search query."),
   }),

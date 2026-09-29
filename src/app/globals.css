@@ -1133,6 +1133,28 @@ body {
   font-size: 15px;
   line-height: 1.55;
 }
+.wr-personal-research {
+  min-height: 150px;
+  padding: 24px 28px;
+  background: var(--wr-card);
+  box-shadow: inset 0 0 0 1px var(--wr-line);
+  font-size: 17px;
+  line-height: 1.7;
+}
+.wr-personal-research p { margin: 0 0 16px; }
+.wr-personal-research p:last-child { margin-bottom: 0; }
+.wr-personal-research a {
+  color: var(--wr-ink);
+  text-decoration-color: var(--wr-yellow-deep);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+.wr-personal-research .wr-research-status {
+  margin-bottom: 18px;
+  color: var(--wr-muted);
+  font-size: 14px;
+  line-height: 1.5;
+}
 
 /* ---------- results: narrative ---------- */
 .wr-narrative {
