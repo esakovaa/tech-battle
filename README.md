@@ -2,6 +2,26 @@
 
 Data and analysis prep for the "Kiez Concierge" challenge (WBS CODING SCHOOL / 42 Berlin / Battle of the Tech Schools, 28–30 Sep 2026).
 
+## Running the Wurzelraum prototype locally
+
+The app at `/` is the full Wurzelraum flow (design Option B, see `design/wurzelraum/`): intake → ranking →
+results with example flats, a per-Kiez map, the side-by-side table, a written trade-off summary and a follow-up chat.
+
+```bash
+npm install
+npm run dev          # then open http://localhost:3000
+```
+
+- **Works without any keys.** Ranking, listings, the map, geocoding (Nominatim) and live commute times (VBB) all
+  run on the repo's data and free public APIs. The address field also suggests Kieze from local data, so you can
+  pick one even if geocoding is unavailable.
+- **AI write-up and open-ended chat** switch on automatically once an LLM key is set: copy `.env.example` to
+  `.env.local` and fill in `LLM_PROVIDER`, the matching API key and model id (optionally `TAVILY_API_KEY` for web
+  search). Without a key, the write-up is composed from the ranking data and the chat answers data questions
+  (transport without a car, rent, noise, parks, safety, Kitas, schools, hobbies).
+- Photos come from `photos/` (Unsplash), resized into `public/photos/`. Kiez and flat photos are illustrative —
+  there are no per-Kiez photos in the data — and are labelled as such in the UI.
+
 ## Data sources
 
 All raw data lives under `DATA  SOURCES/`. Government WFS geodata is **not committed as `.geojson`** — those files are large, regenerable on demand, and excluded via `.gitignore`. Each entry below gives the exact command to fetch it yourself; the flattened `.csv` version (small, git-friendly) is committed alongside it.
