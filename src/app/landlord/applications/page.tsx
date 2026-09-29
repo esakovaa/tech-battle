@@ -228,6 +228,11 @@ export default function ApplicationsDashboardPage() {
           <a href="/landlord#how-it-works">What we use and ignore</a>
         </p>
 
+        <hr className="ll-divider" />
+        <h2 className="ll-panel-title">Invite people to a viewing</h2>
+        <p className="ll-card-sub">The qualifying count is shown above. Draw a fair shortlist of up to 15 people, then choose a viewing time to prepare invitations.</p>
+        <LotteryPanel listingId={listing.id} address={listing.address} />
+
         <h2 className="ll-panel-title">Applicants</h2>
         <div className="ll-tab-row">
           {(Object.keys(TAB_LABELS) as TabKey[]).map((k) => (
@@ -280,11 +285,6 @@ export default function ApplicationsDashboardPage() {
         </div>
 
         <p className="ll-footnote">Showing all {rows.length} applicants in this view. Protected characteristics and personal stories are not used to decide who qualifies.</p>
-
-        <hr className="ll-divider" />
-        <h2 className="ll-panel-title">Invite people to a viewing</h2>
-        <p className="ll-card-sub">First review the applicants who meet every requirement. When you’re ready, draw a fair shortlist of up to 15 people and choose a viewing time.</p>
-        <LotteryPanel listingId={listing.id} address={listing.address} />
       </div>
     </>
   );
