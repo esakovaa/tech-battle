@@ -44,6 +44,7 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
   const photos = useMemo(() => assignKiezPhotos(alternatives.map((a) => a.plr)), [alternatives]);
   const bestIdx = alternatives.reduce((bi, a, i) => (a.score > alternatives[bi].score ? i : bi), 0);
   const [selected, setSelected] = useState<number | null>(null);
+  const [focusedKiez, setFocusedKiez] = useState(bestIdx);
   const [contextResearch, setContextResearch] = useState({ status: "researching" as ResearchStatus, text: "" });
   const flatsRef = useRef<HTMLElement>(null);
   const reportContextResearch = useCallback((status: ResearchStatus, text: string) => {
@@ -55,6 +56,7 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
   const agentPrefs = useMemo(() => ({ ...prefs, currentPlrId: current.plr_id, currentAddress: undefined }), [prefs, current.plr_id]);
 
   function openFlats(i: number) {
+    setFocusedKiez(i);
     setSelected(i);
     requestAnimationFrame(() => flatsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
@@ -111,8 +113,8 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
             const pc = table.prosCons[i];
             const isSel = selected === i;
             return (
-              <article key={alt.plr.plr_id} className={`wr-card${isSel ? " is-selected" : ""}`}>
-                <button type="button" className="wr-card-photo" onClick={() => openFlats(i)} aria-label={`${alt.plr.plr_name}: see example flats`}>
+              <article key={alt.plr.plr_id} className={`wr-card${isSel ? " is-selected" : ""}${focusedKiez === i ? " is-map-focused" : ""}`}>
+                <button type="button" className="wr-card-photo" onClick={() => setFocusedKiez(i)} aria-label={`${alt.plr.plr_name}: focus map on this Kiez`} aria-pressed={focusedKiez === i}>
                   <img className="wr-cover" src={photos[i].src} alt={photos[i].alt} />
                   <span className="wr-card-tag">Illustrative photo</span>
                   {i === bestIdx && <span className="wr-card-pick">Best match</span>}
@@ -144,6 +146,16 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
               </article>
             );
           })}
+        </div>
+      </section>
+
+      <section className="wr-section wr-wrap wr-kiez-map-section" aria-label="Map of your recommended Kieze">
+        <div className="wr-kiez-map-heading">
+          <span className="wr-eyebrow">Map focus · {alternatives[focusedKiez].plr.plr_name}</span>
+          <p>Select a Kiez above to see where it sits in relation to your current address and commute.</p>
+        </div>
+        <div className="wr-map">
+          <KiezMap key={alternatives[focusedKiez].plr.plr_id} plrId={alternatives[focusedKiez].plr.plr_id} categories={poiCategoriesFor(prefs)} currentAddress={prefs.currentAddress} commuteAddresses={prefs.commuteAddresses} height={480} />
         </div>
       </section>
 
@@ -234,8 +246,6 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
   const listings = state.data?.listings ?? [];
   const exact = state.data?.exactRoomMatch ?? true;
   const roomsText = showAll ? "All homes" : rooms ? `${rooms >= 5 ? "5+" : rooms} rooms` : "Homes";
-  const categories = poiCategoriesFor(prefs);
-
   return (
     <div className="wr-flats-inner wr-wrap">
       <div className="wr-flats-head">
@@ -295,9 +305,6 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
         )}
       </div>
 
-      <div className="wr-map">
-        <KiezMap plrId={alt.plr.plr_id} categories={categories} currentAddress={prefs.currentAddress} commuteAddresses={prefs.commuteAddresses} height={380} />
-      </div>
     </div>
   );
 }
