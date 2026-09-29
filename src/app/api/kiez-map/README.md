@@ -20,11 +20,14 @@ current/commute address markers — everything shown on one recommended Kiez's m
   ```tsx
   const KiezMap = dynamic(() => import("@/components/KiezMap"), { ssr: false });
   ```
-- `src/app/map-test/page.tsx` — a minimal manual-QA page (not a real app screen) that renders
-  `<KiezMap plrId="03601347" />` (Helmholtzplatz) so the component can actually be looked at in a
-  browser. Kept deliberately, not scratch — `react-leaflet` is exactly the kind of dependency that
-  typechecks fine and breaks silently at runtime (SSR/hydration, missing marker icon assets, etc.),
-  so having a live page to reload is worth more here than it would be for an ordinary component.
+- `src/app/map-test/page.tsx` — an interactive manual-QA harness (not a real app screen): a preset
+  dropdown (Helmholtzplatz/Wannsee/Schmöckwitz/Charitéviertel) or free-typed `plr_id`, checkboxes for
+  which POI categories to highlight, and optional current/commute address fields, all wired to
+  `<KiezMap>`. "Apply" updates the URL query string (`?plrId=...&categories=...&currentAddress=...`)
+  so a specific test scenario can be bookmarked or shared. Kept deliberately, not scratch —
+  `react-leaflet` is exactly the kind of dependency that typechecks fine and breaks silently at
+  runtime (SSR/hydration, missing marker icon assets, etc.), so having a live page to reload is worth
+  more here than it would be for an ordinary component.
 
 ## Verified, not just typechecked
 
