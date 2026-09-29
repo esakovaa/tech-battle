@@ -1,0 +1,37 @@
+[
+  {
+    "id": "L001",
+    "address": "Baumschulenstraße 84",
+    "ortsteil": "Baumschulenweg",
+    "area_m2": 79,
+    "rooms": 3,
+    "kaltmiete_eur_monthly": 1190,
+    "warmmiete_eur_monthly": 1480,
+    "move_in_date": "2026-12-01",
+    "smoking_policy": "non_smoking_only",
+    "required_documents": [
+      "identity",
+      "payslips",
+      "schufa",
+      "mietschuldenfreiheit"
+    ],
+    "min_income_multiple": 3.0
+  },
+  {
+    "id": "L002",
+    "address": "Wilhelmsruher Damm 12",
+    "ortsteil": "Wittenau",
+    "area_m2": 58,
+    "rooms": 2,
+    "kaltmiete_eur_monthly": 780,
+    "warmmiete_eur_monthly": 990,
+    "move_in_date": "2026-11-01",
+    "smoking_policy": "no_preference",
+    "required_documents": [
+      "identity",
+      "payslips",
+      "schufa"
+    ],
+    "min_income_multiple": 3.0
+  }
+]

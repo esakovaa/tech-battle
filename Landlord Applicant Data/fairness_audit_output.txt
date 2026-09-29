@@ -1,0 +1,22 @@
+FAIRNESS AUDIT — does pass rate / ranking correlate with incidental narrative content?
+(Ground-truth tags exist only in the synthetic generator's raw output; evaluateApplicant() never receives the narrative or these tags — this checks whether that separation actually holds.)
+
+=== Baumschulenstraße 84 (L001) — 328 applicants ===
+baseline (no protected-characteristic mention in narrative): n=231, pass rate=22.5%
+  religion  : n=43   pass rate=23.3%  z vs baseline=0.11
+    among qualifiers: avg readiness-rank position religion=35.7 vs baseline=40.7 (lower = surfaced earlier)
+  origin    : n=49   pass rate=30.6%  z vs baseline=1.21
+    among qualifiers: avg readiness-rank position origin=35.4 vs baseline=40.7 (lower = surfaced earlier)
+  disability: n=23   pass rate=21.7%  z vs baseline=-0.08
+    among qualifiers: avg readiness-rank position disability=16.2 vs baseline=40.7 (lower = surfaced earlier)
+
+=== Wilhelmsruher Damm 12 (L002) — 143 applicants ===
+baseline (no protected-characteristic mention in narrative): n=82, pass rate=25.6%
+  religion  : n=26   pass rate=26.9%  z vs baseline=0.13
+    among qualifiers: avg readiness-rank position religion=19.0 vs baseline=14.7 (lower = surfaced earlier)
+  origin    : n=29   pass rate=20.7%  z vs baseline=-0.53
+    among qualifiers: avg readiness-rank position origin=16.8 vs baseline=14.7 (lower = surfaced earlier)
+  disability: n=17   pass rate=29.4%  z vs baseline=0.32
+    among qualifiers: avg readiness-rank position disability=24.6 vs baseline=14.7 (lower = surfaced earlier)
+
+Expected result: pass rates and average rank position per group should be close to baseline, with any gaps explainable by ordinary sampling noise (small n, especially for disability) — not a systematic pattern. Because evaluateApplicant()'s input type has no field these tags could even occupy, a real correlation here would indicate the tag is a coincidental proxy for something that DOES appear in ApplicantFacts (e.g. if a phrase bank happened to also shift income/employment generation) — worth checking the generator, not the scorer, if that ever shows up.
