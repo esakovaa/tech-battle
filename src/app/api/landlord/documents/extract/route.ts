@@ -81,6 +81,12 @@ export async function POST(req: NextRequest) {
   if (!(file instanceof File) || typeof documentType !== "string") {
     return NextResponse.json({ error: "file and documentType are required" }, { status: 400 });
   }
+  if (file.size === 0 || file.size > 12 * 1024 * 1024) {
+    return NextResponse.json({ error: "File must be non-empty and no larger than 12 MB." }, { status: 400 });
+  }
+  if (!["application/pdf", "image/png", "image/jpeg"].includes(file.type)) {
+    return NextResponse.json({ error: "Only PDF, PNG and JPG documents are supported." }, { status: 415 });
+  }
   if (!(documentType in EXTRACTION_SCHEMAS)) {
     return NextResponse.json({ error: `Unknown documentType: ${documentType}` }, { status: 400 });
   }

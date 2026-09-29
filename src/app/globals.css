@@ -902,6 +902,13 @@ body {
   font-size: 15px;
   line-height: 1.6;
 }
+.wr-flats-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.wr-flat-apply { text-decoration: none; justify-content: center; }
 .wr-flats-note {
   display: flex;
   gap: 14px;
@@ -1344,34 +1351,36 @@ body {
   }
 }
 
-/* ---------- landlord CTA (KiezKiss look, standalone here since the
-   homepage doesn't load landlord.css) ---------- */
+/* ---------- landlord CTA — native Wurzelraum styling (yellow, matching
+   the page's own accent), sitting on the dark "Ready when you are"
+   section for contrast ---------- */
 .wr-landlord-cta {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  background: #1e3a2c;
-  color: #f2ede2;
+  background: var(--wr-yellow);
+  color: var(--wr-ink);
   border-radius: 16px;
   padding: 28px 32px;
   flex-wrap: wrap;
 }
 .wr-landlord-cta-text h3 {
-  font-family: var(--font-fraunces, Georgia, serif);
+  font-family: var(--font-display, Georgia, serif);
   font-weight: 400;
   font-size: 24px;
   margin: 0 0 6px;
+  color: var(--wr-ink);
 }
 .wr-landlord-cta-text p {
   margin: 0;
   font-size: 14px;
-  opacity: 0.8;
+  color: var(--wr-ink-3);
   max-width: 46ch;
 }
 .wr-landlord-cta-btn {
-  background: #c85a2e;
-  color: #fff;
+  background: var(--wr-ink);
+  color: var(--wr-cream);
   border-radius: 999px;
   padding: 14px 24px;
   font-size: 14px;
@@ -1381,5 +1390,55 @@ body {
   flex-shrink: 0;
 }
 .wr-landlord-cta-btn:hover {
-  background: #a8451f;
+  background: #2b2a26;
+}
+
+/* ---------- tenant example-flat application ---------- */
+.wr-apply-page { min-height: 100vh; padding: 32px var(--gutter) 80px; background: var(--wr-grey); }
+.wr-apply-shell { max-width: 880px; margin: 0 auto; }
+.wr-apply-back { display: inline-block; margin-bottom: 44px; color: var(--wr-ink); text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.wr-apply-heading { max-width: 700px; margin-bottom: 36px; }
+.wr-apply-heading h1 { margin: 14px 0; font: 400 clamp(42px, 7vw, 76px)/1 var(--font-display); }
+.wr-apply-heading p, .wr-apply-section > p { color: var(--wr-ink-3); line-height: 1.65; }
+.wr-apply-listing { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 22px 24px; background: var(--wr-yellow); }
+.wr-apply-listing h2 { margin: 8px 0 0; font: 400 28px/1.2 var(--font-display); }
+.wr-apply-listing small { font: 400 15px var(--font-body); }
+.wr-apply-listing p { margin: 0; font-size: 13px; }
+.wr-apply-section { padding: 38px 0; border-bottom: 1px solid var(--wr-line); }
+.wr-apply-section h2 { margin: 12px 0 20px; font: 400 clamp(30px, 5vw, 44px)/1.1 var(--font-display); }
+.wr-apply-field { display: grid; gap: 9px; margin: 22px 0; font-size: 15px; }
+.wr-apply-field input:not([type=file]), .wr-apply-field textarea, .wr-story-draft textarea { width: 100%; border: 1px solid var(--wr-line); border-radius: 0; padding: 14px; background: var(--wr-card); color: var(--wr-ink); font: 400 16px/1.5 var(--font-body); }
+.wr-apply-field textarea, .wr-story-draft textarea { resize: vertical; }
+.wr-apply-field legend { padding: 0; }
+.wr-apply-pills { display: flex; gap: 10px; }
+.wr-apply-pills button { padding: 12px 22px; border: 1px solid var(--wr-ink); border-radius: 30px; background: transparent; color: var(--wr-ink); font: 500 15px var(--font-body); cursor: pointer; }
+.wr-apply-pills button.is-active { background: var(--wr-ink); color: var(--wr-cream); }
+.wr-doc-list { border-top: 1px solid var(--wr-line); }
+.wr-doc-row { display: flex; justify-content: space-between; align-items: center; gap: 18px; min-height: 74px; padding: 14px 0; border-bottom: 1px solid var(--wr-line); }
+.wr-doc-row span { display: grid; gap: 5px; }
+.wr-doc-row b { font-weight: 500; }
+.wr-doc-row small { color: var(--wr-muted); }
+.wr-doc-row input { max-width: 240px; font: 13px var(--font-body); }
+.wr-check-list { display: grid; gap: 0; }
+.wr-check-row { display: grid; grid-template-columns: 32px minmax(0, 1fr); gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--wr-line); }
+.wr-check-row > span { font-size: 22px; }
+.wr-check-row > span.is-pass { color: #25613f; }
+.wr-check-row > span.is-fail { color: #b34322; }
+.wr-check-row b { font-weight: 550; }
+.wr-check-row p { margin: 4px 0 0; color: var(--wr-ink-3); font-size: 14px; line-height: 1.5; }
+.wr-apply-alert { margin-top: 22px; padding: 18px; border-left: 4px solid #b34322; background: #f4e3d9; line-height: 1.5; }
+.wr-apply-alert p { margin: 5px 0 0; }
+.wr-interview { background: var(--wr-yellow); padding: 32px; margin-top: 30px; }
+.wr-interview > p { max-width: 72ch; line-height: 1.7; }
+.wr-story-draft { display: grid; gap: 12px; margin-top: 28px; }
+.wr-story-draft p { margin: 0; font-size: 13px; line-height: 1.5; }
+.wr-apply-footnote { margin-top: 28px; color: var(--wr-muted); font-size: 13px; line-height: 1.6; }
+@media (max-width: 600px) {
+  .wr-apply-page { padding-top: 18px; }
+  .wr-apply-back { margin-bottom: 30px; }
+  .wr-apply-listing { align-items: flex-start; flex-direction: column; }
+  .wr-doc-row { align-items: flex-start; flex-direction: column; }
+  .wr-doc-row input { max-width: 100%; }
+  .wr-interview { padding: 22px 16px; }
+  .wr-flats-actions { justify-content: flex-start; }
 }

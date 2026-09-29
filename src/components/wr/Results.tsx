@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AGENT_KICKOFF, AgentNotConfigured, Emblem, Typed, streamAgent, type ChatTurn } from "./shared";
 import {
@@ -201,11 +202,13 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
   const alt = data.alternatives[index];
   const rooms = prefs.roomsNeeded;
   const [state, setState] = useState<{ data: ListingsApiResponse | null; error: string | null }>({ data: null, error: null });
+  const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     const q = new URLSearchParams({ plrId: alt.plr.plr_id });
-    if (rooms) q.set("rooms", String(rooms));
+    if (rooms && !showAll) q.set("rooms", String(rooms));
+    if (showAll) q.set("all", "1");
     fetch(`/api/listings?${q}`)
       .then(async (r) => {
         if (!r.ok) throw new Error((await r.json()).error ?? `HTTP ${r.status}`);
@@ -216,11 +219,11 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
     return () => {
       cancelled = true;
     };
-  }, [alt.plr.plr_id, rooms]);
+  }, [alt.plr.plr_id, rooms, showAll]);
 
   const listings = state.data?.listings ?? [];
   const exact = state.data?.exactRoomMatch ?? true;
-  const roomsText = rooms ? `${rooms >= 5 ? "5+" : rooms} rooms` : "Homes";
+  const roomsText = showAll ? "All homes" : rooms ? `${rooms >= 5 ? "5+" : rooms} rooms` : "Homes";
   const categories = poiCategoriesFor(prefs);
 
   return (
@@ -231,7 +234,10 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
           <h2>{state.data && listings.length === 0 ? "No example flats here yet" : exact ? `${roomsText}, as you asked` : `Closest matches to ${roomsText.toLowerCase()}`}</h2>
           <p>Example listings — for a feel of what’s typical here, not current live offers. Prices come from a pricing model and run below real market level.</p>
         </div>
-        <button type="button" className="wr-btn wr-btn-ghost" onClick={onClose}>Hide flats</button>
+        <div className="wr-flats-actions">
+          {state.data && listings.length > 0 && <button type="button" className="wr-btn wr-btn-ghost" onClick={() => setShowAll((v) => !v)}>{showAll ? "Show three flats" : "See all flats in this Kiez"}</button>}
+          <button type="button" className="wr-btn wr-btn-ghost" onClick={onClose}>Hide flats</button>
+        </div>
       </div>
 
       {state.data && !exact && listings.length > 0 && (
@@ -270,6 +276,7 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
                   {l.has_balcony && <b>+ Balcony</b>}
                   {l.has_lift && <b>+ Lift</b>}
                 </div>
+                <Link className="wr-btn wr-btn-yellow wr-flat-apply" href={`/apply?listingId=${encodeURIComponent(l.id)}&plrId=${encodeURIComponent(alt.plr.plr_id)}&kiez=${encodeURIComponent(alt.plr.plr_name)}`}>Apply for this flat →</Link>
               </div>
             </article>
           ) : (

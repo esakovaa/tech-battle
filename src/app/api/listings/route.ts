@@ -10,6 +10,7 @@ import { getPlanungsraumById } from "@/lib/rank";
  *
  * GET /api/listings?plrId=03601347&rooms=3
  * rooms is optional — omit it to get unfiltered examples for that Kiez.
+ * all=1 returns the full matching set instead of the three-card preview.
  */
 export async function GET(req: NextRequest) {
   const plrId = req.nextUrl.searchParams.get("plrId");
@@ -29,7 +30,8 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  const { listings, exactRoomMatch } = getExampleListings(plrId, rooms);
+  const all = req.nextUrl.searchParams.get("all") === "1";
+  const { listings, exactRoomMatch } = getExampleListings(plrId, rooms, all ? Number.MAX_SAFE_INTEGER : 3);
 
   return NextResponse.json({
     plrId,
