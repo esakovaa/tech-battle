@@ -71,9 +71,14 @@ interface KiezMapData {
 
 export interface KiezMapProps {
   plrId: string;
-  /** Which POI categories to show — pass the ones the user actually
-   *  selected in the intake (e.g. kids.kita -> "kita", hobbies.yoga ->
-   *  "n_yoga_studios"). Omit for all categories. */
+  /** Which POI categories to show. For a real user, pass
+   *  preferencesToPoiCategories(prefs) from lib/poi-locations.ts — not
+   *  a hand-picked list — so the map only ever shows what they actually
+   *  asked about in the intake (kita/kidDoctor/yoga/gym/bouldering; there
+   *  is no point-location school data, see that function's doc comment).
+   *  Omit this prop entirely for the "show every category" QA default
+   *  (see /map-test) — an empty array is NOT the same thing, it means
+   *  "show nothing" (a real user who matched none of the 5 categories). */
   categories?: PoiCategory[];
   currentAddress?: string;
   commuteAddresses?: string[];
@@ -110,7 +115,11 @@ export default function KiezMap({ plrId, categories, currentAddress, commuteAddr
   useEffect(() => {
     let cancelled = false;
     const params = new URLSearchParams({ plrId });
-    if (categories?.length) params.set("categories", categories.join(","));
+    // Prop omitted -> no categories param -> API shows every category.
+    // Prop given as [] (e.g. preferencesToPoiCategories matched nothing)
+    // -> categories="" -> API shows nothing. See getPoisForKiez's comment —
+    // these two are deliberately different, not both "falsy -> show all."
+    if (categories !== undefined) params.set("categories", categories.join(","));
     if (currentAddress) params.set("currentAddress", currentAddress);
     commuteAddresses?.slice(0, 2).forEach((a) => params.append("commuteAddress", a));
 

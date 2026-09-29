@@ -16,7 +16,18 @@ const PRESETS = [
   { plrId: "01100308", label: "Charitéviertel (Mitte, central)" },
 ];
 
-const ALL_CATEGORIES: PoiCategory[] = ["kita", "n_yoga_studios", "n_kinderarzt", "n_gym", "n_bouldering"];
+// Label shows the real intake field each category maps to — see
+// preferencesToPoiCategories in lib/poi-locations.ts, the single source of
+// truth a real (non-QA) caller should use instead of picking categories by
+// hand. There's deliberately no "schools" entry: no point-location school
+// data exists at all (kids.highSchool/primarySchool never map to anything).
+const ALL_CATEGORIES: { value: PoiCategory; label: string }[] = [
+  { value: "kita", label: "Kita (kids.kita)" },
+  { value: "n_kinderarzt", label: "Kinderarzt (kids.kidDoctor)" },
+  { value: "n_yoga_studios", label: "Yoga studio (hobbies.yoga)" },
+  { value: "n_gym", label: "Gym (hobbies.gym)" },
+  { value: "n_bouldering", label: "Bouldering (hobbies.bouldering)" },
+];
 
 export default function MapTestPage() {
   return (
@@ -77,10 +88,11 @@ function MapTestForm() {
         </label>
 
         <div>
-          Highlight categories (none checked = show all):{" "}
-          {ALL_CATEGORIES.map((cat) => (
-            <label key={cat} style={{ marginRight: 12 }}>
-              <input type="checkbox" checked={categories.includes(cat)} onChange={() => toggleCategory(cat)} /> {cat}
+          Highlight categories (none checked = show all — a real user&apos;s map instead passes
+          preferencesToPoiCategories(prefs), where none-selected correctly means show nothing):{" "}
+          {ALL_CATEGORIES.map(({ value, label }) => (
+            <label key={value} style={{ marginRight: 12 }}>
+              <input type="checkbox" checked={categories.includes(value)} onChange={() => toggleCategory(value)} /> {label}
             </label>
           ))}
         </div>

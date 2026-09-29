@@ -31,10 +31,17 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: `No boundary polygon found for plr_id: ${plrId}` }, { status: 404 });
   }
 
+  // Param OMITTED (null) -> categories stays undefined -> show every
+  // category (the QA/admin default, used by /map-test's "none checked"
+  // state). Param PRESENT, even as an empty string -> categories = [] ->
+  // show nothing — this is what a real user with zero relevant intake
+  // answers should see, not everything. Collapsing these two into one
+  // "falsy" check would silently show a real user POIs they never asked
+  // about whenever preferencesToPoiCategories returns [].
   const categoriesParam = req.nextUrl.searchParams.get("categories");
   let categories: PoiCategory[] | undefined;
-  if (categoriesParam) {
-    const requested = categoriesParam.split(",").map((c) => c.trim());
+  if (categoriesParam !== null) {
+    const requested = categoriesParam.split(",").map((c) => c.trim()).filter(Boolean);
     const invalid = requested.filter((c) => !VALID_CATEGORIES.includes(c as PoiCategory));
     if (invalid.length > 0) {
       return NextResponse.json(
