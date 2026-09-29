@@ -32,7 +32,7 @@ import { getModel, isLlmConfigured } from "@/lib/llm";
 export async function POST(req: NextRequest) {
   if (!isLlmConfigured()) {
     return NextResponse.json(
-      { error: "Cover-letter drafting isn't configured yet — set LLM_PROVIDER + the matching key/model (see .env.example)." },
+      { error: "The story writer is offline on this deployment. Your answers are still here; please try again later." },
       { status: 501 }
     );
   }
