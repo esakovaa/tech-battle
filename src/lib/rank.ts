@@ -14,8 +14,8 @@ export const PRIMARY_SCHOOL_DATA_AVAILABLE = false;
 // Profile Master Table/README.md for why these specific scales, not the
 // ones an earlier version of this code/README assumed).
 // ---------------------------------------------------------------
-const GRUEN_SCALE: Record<string, number> = { gut: 1, mittel: 0.5, schlecht: 0 };
-const BELASTUNG_3_SCALE: Record<string, number> = { gering: 1, mittel: 0.5, hoch: 0 }; // ug_laerm, ug_luft individually
+export const GRUEN_SCALE: Record<string, number> = { gut: 1, mittel: 0.5, schlecht: 0 };
+export const BELASTUNG_3_SCALE: Record<string, number> = { gering: 1, mittel: 0.5, hoch: 0 }; // ug_laerm, ug_luft individually
 
 function minMax(values: number[]): { min: number; max: number } {
   return { min: Math.min(...values), max: Math.max(...values) };

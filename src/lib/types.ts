@@ -161,6 +161,11 @@ export interface UserPreferences {
    *  whatever's available for that Kiez, unfiltered by size. */
   roomsNeeded?: number;
   // commuteAddresses?: string[] — question 7, added once the commute script lands
+  /** Free-text answer to "anything else important to you?" — agent-layer
+   *  only. Deliberately NOT read by rank.ts/compare.ts: it never affects
+   *  filtering or scoring, only what the agent chooses to surface/narrate
+   *  (see lib/context-criteria.ts and the /api/agent system prompt). */
+  additionalContext?: string;
 }
 
 // The soft-weighted (non-filter) scoring factors, derived from the intake
