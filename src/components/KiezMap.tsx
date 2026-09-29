@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, CircleMarker, Popup } from "react-leaflet";
+import { Fragment, useEffect, useState } from "react";
+import { MapContainer, TileLayer, GeoJSON, CircleMarker, Polyline, Tooltip, Popup } from "react-leaflet";
 import type { LatLngBoundsExpression, LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { PoiCategory } from "@/lib/poi-locations";
@@ -31,6 +31,21 @@ const CATEGORY_STYLE: Record<PoiCategory, { color: string; label: string }> = {
 };
 const CURRENT_COLOR = "#1a1a2e";
 const COMMUTE_COLOR = "#2563eb";
+
+// Thunderforest's "Pioneer" style reads closer to the Wurzelraum
+// cottagecore brand than plain OSM tiles. Falls back to keyless OSM tiles
+// when no key is configured (e.g. a fresh clone without .env.local set up).
+const THUNDERFOREST_API_KEY = process.env.NEXT_PUBLIC_THUNDERFOREST_API_KEY;
+const TILE_LAYER = THUNDERFOREST_API_KEY
+  ? {
+      url: `https://{s}.tile.thunderforest.com/pioneer/{z}/{x}/{y}.png?apikey=${THUNDERFOREST_API_KEY}`,
+      attribution:
+        '&copy; <a href="https://www.thunderforest.com/">Thunderforest</a>, &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }
+  : {
+      url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    };
 
 interface PoiLocation {
   plr_id: string;
@@ -76,6 +91,25 @@ function flattenCoords(geom: GeoJSON.Geometry): LatLngTuple[] {
   };
   if ("coordinates" in geom) walk(geom.coordinates);
   return points;
+}
+
+// Average of the boundary's outline points — a good enough visual anchor
+// for "where this Kiez is" when drawing a commute line, not a true
+// area-weighted centroid.
+function outlineCentroid(geom: GeoJSON.Geometry): LatLngTuple {
+  const points = flattenCoords(geom);
+  const [latSum, lonSum] = points.reduce(([la, lo], [lat, lon]) => [la + lat, lo + lon], [0, 0]);
+  return [latSum / points.length, lonSum / points.length];
+}
+
+function haversineKm([lat1, lon1]: LatLngTuple, [lat2, lon2]: LatLngTuple): number {
+  const R = 6371;
+  const toRad = (deg: number) => (deg * Math.PI) / 180;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
 function computeBounds(data: KiezMapData): LatLngBoundsExpression {
@@ -148,14 +182,12 @@ export default function KiezMap({ plrId, categories, currentAddress, commuteAddr
   }
 
   const categoriesPresent = Array.from(new Set(data.pois.map((p) => p.category)));
+  const kiezCenter = outlineCentroid(data.boundary.geometry);
 
   return (
     <div style={{ position: "relative", height }}>
       <MapContainer bounds={computeBounds(data)} boundsOptions={{ padding: [24, 24] }} style={{ height: "100%", width: "100%" }}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
+        <TileLayer url={TILE_LAYER.url} attribution={TILE_LAYER.attribution} />
         <GeoJSON
           data={data.boundary}
           style={{ color: "#334155", weight: 2, fillColor: "#94a3b8", fillOpacity: 0.08 }}
@@ -187,20 +219,34 @@ export default function KiezMap({ plrId, categories, currentAddress, commuteAddr
             </Popup>
           </CircleMarker>
         )}
-        {data.commutes.map((c, i) => (
-          <CircleMarker
-            key={i}
-            center={[c.lat, c.lon]}
-            radius={9}
-            pathOptions={{ color: "#fff", weight: 2, fillColor: COMMUTE_COLOR, fillOpacity: 1 }}
-          >
-            <Popup>
-              <strong>Commute destination</strong>
-              <br />
-              {c.address}
-            </Popup>
-          </CircleMarker>
-        ))}
+        {data.commutes.map((c, i) => {
+          const commutePoint: LatLngTuple = [c.lat, c.lon];
+          return (
+            <Fragment key={i}>
+              <Polyline
+                positions={[kiezCenter, commutePoint]}
+                pathOptions={{ color: COMMUTE_COLOR, weight: 2, dashArray: "6 8", opacity: 0.7 }}
+              >
+                <Tooltip direction="center" permanent={false}>
+                  {haversineKm(kiezCenter, commutePoint).toFixed(1)} km (straight-line) to {c.address}
+                </Tooltip>
+              </Polyline>
+              <CircleMarker
+                center={commutePoint}
+                radius={9}
+                pathOptions={{ color: "#fff", weight: 2, fillColor: COMMUTE_COLOR, fillOpacity: 1 }}
+              >
+                <Popup>
+                  <strong>Commute destination</strong>
+                  <br />
+                  {c.address}
+                  <br />
+                  {haversineKm(kiezCenter, commutePoint).toFixed(1)} km straight-line from this Kiez
+                </Popup>
+              </CircleMarker>
+            </Fragment>
+          );
+        })}
       </MapContainer>
 
       <div

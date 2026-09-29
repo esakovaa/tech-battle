@@ -37,20 +37,28 @@ actually present. Zero page/console errors from the component itself.
 
 ## Tile skin
 
-Base tiles are the standard OpenStreetMap raster tiles (`tile.openstreetmap.org`) — no API key
-needed. **Tried CARTO Positron for a cleaner, more brand-matching muted look first, but reverted:
-CARTO now gates `basemaps.cartocdn.com` behind a free-but-signup-required API key**, which wasn't
-true when this was first tried. If a closer-to-brand skin is wanted later, either sign up for a
-CARTO API key (`carto.com/basemaps/apikey`) and add it to the `url`, or use a genuinely keyless
-alternative like OpenTopoMap (`{s}.tile.opentopomap.org`) — verify no-key-required status live
-before switching again, since these policies change.
+`KiezMap.tsx` picks its `TileLayer` based on `NEXT_PUBLIC_THUNDERFOREST_API_KEY` (see
+`.env.example`):
+
+- **Set** → Thunderforest's "Pioneer" style, closer to the Wurzelraum cottagecore look than plain
+  OSM tiles. Free tier, one signup at thunderforest.com. `NEXT_PUBLIC_` because the browser fetches
+  tiles directly — the key is visible in the network tab by design, same as any Thunderforest
+  usage; their own rate limiting guards it, not secrecy.
+  - Tried CARTO Positron first for a similar muted look; reverted because CARTO now gates
+    `basemaps.cartocdn.com` behind a free-but-signup-required API key, which wasn't true when
+    first tried. Worth knowing if revisiting tile providers again — verify no-key-required status
+    live, these policies change.
+- **Unset** → falls back to the standard keyless OpenStreetMap tile server
+  (`tile.openstreetmap.org`), so a fresh clone without `.env.local` configured still renders a
+  working map.
 
 ## Known gap: two OpenStreetMap domains are blocked in this sandbox
 
-- **`tile.openstreetmap.org`** (the actual map background imagery) — confirmed blocked via the
-  agent-proxy's own `recentRelayFailures` log (`connect_rejected`, policy denial). The map renders
-  correctly *without* tiles (gray background, boundary + markers still fully correct) but needs this
-  domain allowed to show real street/satellite imagery underneath. Not an issue on a real machine
+- **`tile.openstreetmap.org`** (the actual map background imagery, used as the fallback skin
+  above) — confirmed blocked via the agent-proxy's own `recentRelayFailures` log
+  (`connect_rejected`, policy denial). The map renders correctly *without* tiles (gray background,
+  boundary + markers still fully correct) but needs this domain allowed to show real street
+  imagery underneath. Not an issue on a real machine
   outside this sandbox.
 - **`nominatim.openstreetmap.org`** (address → coordinates geocoding, used for `currentAddress` /
   `commuteAddress` and also `/api/rank`'s existing `currentAddress` fallback) — this one is stranger:
