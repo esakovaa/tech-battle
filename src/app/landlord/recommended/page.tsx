@@ -19,7 +19,6 @@ interface ApplicantDetail {
 }
 
 function ApplicantCard({ detail }: { detail: ApplicantDetail }) {
-  const [showNarrative, setShowNarrative] = useState(false);
   const household = detail.shownNotScored.find((s) => s.label === "Household")?.value ?? "";
 
   return (
@@ -54,21 +53,20 @@ function ApplicantCard({ detail }: { detail: ApplicantDetail }) {
         </p>
       )}
 
+      {detail.narrative ? (
+        <section className="ll-narrative-box" aria-label="Applicant story">
+          <span className="ll-narrative-label">Applicant’s story · context only · never used in screening or ranking</span>
+          <p>{detail.narrative.text}</p>
+        </section>
+      ) : (
+        <p className="ll-narrative-box ll-narrative-empty">This applicant hasn’t shared a personal note.</p>
+      )}
+
       <div className="ll-card-actions">
         <button className="ll-btn-primary" type="button">
           📅 Invite to viewing
         </button>
-        <button className="ll-btn-ghost" type="button" onClick={() => setShowNarrative((s) => !s)}>
-          {showNarrative ? "Hide application" : "Open application"}
-        </button>
       </div>
-
-      {showNarrative && detail.narrative && (
-        <div className="ll-narrative-box">
-          <span className="ll-narrative-label">{detail.narrative.note.toUpperCase()}</span>
-          {detail.narrative.text}
-        </div>
-      )}
     </div>
   );
 }
