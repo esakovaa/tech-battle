@@ -37,9 +37,19 @@ export function buildComparisonRows(
 ): FactorDelta[] {
   const rows: FactorDelta[] = [];
 
-  // Crime and kids-population are always-on baseline scoring factors (see
-  // preferencesToWeights in rank.ts) — shown unconditionally, unlike the
-  // rows below which only appear when the user actually selected them.
+  // Distance, crime, and kids-population are always-on — shown
+  // unconditionally, unlike the rows below which only appear when the
+  // user actually selected them. Distance is framed higherIsBetter=true:
+  // the product deliberately always recommends further-from-center
+  // alternatives (see findTopAlternatives in rank.ts), so "further" is
+  // shown as a pro, not a neutral fact.
+  rows.push({
+    factor: "Distance from city center (Alexanderplatz)",
+    currentDisplay: `${current.distance_from_center_km.toFixed(1)} km`,
+    alternativeDisplay: `${alt.distance_from_center_km.toFixed(1)} km`,
+    direction: dir(alt.distance_from_center_km, current.distance_from_center_km, true),
+  });
+
   rows.push({
     factor: "Crime rate (per 10k residents)",
     currentDisplay: current.crime_rate_per_10k_2017_2019?.toFixed(1) ?? "unknown",
