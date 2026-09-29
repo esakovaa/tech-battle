@@ -24,6 +24,7 @@ export default function ApplyForm({ listing, kiez }: { listing: ExampleListing; 
   const [docStatuses, setDocStatuses] = useState<Partial<Record<DocKey, DocStatus>>>({});
   const [answers, setAnswers] = useState(["", "", ""]);
   const [draft, setDraft] = useState("");
+  const [landlordEmail, setLandlordEmail] = useState("");
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -39,6 +40,16 @@ export default function ApplyForm({ listing, kiez }: { listing: ExampleListing; 
   }, [docStatuses, files, income, minimumIncome, moveIn, smoking]);
   const failed = checks.some((c) => c.pass === false);
   const ready = checks.every((c) => c.pass === true);
+  const validLandlordEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(landlordEmail.trim());
+
+  function openEmailDraft() {
+    if (!validLandlordEmail || !draft) return;
+    const subject = `Rental application for a ${listing.rooms}-room flat in ${kiez}`;
+    const body = `${draft.trim()}\n\nBest regards,`;
+    const recipient = encodeURIComponent(landlordEmail.trim()).replace(/%40/gi, "@");
+    const params = new URLSearchParams({ subject, body });
+    window.location.href = `mailto:${recipient}?${params.toString()}`;
+  }
 
   async function chooseFile(key: DocKey, file?: File) {
     if (!file) return;
@@ -50,6 +61,19 @@ export default function ApplyForm({ listing, kiez }: { listing: ExampleListing; 
     setFiles((current) => ({ ...current, [key]: file }));
     if (key === "employment_contract") return;
     setDocStatuses((current) => ({ ...current, [key]: { state: "checking", detail: "Checking document…" } }));
+    // Explicitly synthetic, local-only fixtures let the demo reach the story
+    // builder without pretending their contents prove a real applicant's
+    // identity, credit standing, income, or rental history.
+    if (process.env.NODE_ENV === "development" && file.name.startsWith("wurzelraum-demo-accepted-")) {
+      setDocStatuses((current) => ({
+        ...current,
+        [key]: {
+          state: "verified",
+          detail: "Demo fixture accepted for the local walkthrough only. No real document was verified.",
+        },
+      }));
+      return;
+    }
     const form = new FormData();
     form.set("file", file);
     form.set("documentType", key);
@@ -93,16 +117,16 @@ export default function ApplyForm({ listing, kiez }: { listing: ExampleListing; 
         <fieldset className="wr-apply-field"><legend>Does anyone in your household smoke?</legend><div className="wr-apply-pills"><button type="button" className={smoking === "no" ? "is-active" : ""} onClick={() => setSmoking("no")}>No</button><button type="button" className={smoking === "yes" ? "is-active" : ""} onClick={() => setSmoking("yes")}>Yes</button></div></fieldset>
         <label className="wr-apply-field">When could you move in?<input type="date" value={moveIn} onChange={(e) => setMoveIn(e.target.value)} /></label>
       </section>
-      <section className="wr-apply-section"><span className="wr-eyebrow">02 · Documents</span><h2>Attach the requested documents</h2><p>Each required file is sent to the configured vision model for a narrow type check. Identity documents are checked for validity only; no personal details are extracted. This prototype does not store the files.</p>
+      <section className="wr-apply-section"><span className="wr-eyebrow">02 · Documents</span><h2>Attach the requested documents</h2><p>Real uploads are sent to the configured vision model for a narrow type check. Identity documents are checked for validity only; no personal details are extracted. This prototype does not store the files.</p><p>Local demo fixtures with the <code>wurzelraum-demo-accepted-</code> filename prefix skip extraction so you can preview the interview. They are never treated as verified documents in production.</p>
         <div className="wr-doc-list">{DOCS.map(([key, label]) => <label className="wr-doc-row" key={key}><span><b>{label}</b>{files[key] ? <small>{files[key]!.name}</small> : <small>{key === "employment_contract" ? "Optional" : "Required"}</small>}</span><input type="file" accept={ACCEPT} onChange={(e) => chooseFile(key, e.target.files?.[0])} /></label>)}</div>
       </section>
       <section className="wr-apply-section"><span className="wr-eyebrow">03 · How the basic check works</span><h2>Clear before you continue</h2><div className="wr-check-list">{checks.map((check) => <div className="wr-check-row" key={check.label}><span className={check.pass === false ? "is-fail" : check.pass ? "is-pass" : ""}>{check.pass === false ? "×" : check.pass ? "✓" : "○"}</span><div><b>{check.label}</b><p>{check.detail}</p></div></div>)}</div>
         {failed && <div className="wr-apply-alert" role="alert"><b>This example’s basic requirements don’t fit.</b><p>We won’t prepare or forward an application. These are prototype criteria, not a real landlord decision.</p></div>}
         {!failed && !ready && Object.values(docStatuses).some((status) => status?.state === "unavailable") && <div className="wr-apply-alert" role="status"><b>We couldn’t verify one or more documents.</b><p>The document service may not be configured. We haven’t marked these files as valid, and the application story stays locked until the checks succeed.</p></div>}
       </section>
-      {ready && !failed && <section className="wr-apply-section wr-interview"><span className="wr-eyebrow">04 · Your story</span><h2>A home is also about the people who live there.</h2><p>Now that we have your documents (and run basic checks on them), let’s craft your personal story to touch the landlord’s heart. Small neighbourhoods, Brandenburg and the suburbs often care about the people behind an application, especially when a landlord lives nearby. Tell us only what you’re comfortable sharing; your answers won’t affect the basic check.</p>{["Could you tell us a little about your household and what makes a place feel like home?", `What draws you to ${kiez}?`, "Is there anything else you’d like the landlord to know?"] .map((question, i) => <label className="wr-apply-field" key={question}>{question}<textarea rows={3} value={answers[i]} onChange={(e) => setAnswers((current) => current.map((answer, j) => j === i ? e.target.value : answer))} /></label>)}<button className="wr-btn wr-btn-yellow" type="button" disabled={busy || !answers.some((a) => a.trim())} onClick={makeDraft}>{busy ? "Preparing your draft…" : "Help me shape my story →"}</button>{draft && <div className="wr-story-draft"><span className="wr-eyebrow">Your editable draft</span><textarea aria-label="Editable application story" rows={9} value={draft} onChange={(e) => setDraft(e.target.value)} /><p>You stay in control: review and edit every word. This prototype does not submit or send your application.</p></div>}</section>}
+      {ready && !failed && <section className="wr-apply-section wr-interview"><span className="wr-eyebrow">04 · Your story</span><h2>A home is also about the people who live there.</h2><p>Now that we have your documents (and run basic checks on them), let’s craft your personal story to touch the landlord’s heart. Small neighbourhoods, Brandenburg and the suburbs often care about the people behind an application, especially when a landlord lives nearby. Tell us only what you’re comfortable sharing; your answers won’t affect the basic check.</p>{["Could you tell us a little about your household and what makes a place feel like home?", `What draws you to ${kiez}?`, "Is there anything else you’d like the landlord to know?"] .map((question, i) => <label className="wr-apply-field" key={question}>{question}<textarea rows={3} value={answers[i]} onChange={(e) => setAnswers((current) => current.map((answer, j) => j === i ? e.target.value : answer))} /></label>)}<button className="wr-btn wr-btn-yellow" type="button" disabled={busy || !answers.some((a) => a.trim())} onClick={makeDraft}>{busy ? "Preparing your draft…" : "Help me shape my story →"}</button>{draft && <div className="wr-story-draft"><span className="wr-eyebrow">Your editable draft</span><textarea aria-label="Editable application story" rows={9} value={draft} onChange={(e) => setDraft(e.target.value)} /><p>Review and edit every word. Wurzelraum won’t send the email; your mail app will open a draft for you to review and send.</p><label className="wr-apply-field">Landlord’s email address<input type="email" autoComplete="email" value={landlordEmail} onChange={(e) => setLandlordEmail(e.target.value)} placeholder="landlord@example.com" /></label><button className="wr-btn wr-btn-yellow wr-story-email-btn" type="button" disabled={!validLandlordEmail} onClick={openEmailDraft}>Open in email app →</button></div>}</section>}
       {message && <p className="wr-apply-alert" role="status">{message}</p>}
-      <p className="wr-apply-footnote">Prototype only. Example flats, sample requirements and local file checks are not a real application service. Nothing is sent to a landlord.</p>
+      <p className="wr-apply-footnote">Prototype only. Example flats and sample requirements are not real offers. Wurzelraum doesn’t send applications; email opens in your own mail app for you to review and send.</p>
     </div>
   </main>;
 }

@@ -394,19 +394,22 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
             <span>{canSubmit ? "Takes a few seconds. You can change any answer later." : "Add your current address first — question 01."}</span>
           </div>
         </div>
+      </section>
 
-        <div className="wr-wrap" style={{ margin: "56px 0" }}>
-          <div className="wr-landlord-cta">
-            <div className="wr-landlord-cta-text">
-              <h3>Own a flat in Berlin?</h3>
-              <p>Screen hundreds of applications fairly — affordability, security and fit checked, protected characteristics never used.</p>
-            </div>
-            <a className="wr-landlord-cta-btn" href="/landlord">
-              I want to list my apartment →
-            </a>
+      <section className="wr-landlord-band" aria-labelledby="wr-landlord-title">
+        <div className="wr-landlord-band-inner wr-wrap">
+          <div className="wr-landlord-band-copy">
+            <span className="wr-eyebrow">For Berlin landlords</span>
+            <h2 id="wr-landlord-title">Own a flat in Berlin?</h2>
+            <p>Screen applications fairly, with affordability and fit checks that never use protected characteristics.</p>
           </div>
+          <a className="wr-landlord-band-btn" href="/landlord">
+            I want to list my apartment <span aria-hidden="true">→</span>
+          </a>
         </div>
+      </section>
 
+      <section className="wr-dark">
         <footer id="footer" className="wr-footer wr-wrap">
           <span className="wr-display" style={{ fontSize: 28, letterSpacing: 0, color: "var(--wr-yellow)" }}>Wurzelraum</span>
           <span>BERLIN PLANUNGSRAUM DATA · PHOTOS VIA UNSPLASH · © 2026</span>
