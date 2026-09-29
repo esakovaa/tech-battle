@@ -4,12 +4,19 @@ import boundariesData from "@/data/planungsraum_boundaries.json";
 import { getAllPlanungsraeume } from "./rank";
 import type { PlanungsraumProfile } from "./types";
 
-interface BoundaryFeature {
+export interface BoundaryFeature {
   type: "Feature";
   properties: { plr_id: string; plr_name: string };
   geometry: GeoJSON.MultiPolygon | GeoJSON.Polygon;
 }
 const boundaries = (boundariesData as unknown as { features: BoundaryFeature[] }).features;
+
+/** One Planungsraum's boundary polygon, for map rendering — e.g. the
+ *  per-Kiez map (see app/api/kiez-map). Avoids shipping the whole
+ *  5.8MB/542-feature file to the client for a single Kiez's map. */
+export function getBoundaryFeature(plrId: string): BoundaryFeature | undefined {
+  return boundaries.find((f) => f.properties.plr_id === plrId);
+}
 
 /** Nominatim usage policy: max 1 req/sec, identify with a real User-Agent.
  *  Same pattern already used for the air-quality station geocoding in the
