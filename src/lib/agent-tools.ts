@@ -54,6 +54,13 @@ const preferencesInputSchema = z.object({
       bouldering: z.boolean().default(false),
     })
     .default({ yoga: false, gym: false, bouldering: false }),
+  commuteAddresses: z
+    .array(z.string())
+    .optional()
+    .describe(
+      "Free-text addresses (e.g. workplaces) to compute real transit commute time against — up to 2 (both " +
+        "partners' commutes average together). Omit for no commute filtering/scoring."
+    ),
 });
 
 export const getTopKiezRecommendations = tool({
@@ -90,10 +97,11 @@ export const getTopKiezRecommendations = tool({
       noiseAirSensitive: input.noiseAirSensitive,
       parksImportant: input.parksImportant,
       hobbies: input.hobbies,
+      commuteAddresses: input.commuteAddresses,
     };
 
-    const { results, secondBest, droppedFilters, distinctRadiusTiers, distanceConstraintRelaxed } =
-      findTopAlternatives(currentPlrId!, prefs, 3);
+    const { results, secondBest, droppedFilters, distinctRadiusTiers, distanceConstraintRelaxed, commuteConstraintRelaxed } =
+      await findTopAlternatives(currentPlrId!, prefs, 3);
     const comparisonTable = buildComparisonTable(current, results, prefs);
 
     return {
@@ -104,6 +112,7 @@ export const getTopKiezRecommendations = tool({
       droppedFilters,
       distinctRadiusTiers,
       distanceConstraintRelaxed,
+      commuteConstraintRelaxed,
       primarySchoolDataAvailable: PRIMARY_SCHOOL_DATA_AVAILABLE,
       primarySchoolNote: prefs.kids.primarySchool
         ? "Primary school quality/presence data isn't available yet — this criterion wasn't used to filter or rank results."

@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, GeoJSON, CircleMarker, Polyline, Tooltip, Popu
 import type { LatLngBoundsExpression, LatLngTuple } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { PoiCategory } from "@/lib/poi-locations";
+import { outlineCentroid, haversineKm, flattenCoords } from "@/lib/geo";
 
 /**
  * Per-Kiez map: real boundary polygon, real POI points (colored by
@@ -79,41 +80,8 @@ export interface KiezMapProps {
   height?: number | string;
 }
 
-function flattenCoords(geom: GeoJSON.Geometry): LatLngTuple[] {
-  const points: LatLngTuple[] = [];
-  const walk = (coords: unknown): void => {
-    if (Array.isArray(coords) && typeof coords[0] === "number") {
-      const [lon, lat] = coords as [number, number];
-      points.push([lat, lon]);
-    } else if (Array.isArray(coords)) {
-      coords.forEach(walk);
-    }
-  };
-  if ("coordinates" in geom) walk(geom.coordinates);
-  return points;
-}
-
-// Average of the boundary's outline points — a good enough visual anchor
-// for "where this Kiez is" when drawing a commute line, not a true
-// area-weighted centroid.
-function outlineCentroid(geom: GeoJSON.Geometry): LatLngTuple {
-  const points = flattenCoords(geom);
-  const [latSum, lonSum] = points.reduce(([la, lo], [lat, lon]) => [la + lat, lo + lon], [0, 0]);
-  return [latSum / points.length, lonSum / points.length];
-}
-
-function haversineKm([lat1, lon1]: LatLngTuple, [lat2, lon2]: LatLngTuple): number {
-  const R = 6371;
-  const toRad = (deg: number) => (deg * Math.PI) / 180;
-  const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
-
 function computeBounds(data: KiezMapData): LatLngBoundsExpression {
-  const points = flattenCoords(data.boundary.geometry);
+  const points: LatLngTuple[] = flattenCoords(data.boundary.geometry);
   data.pois.forEach((p) => points.push([p.lat, p.lon]));
   if (data.current) points.push([data.current.lat, data.current.lon]);
   data.commutes.forEach((c) => points.push([c.lat, c.lon]));
@@ -220,7 +188,7 @@ export default function KiezMap({ plrId, categories, currentAddress, commuteAddr
           </CircleMarker>
         )}
         {data.commutes.map((c, i) => {
-          const commutePoint: LatLngTuple = [c.lat, c.lon];
+          const commutePoint: [number, number] = [c.lat, c.lon];
           return (
             <Fragment key={i}>
               <Polyline

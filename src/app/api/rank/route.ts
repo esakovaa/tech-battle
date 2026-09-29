@@ -61,10 +61,11 @@ export async function POST(req: NextRequest) {
       gym: body.hobbies?.gym ?? false,
       bouldering: body.hobbies?.bouldering ?? false,
     },
+    commuteAddresses: body.commuteAddresses,
   };
 
-  const { results, secondBest, droppedFilters, distinctRadiusTiers, distanceConstraintRelaxed } =
-    findTopAlternatives(currentPlrId!, prefs, 3);
+  const { results, secondBest, droppedFilters, distinctRadiusTiers, distanceConstraintRelaxed, commuteConstraintRelaxed } =
+    await findTopAlternatives(currentPlrId!, prefs, 3);
   const comparisonTable = buildComparisonTable(current, results, prefs);
 
   return NextResponse.json({
@@ -75,6 +76,7 @@ export async function POST(req: NextRequest) {
     droppedFilters,
     distinctRadiusTiers,
     distanceConstraintRelaxed,
+    commuteConstraintRelaxed,
     primarySchoolDataAvailable: PRIMARY_SCHOOL_DATA_AVAILABLE,
     primarySchoolNote: prefs.kids.primarySchool
       ? "Primary school quality/presence data isn't available yet — this criterion wasn't used to filter or rank results."
