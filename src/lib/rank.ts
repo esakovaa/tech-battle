@@ -45,6 +45,31 @@ const kidsPopRange = minMax(ALL.map((p) => kidsUnder18Weighted(p, 1)));
 const kidsPopKitaRange = minMax(ALL.map((p) => kidsUnder18Weighted(p, 2)));
 
 // ---------------------------------------------------------------
+// Distance-from-center tiers ("recommend more remote Kieze first") —
+// terciles computed once over the whole city, so tier boundaries are a
+// stable, meaningful reference (not shifting per-request based on
+// whatever's left after filtering). See findTopAlternatives for how these
+// combine with the "always further than the user's current Kiez" rule.
+// ---------------------------------------------------------------
+function quantile(sortedAsc: number[], q: number): number {
+  const idx = (sortedAsc.length - 1) * q;
+  const lo = Math.floor(idx);
+  const hi = Math.ceil(idx);
+  if (lo === hi) return sortedAsc[lo];
+  return sortedAsc[lo] + (sortedAsc[hi] - sortedAsc[lo]) * (idx - lo);
+}
+const distancesAsc = ALL.map((p) => p.distance_from_center_km).sort((a, b) => a - b);
+const DISTANCE_TIER_BOUNDS: [number, number] = [quantile(distancesAsc, 1 / 3), quantile(distancesAsc, 2 / 3)];
+
+/** 0 = near, 1 = mid, 2 = far, by city-wide terciles of distance from
+ *  Alexanderplatz. */
+function distanceTier(km: number): 0 | 1 | 2 {
+  if (km < DISTANCE_TIER_BOUNDS[0]) return 0;
+  if (km < DISTANCE_TIER_BOUNDS[1]) return 1;
+  return 2;
+}
+
+// ---------------------------------------------------------------
 // Soft (weighted, non-excluding) factors — only the 4 things actually
 // asked about in the intake. Everything else the earlier version of this
 // file scored (safety, transit, kita capacity, location quality) either
@@ -251,10 +276,68 @@ export interface FindTopAlternativesResult {
   results: RankedResult[];
   secondBest: boolean;
   droppedFilters: string[];
+  /** All 3 results landed in 3 different distance-from-center tiers. */
+  distinctRadiusTiers: boolean;
+  /** The "further than your current Kiez" rule had to be dropped entirely
+   *  to reach `count` results — see the comment on findTopAlternatives. */
+  distanceConstraintRelaxed: boolean;
+}
+
+/** Score + rank a candidate pool, then greedily pick one winner per
+ *  distance tier (visiting far -> mid -> near, so a fallback-fill below
+ *  favors remoteness too), falling back to best-score-regardless-of-tier
+ *  for any slots a tier couldn't fill. Final order is furthest-from-center
+ *  first — "recommend more remote Kieze first" as literal presentation
+ *  order, not just a selection bias. */
+function rankAndPickByTier(
+  candidates: PlanungsraumProfile[],
+  weights: FactorWeights,
+  prefs: UserPreferences,
+  count: number
+): { picked: RankedResult[]; distinctRadiusTiers: boolean } {
+  const ranked = candidates
+    .map((p) => {
+      const { score, factorScores } = scorePlanungsraum(p, weights, prefs);
+      return { plr: p, score, factorScores } as RankedResult;
+    })
+    .sort((a, b) => b.score - a.score);
+
+  const seenPlz = new Set<string>();
+  const byTier: (RankedResult | undefined)[] = [undefined, undefined, undefined];
+  for (const tier of [2, 1, 0] as const) {
+    const winner = ranked.find((r) => distanceTier(r.plr.distance_from_center_km) === tier && !seenPlz.has(r.plr.dominant_plz));
+    if (winner) {
+      byTier[tier] = winner;
+      seenPlz.add(winner.plr.dominant_plz);
+    }
+  }
+  const picked = [2, 1, 0].map((t) => byTier[t]).filter((r): r is RankedResult => r != null);
+  const distinctRadiusTiers = picked.length === count;
+
+  for (const r of ranked) {
+    if (picked.length >= count) break;
+    if (seenPlz.has(r.plr.dominant_plz)) continue;
+    picked.push(r);
+    seenPlz.add(r.plr.dominant_plz);
+  }
+
+  picked.sort((a, b) => b.plr.distance_from_center_km - a.plr.distance_from_center_km);
+  return { picked: picked.slice(0, count), distinctRadiusTiers };
 }
 
 /** Steps 2-4: filter (with graceful degradation), score, and pick the top 3
- *  in different ZIP codes, excluding the user's own current ZIP code too. */
+ *  in different ZIP codes, excluding the user's own current ZIP code too.
+ *
+ * Two deliberately separate rules about distance from Alexanderplatz:
+ * 1. Every alternative must be further from the center than the user's
+ *    current Kiez — applied as a strict pre-filter, BEFORE kita/kidDoctor
+ *    degradation runs, so those get degraded first if candidates are tight.
+ *    Only relaxed as an absolute last resort (see distanceConstraintRelaxed
+ *    below) — this is the one rule the product wants to basically never
+ *    break, unlike kita/kidDoctor which are expected to degrade sometimes.
+ * 2. The 3 picks should land in 3 different distance tiers (near/mid/far)
+ *    where possible, furthest first — see rankAndPickByTier.
+ */
 export function findTopAlternatives(
   currentPlrId: string,
   prefs: UserPreferences,
@@ -265,27 +348,35 @@ export function findTopAlternatives(
   const currentPlz = current.dominant_plz;
 
   const candidatePool = ALL.filter((p) => p.plr_id !== currentPlrId && p.dominant_plz !== currentPlz);
+  const fartherPool = candidatePool.filter((p) => p.distance_from_center_km > current.distance_from_center_km);
+
   const filters = deriveFilters(prefs);
-  const { filtered, droppedFilters } = filterWithDegradation(candidatePool, filters, count);
-
   const weights = preferencesToWeights(prefs);
-  const ranked = filtered
-    .map((p) => {
-      const { score, factorScores } = scorePlanungsraum(p, weights, prefs);
-      return { plr: p, score, factorScores } as RankedResult;
-    })
-    .sort((a, b) => b.score - a.score);
 
-  const picked: RankedResult[] = [];
-  const seenPlz = new Set<string>();
-  for (const r of ranked) {
-    if (seenPlz.has(r.plr.dominant_plz)) continue;
-    picked.push(r);
-    seenPlz.add(r.plr.dominant_plz);
-    if (picked.length === count) break;
+  const { filtered, droppedFilters } = filterWithDegradation(fartherPool, filters, count);
+  let { picked, distinctRadiusTiers } = rankAndPickByTier(filtered, weights, prefs, count);
+  let distanceConstraintRelaxed = false;
+
+  // Last resort: even the full farther-than-current pool (with every
+  // kita/kidDoctor filter already dropped) couldn't reach `count` — relax
+  // the distance rule itself rather than ever returning fewer than
+  // requested. Re-run filter degradation against the full candidate pool.
+  if (picked.length < count) {
+    distanceConstraintRelaxed = true;
+    const fallback = filterWithDegradation(candidatePool, filters, count);
+    const result = rankAndPickByTier(fallback.filtered, weights, prefs, count);
+    picked = result.picked;
+    distinctRadiusTiers = result.distinctRadiusTiers;
+    droppedFilters.push(...fallback.droppedFilters.filter((f) => !droppedFilters.includes(f)));
   }
 
-  return { results: picked, secondBest: droppedFilters.length > 0, droppedFilters };
+  return {
+    results: picked,
+    secondBest: droppedFilters.length > 0,
+    droppedFilters,
+    distinctRadiusTiers,
+    distanceConstraintRelaxed,
+  };
 }
 
 export function getPlanungsraumById(plrId: string): PlanungsraumProfile | undefined {

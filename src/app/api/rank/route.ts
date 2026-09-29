@@ -63,7 +63,8 @@ export async function POST(req: NextRequest) {
     },
   };
 
-  const { results, secondBest, droppedFilters } = findTopAlternatives(currentPlrId!, prefs, 3);
+  const { results, secondBest, droppedFilters, distinctRadiusTiers, distanceConstraintRelaxed } =
+    findTopAlternatives(currentPlrId!, prefs, 3);
   const comparisonTable = buildComparisonTable(current, results, prefs);
 
   return NextResponse.json({
@@ -72,6 +73,8 @@ export async function POST(req: NextRequest) {
     comparisonTable,
     secondBest,
     droppedFilters,
+    distinctRadiusTiers,
+    distanceConstraintRelaxed,
     primarySchoolDataAvailable: PRIMARY_SCHOOL_DATA_AVAILABLE,
     primarySchoolNote: prefs.kids.primarySchool
       ? "Primary school quality/presence data isn't available yet — this criterion wasn't used to filter or rank results."

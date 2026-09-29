@@ -92,7 +92,8 @@ export const getTopKiezRecommendations = tool({
       hobbies: input.hobbies,
     };
 
-    const { results, secondBest, droppedFilters } = findTopAlternatives(currentPlrId!, prefs, 3);
+    const { results, secondBest, droppedFilters, distinctRadiusTiers, distanceConstraintRelaxed } =
+      findTopAlternatives(currentPlrId!, prefs, 3);
     const comparisonTable = buildComparisonTable(current, results, prefs);
 
     return {
@@ -101,6 +102,8 @@ export const getTopKiezRecommendations = tool({
       comparisonTable,
       secondBest,
       droppedFilters,
+      distinctRadiusTiers,
+      distanceConstraintRelaxed,
       primarySchoolDataAvailable: PRIMARY_SCHOOL_DATA_AVAILABLE,
       primarySchoolNote: prefs.kids.primarySchool
         ? "Primary school quality/presence data isn't available yet — this criterion wasn't used to filter or rank results."

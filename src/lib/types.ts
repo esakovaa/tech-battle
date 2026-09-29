@@ -10,6 +10,11 @@ export interface PlanungsraumProfile {
   lat: number;
   lon: number;
   n_addresses: number;
+  /** Great-circle (haversine) distance from this Planungsraum's centroid to
+   *  Alexanderplatz (52.5219, 13.4132), Berlin's conventional city-center
+   *  reference point. Drives the "recommend more remote Kieze first"
+   *  selection logic in rank.ts — see distanceTier / findTopAlternatives. */
+  distance_from_center_km: number;
 
   // Wohnlage (real, exact)
   pct_wohnlage_einfach: number;
@@ -150,6 +155,11 @@ export interface UserPreferences {
   noiseAirSensitive: boolean;
   parksImportant: boolean;
   hobbies: HobbiesCriteria;
+  /** Rooms needed, for the example-flat-listings feature (lib/listings.ts) —
+   *  not used anywhere in ranking/scoring, only to filter listings after a
+   *  Kiez is picked. Optional: omit it and getExampleListings just returns
+   *  whatever's available for that Kiez, unfiltered by size. */
+  roomsNeeded?: number;
   // commuteAddresses?: string[] — question 7, added once the commute script lands
 }
 
@@ -194,5 +204,17 @@ export interface RankResponse {
   comparisonTable: unknown; // filled in by compare.ts's ComparisonTable
   secondBest: boolean;
   droppedFilters: string[];
+  /** True only if all 3 alternatives landed in 3 different distance-from-
+   *  center tiers (near/mid/far) — see rank.ts's distanceTier. False means
+   *  the city's geography (or the user's other filters) didn't leave enough
+   *  further-out candidates to spread across all 3 tiers; some slots were
+   *  filled from whichever tier scored best instead. */
+  distinctRadiusTiers: boolean;
+  /** True if "further from the center than your current Kiez" had to be
+   *  dropped entirely to reach 3 results (e.g. the user already lives in
+   *  one of the most remote Planungsräume in the dataset). Distinct from
+   *  droppedFilters — this is the one constraint the product explicitly
+   *  wants to never relax except as a last resort. */
+  distanceConstraintRelaxed: boolean;
   primarySchoolDataAvailable: false;
 }
