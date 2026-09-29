@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { revealLottery, sha256Hex } from "@/lib/landlord-lottery";
-import { getApplicantFactsById } from "@/lib/landlord-data";
+import { getApplicantFactsById, getApplicantIdentityById } from "@/lib/landlord-data";
 import { anonymizedLabel } from "@/lib/landlord-eval";
 
 /**
@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
       applicantId: id,
       anonLabel: anonLabelById.get(id),
       household: facts ? `${facts.householdAdults} adult(s), ${facts.householdChildren} child(ren)` : undefined,
+      invitationEmail: getApplicantIdentityById(id)?.email,
     };
   });
 

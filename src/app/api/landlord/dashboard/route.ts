@@ -83,11 +83,7 @@ export async function POST(req: NextRequest) {
       employment: EMPLOYMENT_LABELS[f.employmentType],
       documents: `${e.documentsCompleteCount} of ${e.documentsRequiredCount}`,
       meetsAllRequirements: e.meetsAllRequirements,
-      status: e.meetsAllRequirements
-        ? recommended.some((r) => r.applicantId === e.applicantId)
-          ? "Recommended for review"
-          : "Meets requirements"
-        : "Needs a check",
+      status: e.meetsAllRequirements ? "Meets all criteria" : "Needs a check",
     };
   }
 
