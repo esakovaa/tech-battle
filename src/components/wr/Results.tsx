@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AGENT_KICKOFF, AgentNotConfigured, Emblem, Typed, streamAgent, type ChatTurn } from "./shared";
+import { AGENT_KICKOFF, AgentNotConfigured, Emblem, LandlordBand, Typed, streamAgent, type ChatTurn } from "./shared";
 import {
   assignKiezPhotos,
   cellDirection,
@@ -194,6 +194,7 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
       {prefs.additionalContext && <ExtraContext data={data} text={prefs.additionalContext} />}
 
       <Conversation data={data} prefs={prefs} agentPrefs={agentPrefs} />
+      <LandlordBand />
     </div>
   );
 }

@@ -20,6 +20,23 @@ export function Emblem({ size = 52, color = "var(--wr-yellow)", label }: { size?
   );
 }
 
+export function LandlordBand() {
+  return (
+    <section className="wr-landlord-band" aria-labelledby="wr-landlord-title">
+      <div className="wr-landlord-band-inner wr-wrap">
+        <div className="wr-landlord-band-copy">
+          <span className="wr-eyebrow">For Berlin landlords</span>
+          <h2 id="wr-landlord-title">Own a flat in Berlin?</h2>
+          <p>Screen applications fairly, with affordability and fit checks that never use protected characteristics.</p>
+        </div>
+        <a className="wr-landlord-band-btn" href="/landlord">
+          I want to list my apartment <span aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+  );
+}
+
 /** Reveals `text` progressively, like a message being written. Restarts
  *  whenever `text` changes; calls onDone once fully shown. */
 export function Typed({ text, cps = 90, onDone }: { text: string; cps?: number; onDone?: () => void }) {

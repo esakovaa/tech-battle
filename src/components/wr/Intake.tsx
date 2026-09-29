@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { Emblem } from "./shared";
+import { Emblem, LandlordBand } from "./shared";
 import type { RentBudget } from "@/lib/types";
 
 export interface PlrPick {
@@ -396,18 +396,7 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
         </div>
       </section>
 
-      <section className="wr-landlord-band" aria-labelledby="wr-landlord-title">
-        <div className="wr-landlord-band-inner wr-wrap">
-          <div className="wr-landlord-band-copy">
-            <span className="wr-eyebrow">For Berlin landlords</span>
-            <h2 id="wr-landlord-title">Own a flat in Berlin?</h2>
-            <p>Screen applications fairly, with affordability and fit checks that never use protected characteristics.</p>
-          </div>
-          <a className="wr-landlord-band-btn" href="/landlord">
-            I want to list my apartment <span aria-hidden="true">→</span>
-          </a>
-        </div>
-      </section>
+      <LandlordBand />
 
       <section className="wr-dark">
         <footer id="footer" className="wr-footer wr-wrap">
