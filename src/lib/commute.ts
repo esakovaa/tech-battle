@@ -27,6 +27,13 @@ const TIMEZONE = "Europe/Berlin";
  *  reasonable default for a family with kids commuting across Berlin. */
 export const MAX_COMMUTE_MIN = 60;
 
+/** The user's own limit when they gave a sane one, else the default. */
+export function commuteLimit(maxCommuteMinutes?: number): number {
+  return maxCommuteMinutes != null && Number.isFinite(maxCommuteMinutes) && maxCommuteMinutes >= 10 && maxCommuteMinutes <= 180
+    ? maxCommuteMinutes
+    : MAX_COMMUTE_MIN;
+}
+
 function nextWeekdayArrival(hour = ARRIVAL_HOUR, weekday = 2 /* Tuesday, 0=Sunday */): Date {
   const now = new Date();
   const berlinNow = new Date(now.toLocaleString("en-US", { timeZone: TIMEZONE }));

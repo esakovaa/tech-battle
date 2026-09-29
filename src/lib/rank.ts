@@ -1,7 +1,7 @@
 import planungsraumData from "@/data/planungsraum.json";
 import { SOFT_FACTOR_KEYS } from "./types";
 import type { FactorWeights, PlanungsraumProfile, RankedResult, UserPreferences } from "./types";
-import { averageCommuteMinutes, MAX_COMMUTE_MIN, type CommuteOrigin } from "./commute";
+import { averageCommuteMinutes, commuteLimit, type CommuteOrigin } from "./commute";
 import { geocodeAddress } from "./geocode";
 
 const ALL: PlanungsraumProfile[] = planungsraumData as unknown as PlanungsraumProfile[];
@@ -167,12 +167,24 @@ function kidsPopulationScore(p: PlanungsraumProfile, kitaRelevant: boolean): num
 export interface CommuteScoreContext {
   minutesByPlr: Map<string, number | null>;
   range: { min: number; max: number };
+  /** The user's own max commute, when they gave one. */
+  limit?: number;
 }
 
 function commuteScore(p: PlanungsraumProfile, ctx: CommuteScoreContext | undefined): number | null {
   if (!ctx) return null;
   const minutes = ctx.minutesByPlr.get(p.plr_id);
   if (minutes == null) return null; // no VBB data for this Kiez — excluded, not penalized
+  if (ctx.limit) {
+    // Anchored to what THIS user said is acceptable, not just relative to
+    // the shortlist: a door-to-door trip scores 1, one right at the limit
+    // scores 0.2; anything over it (only reachable when the cutoff had
+    // to be relaxed — see pickWithCommute). Past the limit it keeps
+    // falling, so when the cutoff is relaxed, "a bit over" still beats
+    // "far over"; at twice the limit it bottoms out at 0.
+    if (minutes > ctx.limit) return Math.max(0, 0.2 * (1 - (minutes - ctx.limit) / ctx.limit));
+    return 1 - 0.8 * (minutes / ctx.limit);
+  }
   return normalize(minutes, ctx.range.min, ctx.range.max, false); // fewer minutes = better
 }
 
@@ -376,7 +388,8 @@ function buildCommuteShortlist(candidates: PlanungsraumProfile[], weights: Facto
 }
 
 /** Fetches real commute time for a bounded shortlist of `candidates`,
- *  applies the MAX_COMMUTE_MIN hard cutoff, and ranks+picks from the
+ *  applies the max-commute hard cutoff (the user's maxCommuteMinutes, else
+ *  lib/commute.ts's MAX_COMMUTE_MIN), and ranks+picks from the
  *  survivors — falling back to the full (uncut) shortlist, commute used
  *  only as a soft factor, if the cutoff left too few distinct-PLZ results. */
 async function pickWithCommute(
@@ -393,12 +406,15 @@ async function pickWithCommute(
   const minutesByPlr = await withTimeout(averageCommuteMinutes(origins, shortlistIds), COMMUTE_PHASE_BUDGET_MS, fallbackMinutes);
 
   const knownMinutes = Array.from(minutesByPlr.values()).filter((v): v is number => v != null);
+  const limit = commuteLimit(prefs.maxCommuteMinutes);
   const commuteCtx: CommuteScoreContext | undefined =
-    knownMinutes.length > 0 ? { minutesByPlr, range: minMax(knownMinutes) } : undefined;
+    knownMinutes.length > 0
+      ? { minutesByPlr, range: minMax(knownMinutes), limit: prefs.maxCommuteMinutes != null ? limit : undefined }
+      : undefined;
 
   const withinCutoff = shortlist.filter((p) => {
     const m = minutesByPlr.get(p.plr_id);
-    return m == null || m <= MAX_COMMUTE_MIN; // unknown passes through — never excluded on missing data
+    return m == null || m <= limit; // unknown passes through — never excluded on missing data
   });
 
   let { picked, distinctRadiusTiers } = rankAndPickByTier(withinCutoff, weights, prefs, count, commuteCtx);

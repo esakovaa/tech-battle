@@ -8,6 +8,7 @@ import {
   cellDirection,
   composeNarrative,
   conditionLabel,
+  contextLabel,
   displayValue,
   eraLabel,
   euro,
@@ -22,6 +23,7 @@ import {
   type RankApiResponse,
 } from "@/lib/wurzelraum";
 import type { UserPreferences } from "@/lib/types";
+import { matchContextTopics } from "@/lib/context-match";
 
 const KiezMap = dynamic(() => import("@/components/KiezMap"), {
   ssr: false,
@@ -67,7 +69,8 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
     prefs.hobbies.yoga && "yoga",
     prefs.hobbies.gym && "a gym",
     prefs.hobbies.bouldering && "bouldering",
-    prefs.commuteAddresses?.length && "your commute",
+    prefs.additionalContext?.includes("Other hobby:") && "your other hobby",
+    prefs.commuteAddresses?.length && (prefs.maxCommuteMinutes ? `a commute under ${prefs.maxCommuteMinutes} min` : "your commute"),
   ].filter(Boolean) as string[];
 
   return (
@@ -94,6 +97,11 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
           <h2 id="cards-title" className="wr-h2">Three Kieze worth<br />a closer look</h2>
           <p>{matchedOn.length ? `Matched on ${matchedOn.join(", ")}` : "Matched on the basics every family cares about"} — each one further from the centre than where you are now.</p>
         </div>
+        {data.commuteConstraintRelaxed && (
+          <p className="wr-extra-note" role="note" style={{ margin: "-24px 0 32px" }}>
+            Fewer than three Kieze fit within {prefs.maxCommuteMinutes ?? 60} minutes of your commute address, so we included the closest-scoring ones anyway — they’re marked below.
+          </p>
+        )}
         <div className="wr-cards">
           {alternatives.map((alt, i) => {
             const pc = table.prosCons[i];
@@ -112,6 +120,11 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
                 <span className="wr-card-fit">
                   {alt.plr.distance_from_center_km.toFixed(1)} km from Alexanderplatz
                   {alt.commuteMinutes != null ? ` · about ${Math.round(alt.commuteMinutes)} min commute` : ""}
+                  {alt.commuteMinutes != null && prefs.maxCommuteMinutes != null && (
+                    <span className={`wr-limit${alt.commuteMinutes > prefs.maxCommuteMinutes ? " is-over" : ""}`}>
+                      {alt.commuteMinutes > prefs.maxCommuteMinutes ? `Over your ${prefs.maxCommuteMinutes}-min limit` : `Within your ${prefs.maxCommuteMinutes} min`}
+                    </span>
+                  )}
                 </span>
                 <div className="wr-pc">
                   {pc.pros.slice(0, 5).map((f) => (
@@ -176,6 +189,8 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
           {data.primarySchoolNote ? ` ${data.primarySchoolNote}` : ""}
         </p>
       </section>
+
+      {prefs.additionalContext && <ExtraContext data={data} text={prefs.additionalContext} />}
 
       <Conversation data={data} prefs={prefs} agentPrefs={agentPrefs} />
     </div>
@@ -267,6 +282,104 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
         <KiezMap plrId={alt.plr.plr_id} categories={categories} currentAddress={prefs.currentAddress} commuteAddresses={prefs.commuteAddresses} height={380} />
       </div>
     </div>
+  );
+}
+
+interface ContextRow {
+  key: string;
+  label: string;
+  values: { plrId: string; value: string; notability: string | null }[];
+}
+
+const NOTABILITY_SHORT: Record<string, { text: string; good: boolean }> = {
+  "one of the best citywide (top 10%)": { text: "Top 10% in Berlin", good: true },
+  "well above average (top quarter)": { text: "Top quarter", good: true },
+  "one of the worst citywide (bottom 10%)": { text: "Bottom 10% in Berlin", good: false },
+  "well below average (bottom quarter)": { text: "Bottom quarter", good: false },
+};
+
+/** The user's free-text answers (other hobby + "anything else"), matched to
+ *  the grounded extra criteria and shown for every Kiez — so they visibly
+ *  count, with or without the AI agent. */
+function ExtraContext({ data, text }: { data: RankApiResponse; text: string }) {
+  const match = useMemo(() => matchContextTopics(text), [text]);
+  const plrs = [data.current, ...data.alternatives.map((a) => a.plr)];
+  const [rows, setRows] = useState<ContextRow[] | null>(null);
+
+  const plrKey = plrs.map((p) => p.plr_id).join(",");
+  useEffect(() => {
+    if (!match.keys.length) return;
+    let cancelled = false;
+    const q = new URLSearchParams({ keys: match.keys.join(",") });
+    plrKey.split(",").forEach((id) => q.append("plrId", id));
+    fetch(`/api/context-criteria?${q}`)
+      .then((r) => (r.ok ? r.json() : { rows: [] }))
+      .then((d: { rows: ContextRow[] }) => !cancelled && setRows(d.rows))
+      .catch(() => !cancelled && setRows([]));
+    return () => {
+      cancelled = true;
+    };
+  }, [match.keys, plrKey]);
+
+  const quote = text.split("\n");
+
+  return (
+    <section className="wr-section wr-wrap" aria-labelledby="extra-title" style={{ paddingTop: 0 }}>
+      <div className="wr-extra">
+        <div className="wr-extra-side">
+          <span className="wr-eyebrow">You also told us</span>
+          <h2 id="extra-title" className="wr-h2" style={{ fontSize: 36 }}>What else you mentioned</h2>
+          <blockquote className="wr-quote">
+            {quote.map((line, i) => (
+              <p key={i}>“{line}”</p>
+            ))}
+          </blockquote>
+          <span className="wr-source">These answers don’t change the ranking — we look up what the data can say about them.</span>
+        </div>
+        <div>
+          {match.keys.length > 0 && (
+            <div className="wr-table-scroll">
+              <div className="wr-table" role="table" aria-labelledby="extra-title">
+                <div className="wr-tr is-head" role="row">
+                  <div className="wr-th" role="columnheader" style={{ paddingLeft: 0 }}><small>From the data</small></div>
+                  {plrs.map((p, i) => (
+                    <div key={p.plr_id} className={`wr-th${i === 0 ? " is-current" : ""}`} role="columnheader" style={{ fontSize: 18 }}>
+                      {i === 0 && <small>You are here</small>}
+                      {p.plr_name}
+                    </div>
+                  ))}
+                </div>
+                {(rows ?? match.keys.map((k) => ({ key: k, label: "…", values: [] }))).map((row) => (
+                  <div key={row.key} className="wr-tr" role="row">
+                    <div className="wr-rh" role="rowheader" style={{ fontSize: 15, paddingRight: 12 }}>{contextLabel(row.key, row.label)}</div>
+                    {plrs.map((p, i) => {
+                      const v = row.values.find((x) => x.plrId === p.plr_id);
+                      const n = v?.notability ? NOTABILITY_SHORT[v.notability] : null;
+                      return (
+                        <div key={p.plr_id} className={`wr-td${i === 0 ? " is-current" : ""}`} role="cell" style={{ flexDirection: "column", alignItems: "flex-start", gap: 6 }}>
+                          <span>{v ? displayValue(v.value) : "…"}</span>
+                          {n && <span className={`wr-notable${n.good ? " is-good" : ""}`}>{n.text}</span>}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {match.unavailable.length > 0 && (
+            <p className="wr-extra-note">
+              We don’t have data on <strong>{match.unavailable.join(", ")}</strong>, so we can’t compare Kieze on {match.unavailable.length === 1 ? "it" : "those"} — worth asking locals or a quick search.
+            </p>
+          )}
+          {match.keys.length === 0 && match.unavailable.length === 0 && (
+            <p className="wr-extra-note">
+              Nothing in what you wrote maps onto our data directly — ask about it in the chat below and we’ll tell you what we can.
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
   );
 }
 

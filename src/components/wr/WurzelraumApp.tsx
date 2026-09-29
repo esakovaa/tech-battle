@@ -19,7 +19,19 @@ function toPreferences(a: Answers): UserPreferences {
     hobbies: a.hobbies,
     roomsNeeded: a.rooms,
     commuteAddresses: commutes.length ? commutes : undefined,
+    maxCommuteMinutes: commutes.length && a.maxCommute != null ? a.maxCommute : undefined,
+    additionalContext: additionalContext(a),
   };
+}
+
+/** Both free-text answers go to the agent layer as additionalContext —
+ *  never into ranking (see UserPreferences.additionalContext). */
+function additionalContext(a: Answers): string | undefined {
+  const parts = [
+    a.otherHobby && a.otherHobbyText.trim() ? `Other hobby: ${a.otherHobbyText.trim()}` : "",
+    a.anythingElse.trim(),
+  ].filter(Boolean);
+  return parts.length ? parts.join("\n") : undefined;
 }
 
 const STEPS = ["Finding your Kiez on the map", "Reading all 542 Berlin Planungsräume", "Weighing what you told us matters", "Checking commutes and picking three"];

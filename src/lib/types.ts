@@ -165,6 +165,11 @@ export interface UserPreferences {
    *  extras beyond 2 are ignored. Geocoded server-side, same as
    *  currentAddress. Omit for no commute filtering/scoring at all. */
   commuteAddresses?: string[];
+  /** The user's own maximum acceptable commute (minutes, public transport).
+   *  Replaces lib/commute.ts's MAX_COMMUTE_MIN default as the hard cutoff,
+   *  and anchors the commute score (see commuteScore in rank.ts). Ignored
+   *  without commuteAddresses. */
+  maxCommuteMinutes?: number;
   /** Free-text answer to "anything else important to you?" — agent-layer
    *  only. Deliberately NOT read by rank.ts/compare.ts: it never affects
    *  filtering or scoring, only what the agent chooses to surface/narrate

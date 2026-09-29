@@ -21,9 +21,14 @@ export interface Answers {
   noiseAirSensitive: boolean | null;
   parksImportant: boolean | null;
   hobbies: { yoga: boolean; gym: boolean; bouldering: boolean };
+  otherHobby: boolean;
+  otherHobbyText: string;
   commute1: string;
   commute2: string;
+  /** Minutes; null = not chosen (the ranking's 60-minute default applies). */
+  maxCommute: number | null;
   nomad: boolean;
+  anythingElse: string;
 }
 
 export const EMPTY_ANSWERS: Answers = {
@@ -36,14 +41,20 @@ export const EMPTY_ANSWERS: Answers = {
   noiseAirSensitive: null,
   parksImportant: null,
   hobbies: { yoga: false, gym: false, bouldering: false },
+  otherHobby: false,
+  otherHobbyText: "",
   commute1: "",
   commute2: "",
+  maxCommute: null,
   nomad: false,
+  anythingElse: "",
 };
+
+export const QUESTION_COUNT = 9;
 
 function answeredCount(a: Answers): number {
   const kidsAnswered = a.noKids || Object.values(a.kids).some(Boolean);
-  const hobbiesAnswered = Object.values(a.hobbies).some(Boolean);
+  const hobbiesAnswered = Object.values(a.hobbies).some(Boolean) || (a.otherHobby && a.otherHobbyText.trim().length > 1);
   return [
     a.plr != null || a.address.trim().length > 3,
     kidsAnswered,
@@ -53,6 +64,7 @@ function answeredCount(a: Answers): number {
     a.parksImportant != null,
     hobbiesAnswered,
     a.nomad || a.commute1.trim().length > 3,
+    a.anythingElse.trim().length > 2,
   ].filter(Boolean).length;
 }
 
@@ -105,7 +117,7 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
             The Kita walk, the Sunday park, the quiet at night, the ride to work. Tell us what shapes your days and
             we’ll show you the three Kieze that fit — and exactly what would change if you moved.
           </p>
-          <a href="#questions" className="wr-btn">Start the eight questions</a>
+          <a href="#questions" className="wr-btn">Start the questions</a>
         </div>
         <div className="wr-orbit">
           <img className="wr-cover" src="/photos/boy-jumping.jpg" alt="A small boy jumping on an open road under a blue sky" />
@@ -164,11 +176,11 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
         <div className="wr-form-intro">
           <span className="wr-eyebrow">The questions</span>
           <h2>Tell us how you live</h2>
-          <p>Eight short questions. Skip anything that doesn’t apply — we only compare what matters to you.</p>
-          <div className="wr-progress" role="progressbar" aria-label="Questions answered" aria-valuemin={0} aria-valuemax={8} aria-valuenow={done}>
-            <div style={{ width: `${(done / 8) * 100}%` }} />
+          <p>Nine short questions. Skip anything that doesn’t apply — we only compare what matters to you.</p>
+          <div className="wr-progress" role="progressbar" aria-label="Questions answered" aria-valuemin={0} aria-valuemax={QUESTION_COUNT} aria-valuenow={done}>
+            <div style={{ width: `${(done / QUESTION_COUNT) * 100}%` }} />
           </div>
-          <span className="wr-help">{done} of 8 answered</span>
+          <span className="wr-help">{done} of {QUESTION_COUNT} answered</span>
         </div>
 
         <div>
@@ -278,8 +290,35 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
                     {label}
                   </label>
                 ))}
+                <label className="wr-chip">
+                  <input
+                    type="checkbox"
+                    checked={a.otherHobby}
+                    aria-controls="wr-other-hobby"
+                    onChange={(e) => {
+                      set({ otherHobby: e.target.checked });
+                      if (e.target.checked) requestAnimationFrame(() => document.getElementById("wr-other-hobby")?.focus());
+                    }}
+                  />
+                  Other
+                </label>
               </div>
             </fieldset>
+            {a.otherHobby && (
+              <>
+                <label htmlFor="wr-other-hobby" className="wr-sr">Your other hobby</label>
+                <input
+                  id="wr-other-hobby"
+                  className="wr-input"
+                  type="text"
+                  autoComplete="off"
+                  maxLength={120}
+                  placeholder="Which one? e.g. running, swimming, choir"
+                  value={a.otherHobbyText}
+                  onChange={(e) => set({ otherHobbyText: e.target.value })}
+                />
+              </>
+            )}
           </Question>
 
           <Question num="08">
@@ -307,10 +346,39 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
               disabled={a.nomad}
               onChange={(e) => set({ commute2: e.target.value })}
             />
+            <fieldset className="wr-q-row" disabled={a.nomad} style={{ marginTop: 10, opacity: a.nomad ? 0.4 : 1 }}>
+              <legend className="wr-sub-title" style={{ float: "left" }}>Maximum commute time for you</legend>
+              <div className="wr-seg">
+                {[20, 30, 45, 60, 90].map((m) => (
+                  <label key={m} className="wr-chip" style={{ padding: "0 16px" }}>
+                    <input type="radio" name="max-commute" checked={a.maxCommute === m} onChange={() => set({ maxCommute: m })} />
+                    {m} min
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+            <span className="wr-help">
+              One way, by public transport. Kieze over it are left out while there are enough others{a.maxCommute == null ? " — no choice means 60 minutes" : ""}.
+            </span>
             <label className="wr-chip is-yellow" style={{ alignSelf: "flex-start", marginTop: 8 }}>
               <input type="checkbox" checked={a.nomad} onChange={(e) => set({ nomad: e.target.checked })} />
               None — I’m flexible / a nomad
             </label>
+          </Question>
+
+          <Question num="09">
+            <label htmlFor="wr-anything" className="wr-q-title">Anything else is important for you?</label>
+            <span id="wr-anything-help" className="wr-help">In your own words — we’ll check what our data can tell you about it, and say honestly where it can’t.</span>
+            <textarea
+              id="wr-anything"
+              className="wr-input wr-textarea"
+              rows={3}
+              maxLength={600}
+              aria-describedby="wr-anything-help"
+              placeholder="e.g. we both work from home, grandparents live in Spandau, our eldest has asthma…"
+              value={a.anythingElse}
+              onChange={(e) => set({ anythingElse: e.target.value })}
+            />
           </Question>
         </div>
         <button type="submit" hidden aria-hidden tabIndex={-1} />

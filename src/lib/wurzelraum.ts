@@ -75,6 +75,15 @@ export function displayValue(v: string): string {
   return v;
 }
 
+/** context-criteria.ts labels some criteria by the thing measured ("Air
+ *  quality") while the value is a pollution/noise LEVEL ("high") — relabel
+ *  so "high" reads the right way round. */
+const CONTEXT_LABELS: Record<string, string> = {
+  air_quality: "Air pollution",
+  noise: "Noise level",
+};
+export const contextLabel = (key: string, fallback: string) => CONTEXT_LABELS[key] ?? fallback;
+
 export function cellDirection(table: ComparisonTable, altIndex: number, factor: string): Direction {
   const pc = table.prosCons[altIndex];
   if (!pc) return "same";
@@ -220,6 +229,12 @@ export function composeNarrative(data: RankApiResponse, prefs: UserPreferences):
       return `${a.plr.plr_name} (${a.plr.bezirk}) ${top.length ? `stands out for ${list(top)}` : "is a solid middle ground"}`;
     });
   if (others.length) paras.push(`The other two are worth a look too: ${others.join("; ")}.`);
+
+  if (prefs.additionalContext?.trim()) {
+    paras.push(
+      `You also told us: “${prefs.additionalContext.trim().replace(/\n/g, "; ")}”. What the data can say about that is in “What else you mentioned” above — and where it's silent, we say so rather than guess.`
+    );
+  }
 
   const notes: string[] = [];
   if (prefs.kids.primarySchool) notes.push("There's no reliable primary-school data yet, so that answer didn't change the ranking.");

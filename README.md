@@ -6,6 +6,10 @@ Data and analysis prep for the "Kiez Concierge" challenge (WBS CODING SCHOOL / 4
 
 The app at `/` is the full Wurzelraum flow (design Option B, see `design/wurzelraum/`): intake → ranking →
 results with example flats, a per-Kiez map, the side-by-side table, a written trade-off summary and a follow-up chat.
+The intake's free-text answers ("Other" hobby, "Anything else is important for you?") go to the agent as
+`additionalContext` and are matched to data-backed extra criteria on the results page (`src/lib/context-match.ts`);
+they never change the ranking. The "Maximum commute time" answer does: it replaces the 60-minute default cutoff and
+anchors the commute score (`maxCommuteMinutes`, see `commuteScore` in `src/lib/rank.ts`).
 
 ```bash
 npm install

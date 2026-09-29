@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
       bouldering: body.hobbies?.bouldering ?? false,
     },
     commuteAddresses: body.commuteAddresses,
+    maxCommuteMinutes: body.maxCommuteMinutes,
   };
 
   const { results, secondBest, droppedFilters, distinctRadiusTiers, distanceConstraintRelaxed, commuteConstraintRelaxed } =

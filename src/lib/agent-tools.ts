@@ -62,6 +62,16 @@ const preferencesInputSchema = z.object({
       "Free-text addresses (e.g. workplaces) to compute real transit commute time against — up to 2 (both " +
         "partners' commutes average together). Omit for no commute filtering/scoring."
     ),
+  maxCommuteMinutes: z
+    .number()
+    .int()
+    .min(10)
+    .max(180)
+    .optional()
+    .describe(
+      "The user's own maximum acceptable commute in minutes (public transport). Kieze over it are excluded while " +
+        "enough others remain, and commute is scored against it. Omit to use the 60-minute default."
+    ),
 });
 
 export const getTopKiezRecommendations = tool({
@@ -99,6 +109,7 @@ export const getTopKiezRecommendations = tool({
       parksImportant: input.parksImportant,
       hobbies: input.hobbies,
       commuteAddresses: input.commuteAddresses,
+      maxCommuteMinutes: input.maxCommuteMinutes,
     };
 
     const { results, secondBest, droppedFilters, distinctRadiusTiers, distanceConstraintRelaxed, commuteConstraintRelaxed } =

@@ -3,7 +3,9 @@ import { findTopAlternatives, getPlanungsraumById } from "./rank";
 import { buildComparisonTable, type ComparisonTable } from "./compare";
 import { resolveAddressToPlanungsraum } from "./geocode";
 import type { PlanungsraumProfile, RankedResult, UserPreferences } from "./types";
-import { factorCopy } from "./wurzelraum";
+import { contextLabel, factorCopy } from "./wurzelraum";
+import { matchContextTopics } from "./context-match";
+import { evaluateContextCriteria } from "./context-criteria";
 
 /**
  * AGENT_MOCK=1 — a stand-in for the LLM behind /api/agent, for demos and
@@ -57,13 +59,35 @@ function narrative(c: Ctx): string {
     : `On everything you told me mattered, it doesn't lose to ${c.current.plr_name} anywhere, which is rare.`;
   const kids = best.n_population_under6 > c.current.n_population_under6 ? ` There are more under-sixes around, too — about ${best.n_population_under6.toLocaleString()} versus ${c.current.n_population_under6.toLocaleString()}.` : "";
 
+  const extra = extraParagraph(c, best);
   return [
     `If I were in your shoes, I'd look hardest at ${best.plr_name} in ${best.bezirk}. It's ${best.distance_from_center_km.toFixed(1)} km out from Alexanderplatz, and that distance buys you a different pace of life: ${listJoin([quieter, greener].filter(Boolean) as string[]) || "calmer streets and more room"}.${rentLine}${kids}`,
     tradeoff +
       (station(best) ? ` Getting around, your nearest station would be ${station(best)} (${best.nearest_transit_line}), ${best.transit_distance_km?.toFixed(1)} km away.` : "") +
       (c.alts[c.bestIdx].commuteMinutes != null ? ` Your commute would be roughly ${Math.round(c.alts[c.bestIdx].commuteMinutes!)} minutes door to door.` : ""),
     `Don't dismiss the other two. ${others.map((p) => `${p.plr_name} (${p.bezirk}) sits ${p.distance_from_center_km.toFixed(1)} km out with green space rated ${en(p.ug_gruenversorgung)}`).join("; ")}. Ask me anything — the car question, schools, rent, what evenings are like.`,
+    ...(extra ? [extra] : []),
   ].join("\n\n");
+}
+
+/** Responds to the free-text answers (other hobby / "anything else") using
+ *  only grounded criteria — notable values for the top pick, and a plain
+ *  "no data" for topics nothing covers. */
+function extraParagraph(c: Ctx, best: PlanungsraumProfile): string | null {
+  const text = c.prefs.additionalContext?.trim();
+  if (!text) return null;
+  const { keys, unavailable } = matchContextTopics(text);
+  const results = evaluateContextCriteria(keys, best);
+  const notable = results.filter((r) => r.notability).slice(0, 3);
+  const plain = results.filter((r) => !r.notability).slice(0, 2);
+  const bits: string[] = [];
+  if (notable.length) bits.push(`in ${best.plr_name}, ${listJoin(notable.map((r) => `${contextLabel(r.key, r.label).toLowerCase()} is ${en(r.value)} — ${r.notability}`))}`);
+  else if (plain.length) bits.push(`in ${best.plr_name}, ${listJoin(plain.map((r) => `${contextLabel(r.key, r.label).toLowerCase()} is ${en(r.value)}`))}, which is about average for Berlin`);
+  let out = `You also mentioned “${text.replace(/\n/g, "; ")}”.`;
+  if (bits.length) out += ` From the data: ${bits.join("; ")}.`;
+  if (unavailable.length) out += ` I honestly can't tell you about ${listJoin(unavailable)} — that isn't in the data, so it's worth a walk around before you decide.`;
+  if (!bits.length && !unavailable.length) out += " Nothing in the data maps onto that directly, so I'd weigh it yourself on a visit.";
+  return out;
 }
 
 function lastUserText(messages: UIMessage[]): string {
