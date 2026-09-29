@@ -160,7 +160,11 @@ export interface UserPreferences {
    *  Kiez is picked. Optional: omit it and getExampleListings just returns
    *  whatever's available for that Kiez, unfiltered by size. */
   roomsNeeded?: number;
-  // commuteAddresses?: string[] — question 7, added once the commute script lands
+  /** Free-text addresses (e.g. workplaces) to compute real transit commute
+   *  time against — see lib/commute.ts. Up to 2 (both partners' commutes);
+   *  extras beyond 2 are ignored. Geocoded server-side, same as
+   *  currentAddress. Omit for no commute filtering/scoring at all. */
+  commuteAddresses?: string[];
   /** Free-text answer to "anything else important to you?" — agent-layer
    *  only. Deliberately NOT read by rank.ts/compare.ts: it never affects
    *  filtering or scoring, only what the agent chooses to surface/narrate
@@ -185,6 +189,12 @@ export interface FactorWeights {
   hobbies: number;
   crime: number;
   kids_population: number;
+  /** Only nonzero when the user gave at least one commuteAddresses entry —
+   *  see lib/commute.ts and findTopAlternatives in rank.ts. Unlike the
+   *  other factors, this one isn't derived from a static PlanungsraumProfile
+   *  field — it's fetched live (real VBB transit time), so it's only
+   *  computed for a bounded shortlist, not every candidate. */
+  commute: number;
 }
 
 export const SOFT_FACTOR_KEYS: (keyof FactorWeights)[] = [
@@ -195,12 +205,17 @@ export const SOFT_FACTOR_KEYS: (keyof FactorWeights)[] = [
   "hobbies",
   "crime",
   "kids_population",
+  "commute",
 ];
 
 export interface RankedResult {
   plr: PlanungsraumProfile;
   score: number;
   factorScores: Record<keyof FactorWeights, number | null>;
+  /** Real transit minutes (averaged across commuteAddresses), when
+   *  computed for this result — null if VBB had no data, undefined if
+   *  commute wasn't part of this request at all. */
+  commuteMinutes?: number | null;
 }
 
 export interface RankResponse {
@@ -221,5 +236,11 @@ export interface RankResponse {
    *  droppedFilters — this is the one constraint the product explicitly
    *  wants to never relax except as a last resort. */
   distanceConstraintRelaxed: boolean;
+  /** True if commuteAddresses were given but the max-commute hard cutoff
+   *  (lib/commute.ts's MAX_COMMUTE_MIN) had to be dropped entirely to reach
+   *  3 results — commute is still used as a soft ranking factor in that
+   *  case, same pattern as distanceConstraintRelaxed. False (not just
+   *  absent) when no commuteAddresses were given at all. */
+  commuteConstraintRelaxed: boolean;
   primarySchoolDataAvailable: false;
 }

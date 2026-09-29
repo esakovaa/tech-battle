@@ -1,6 +1,8 @@
 import planungsraumData from "@/data/planungsraum.json";
 import { SOFT_FACTOR_KEYS } from "./types";
 import type { FactorWeights, PlanungsraumProfile, RankedResult, UserPreferences } from "./types";
+import { averageCommuteMinutes, MAX_COMMUTE_MIN, type CommuteOrigin } from "./commute";
+import { geocodeAddress } from "./geocode";
 
 const ALL: PlanungsraumProfile[] = planungsraumData as unknown as PlanungsraumProfile[];
 
@@ -119,6 +121,13 @@ function factorScore(p: PlanungsraumProfile, key: keyof FactorWeights): number |
       // under-6) — see kidsPopulationScore below, called from scorePlanungsraum.
       return null;
     }
+    case "commute": {
+      // Not a static PlanungsraumProfile field — fetched live per request,
+      // only for a bounded shortlist. See commuteScore below, called from
+      // scorePlanungsraum, and findTopAlternatives for how the shortlist
+      // and its min/max normalization range get built.
+      return null;
+    }
   }
 }
 
@@ -149,6 +158,24 @@ function kidsPopulationScore(p: PlanungsraumProfile, kitaRelevant: boolean): num
   return normalize(kidsUnder18Weighted(p, multiplier), range.min, range.max, true);
 }
 
+/** Context needed to score the "commute" factor — unlike every other
+ *  factor, this isn't a static field on PlanungsraumProfile, it's fetched
+ *  live for a bounded shortlist (see findTopAlternatives). `range` is the
+ *  min/max of whatever commute minutes were actually fetched this
+ *  request, NOT a city-wide constant like priceRange/schoolRange — there's
+ *  no live commute data for the whole dataset. */
+export interface CommuteScoreContext {
+  minutesByPlr: Map<string, number | null>;
+  range: { min: number; max: number };
+}
+
+function commuteScore(p: PlanungsraumProfile, ctx: CommuteScoreContext | undefined): number | null {
+  if (!ctx) return null;
+  const minutes = ctx.minutesByPlr.get(p.plr_id);
+  if (minutes == null) return null; // no VBB data for this Kiez — excluded, not penalized
+  return normalize(minutes, ctx.range.min, ctx.range.max, false); // fewer minutes = better
+}
+
 /** Fixed weight per answer tier — these are intake answers (minimal/flexible/
  *  not_a_concern, yes/no), not a 1-5 slider, so weights are fixed constants
  *  per tier rather than user-supplied numbers. */
@@ -165,6 +192,10 @@ export function preferencesToWeights(prefs: UserPreferences): FactorWeights {
     // Always-on baseline factors — not conditional on an intake answer.
     crime: 2,
     kids_population: 2,
+    // Same weight tier as price/schools/parks/noise — "an important factor"
+    // per product direction, not a minor nudge like hobbies. Zero unless
+    // the user actually gave a commute address (see findTopAlternatives).
+    commute: (prefs.commuteAddresses?.length ?? 0) > 0 ? 3 : 0,
   };
   const total = SOFT_FACTOR_KEYS.reduce((s, k) => s + raw[k], 0);
   // Safety net: if the user flagged nothing as important, don't degenerate
@@ -183,7 +214,8 @@ export function preferencesToWeights(prefs: UserPreferences): FactorWeights {
 export function scorePlanungsraum(
   p: PlanungsraumProfile,
   weights: FactorWeights,
-  prefs: Pick<UserPreferences, "hobbies" | "kids">
+  prefs: Pick<UserPreferences, "hobbies" | "kids">,
+  commuteCtx?: CommuteScoreContext
 ): { score: number; factorScores: Record<keyof FactorWeights, number | null> } {
   const factorScores = {} as Record<keyof FactorWeights, number | null>;
   let weightedSum = 0;
@@ -194,7 +226,9 @@ export function scorePlanungsraum(
         ? selectedHobbiesScore(p, prefs.hobbies)
         : key === "kids_population"
           ? kidsPopulationScore(p, prefs.kids.kita)
-          : factorScore(p, key);
+          : key === "commute"
+            ? commuteScore(p, commuteCtx)
+            : factorScore(p, key);
     factorScores[key] = s;
     if (s != null) {
       weightedSum += s * weights[key];
@@ -281,6 +315,103 @@ export interface FindTopAlternativesResult {
   /** The "further than your current Kiez" rule had to be dropped entirely
    *  to reach `count` results — see the comment on findTopAlternatives. */
   distanceConstraintRelaxed: boolean;
+  /** commuteAddresses were given but the max-commute hard cutoff had to be
+   *  dropped to reach `count` results. False (not absent) when no
+   *  commuteAddresses were given. */
+  commuteConstraintRelaxed: boolean;
+}
+
+// Real commute time is only ever fetched for a bounded shortlist, never
+// the full ~540-Planungsraum pool — VBB rate-limits to ~100 req/min (see
+// src/tools/commute.py), so calling it per-candidate for the whole city
+// would take minutes. This many top candidates per distance tier (by
+// every OTHER factor's score) is the shortlist that gets a real commute
+// check — generous enough that the commute hard-cutoff has room to
+// exclude some of them and still leave `count` distinct-PLZ survivors.
+const COMMUTE_SHORTLIST_PER_TIER = 8;
+
+// A live public API with no SLA (has been observed hanging outright) must
+// never be allowed to hang the whole ranking request — past this budget,
+// give up on commute data for this request and score/return without it,
+// same as if commuteAddresses had never been given. Whatever VBB calls
+// are still in flight keep running in the background and land in
+// lib/commute.ts's cache anyway, warming it for the next request.
+const COMMUTE_PHASE_BUDGET_MS = 15000;
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const timeout = new Promise<T>((resolve) => {
+    timer = setTimeout(() => resolve(fallback), ms);
+  });
+  const result = await Promise.race([promise, timeout]);
+  clearTimeout(timer!);
+  return result;
+}
+
+async function resolveCommuteOrigins(addresses: string[] | undefined): Promise<CommuteOrigin[]> {
+  const trimmed = (addresses ?? []).map((a) => a.trim()).filter(Boolean).slice(0, 2);
+  if (trimmed.length === 0) return [];
+  const resolved = await Promise.all(
+    trimmed.map(async (address) => {
+      const coords = await geocodeAddress(address);
+      return coords ? { address, lat: coords.lat, lon: coords.lon } : null;
+    })
+  );
+  return resolved.filter((o): o is CommuteOrigin => o != null);
+}
+
+/** Top N candidates per distance tier, by non-commute score — the pool
+ *  that's actually worth spending live VBB calls on. */
+function buildCommuteShortlist(candidates: PlanungsraumProfile[], weights: FactorWeights, prefs: UserPreferences): PlanungsraumProfile[] {
+  const byTier: { plr: PlanungsraumProfile; score: number }[][] = [[], [], []];
+  for (const p of candidates) {
+    byTier[distanceTier(p.distance_from_center_km)].push({ plr: p, score: scorePlanungsraum(p, weights, prefs).score });
+  }
+  return byTier.flatMap((tierList) =>
+    tierList
+      .sort((a, b) => b.score - a.score)
+      .slice(0, COMMUTE_SHORTLIST_PER_TIER)
+      .map((r) => r.plr)
+  );
+}
+
+/** Fetches real commute time for a bounded shortlist of `candidates`,
+ *  applies the MAX_COMMUTE_MIN hard cutoff, and ranks+picks from the
+ *  survivors — falling back to the full (uncut) shortlist, commute used
+ *  only as a soft factor, if the cutoff left too few distinct-PLZ results. */
+async function pickWithCommute(
+  candidates: PlanungsraumProfile[],
+  weights: FactorWeights,
+  prefs: UserPreferences,
+  count: number,
+  origins: CommuteOrigin[]
+): Promise<{ picked: RankedResult[]; distinctRadiusTiers: boolean; commuteConstraintRelaxed: boolean }> {
+  const shortlist = buildCommuteShortlist(candidates, weights, prefs);
+  const shortlistIds = shortlist.map((p) => p.plr_id);
+
+  const fallbackMinutes = new Map<string, number | null>(shortlistIds.map((id) => [id, null]));
+  const minutesByPlr = await withTimeout(averageCommuteMinutes(origins, shortlistIds), COMMUTE_PHASE_BUDGET_MS, fallbackMinutes);
+
+  const knownMinutes = Array.from(minutesByPlr.values()).filter((v): v is number => v != null);
+  const commuteCtx: CommuteScoreContext | undefined =
+    knownMinutes.length > 0 ? { minutesByPlr, range: minMax(knownMinutes) } : undefined;
+
+  const withinCutoff = shortlist.filter((p) => {
+    const m = minutesByPlr.get(p.plr_id);
+    return m == null || m <= MAX_COMMUTE_MIN; // unknown passes through — never excluded on missing data
+  });
+
+  let { picked, distinctRadiusTiers } = rankAndPickByTier(withinCutoff, weights, prefs, count, commuteCtx);
+  let commuteConstraintRelaxed = false;
+
+  if (picked.length < count) {
+    commuteConstraintRelaxed = true;
+    const result = rankAndPickByTier(shortlist, weights, prefs, count, commuteCtx);
+    picked = result.picked;
+    distinctRadiusTiers = result.distinctRadiusTiers;
+  }
+
+  return { picked, distinctRadiusTiers, commuteConstraintRelaxed };
 }
 
 /** Score + rank a candidate pool, then greedily pick one winner per
@@ -293,12 +424,15 @@ function rankAndPickByTier(
   candidates: PlanungsraumProfile[],
   weights: FactorWeights,
   prefs: UserPreferences,
-  count: number
+  count: number,
+  commuteCtx?: CommuteScoreContext
 ): { picked: RankedResult[]; distinctRadiusTiers: boolean } {
   const ranked = candidates
     .map((p) => {
-      const { score, factorScores } = scorePlanungsraum(p, weights, prefs);
-      return { plr: p, score, factorScores } as RankedResult;
+      const { score, factorScores } = scorePlanungsraum(p, weights, prefs, commuteCtx);
+      const result: RankedResult = { plr: p, score, factorScores };
+      if (commuteCtx) result.commuteMinutes = commuteCtx.minutesByPlr.get(p.plr_id) ?? null;
+      return result;
     })
     .sort((a, b) => b.score - a.score);
 
@@ -338,11 +472,11 @@ function rankAndPickByTier(
  * 2. The 3 picks should land in 3 different distance tiers (near/mid/far)
  *    where possible, furthest first — see rankAndPickByTier.
  */
-export function findTopAlternatives(
+export async function findTopAlternatives(
   currentPlrId: string,
   prefs: UserPreferences,
   count = 3
-): FindTopAlternativesResult {
+): Promise<FindTopAlternativesResult> {
   const current = ALL.find((p) => p.plr_id === currentPlrId);
   if (!current) throw new Error(`Unknown plr_id: ${currentPlrId}`);
   const currentPlz = current.dominant_plz;
@@ -352,9 +486,15 @@ export function findTopAlternatives(
 
   const filters = deriveFilters(prefs);
   const weights = preferencesToWeights(prefs);
+  const commuteOrigins = await resolveCommuteOrigins(prefs.commuteAddresses);
+
+  const pick = (pool: PlanungsraumProfile[]) =>
+    commuteOrigins.length > 0
+      ? pickWithCommute(pool, weights, prefs, count, commuteOrigins)
+      : Promise.resolve({ ...rankAndPickByTier(pool, weights, prefs, count), commuteConstraintRelaxed: false });
 
   const { filtered, droppedFilters } = filterWithDegradation(fartherPool, filters, count);
-  let { picked, distinctRadiusTiers } = rankAndPickByTier(filtered, weights, prefs, count);
+  let { picked, distinctRadiusTiers, commuteConstraintRelaxed } = await pick(filtered);
   let distanceConstraintRelaxed = false;
 
   // Last resort: even the full farther-than-current pool (with every
@@ -364,9 +504,10 @@ export function findTopAlternatives(
   if (picked.length < count) {
     distanceConstraintRelaxed = true;
     const fallback = filterWithDegradation(candidatePool, filters, count);
-    const result = rankAndPickByTier(fallback.filtered, weights, prefs, count);
+    const result = await pick(fallback.filtered);
     picked = result.picked;
     distinctRadiusTiers = result.distinctRadiusTiers;
+    commuteConstraintRelaxed ||= result.commuteConstraintRelaxed;
     droppedFilters.push(...fallback.droppedFilters.filter((f) => !droppedFilters.includes(f)));
   }
 
@@ -376,6 +517,7 @@ export function findTopAlternatives(
     droppedFilters,
     distinctRadiusTiers,
     distanceConstraintRelaxed,
+    commuteConstraintRelaxed,
   };
 }
 
