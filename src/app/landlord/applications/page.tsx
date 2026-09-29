@@ -124,6 +124,12 @@ function LotteryPanel({ listingId, address }: { listingId: string; address: stri
               ? `✓ Draw complete. ${reveal.drawn.length} applicants selected from ${reveal.poolSize} qualified applications.`
               : "✕ We couldn’t verify this draw. Please run it again."}
           </p>
+          {reveal.hashMatchesCommitment && (
+            <div className="ll-lottery-purpose">
+              <h4>Why use a lottery?</h4>
+              <p>Finding a home is already hard; access to a viewing shouldn’t depend on social polish, who writes the most persuasive letter, or who knows the landlord. Once the same clear requirements are met, every qualifying applicant has an equal chance at a limited viewing place. The draw doesn’t decide who gets the apartment—it makes this first step fair, visible and easier to trust. You meet the people invited and make your decision afterward.</p>
+            </div>
+          )}
           <ol className="ll-check-list" style={{ marginTop: 10 }}>
             {reveal.drawn.map((d) => (
               <li key={d.applicantId}>
@@ -133,7 +139,7 @@ function LotteryPanel({ listingId, address }: { listingId: string; address: stri
             ))}
           </ol>
           <p className="ll-to-check-text" style={{ fontSize: 12, color: "var(--ll-muted)", marginTop: 8 }}>
-            The draw is random and can be verified. Each selected applicant’s email will be placed in BCC so invitees cannot see one another’s addresses.
+            The draw is random and can be verified. When you prepare invitations, selected applicants’ email addresses are placed in BCC so invitees cannot see one another’s addresses.
           </p>
           <details className="ll-draw-details">
             <summary>How the draw stays fair</summary>

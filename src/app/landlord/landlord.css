@@ -475,6 +475,25 @@
   color: var(--ll-ink);
   line-height: 1.5;
 }
+.ll-lottery-purpose {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border-left: 3px solid var(--ll-green);
+  background: var(--ll-cream);
+}
+.ll-lottery-purpose h4 {
+  margin: 0 0 6px;
+  color: var(--ll-green-deep);
+  font-family: var(--ll-font-display);
+  font-size: 19px;
+  font-weight: 500;
+}
+.ll-lottery-purpose p {
+  margin: 0;
+  color: var(--ll-ink);
+  font-size: 14px;
+  line-height: 1.65;
+}
 .ll-card-actions {
   display: flex;
   gap: 14px;
