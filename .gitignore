@@ -6,6 +6,12 @@
 # The flattened .csv next to each one IS committed (small, git-friendly).
 DATA  SOURCES/**/*.geojson
 
+# Raw VBB GTFS feed — regenerated on demand, not committed (stop_times.csv
+# alone is ~400MB). See "Kiez Profile Master Table/build_real_transit_data.py"
+# for the exact fetch commands. Its output (updated planungsraum_profile.csv
+# + planungsraum.json) IS committed.
+DATA  SOURCES/VBB GTFS/
+
 # Python
 __pycache__/
 *.pyc
