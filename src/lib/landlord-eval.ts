@@ -7,6 +7,15 @@ import type {
 } from "./landlord-types";
 import { DOCUMENT_LABELS, EMPLOYMENT_LABELS, ALL_DOCUMENT_TYPES } from "./landlord-types";
 
+/** Portland's FAIR ordinance caps how high a landlord may set the
+ *  income-to-rent multiple (2-2.5x depending on rent level) — this
+ *  product's cap is a flat 3.0x, still meaningfully looser than a
+ *  "5x or nothing" norm but not unbounded. Applied wherever a listing's
+ *  multiple is read, not just at intake, so a stray override can't bypass it. */
+export function clampIncomeMultiple(multiple: number): number {
+  return Math.min(3.0, Math.max(2.0, multiple));
+}
+
 /** The REQUIRED gate + SHOWN-NOT-SCORED context + TO-CHECK follow-ups, for
  *  one applicant against one listing. Signature only accepts
  *  ApplicantFacts — see the comment on that type for why that's the actual
@@ -14,13 +23,33 @@ import { DOCUMENT_LABELS, EMPLOYMENT_LABELS, ALL_DOCUMENT_TYPES } from "./landlo
 export function evaluateApplicant(facts: ApplicantFacts, listing: Listing): EvaluationResult {
   const checks: RequirementCheck[] = [];
 
-  const requiredIncome = listing.min_income_multiple * listing.kaltmiete_eur_monthly;
+  const minMultiple = clampIncomeMultiple(listing.min_income_multiple);
+  const requiredIncome = minMultiple * listing.kaltmiete_eur_monthly;
   const incomeMultiple = facts.netIncomeMonthlyDeclared / listing.kaltmiete_eur_monthly;
+  const savingsMultiple = facts.savingsEur / listing.warmmiete_eur_monthly;
+
+  // Financial security through several equal routes — a permanent
+  // contract is ONE way to look reliable, not the only legitimate one.
+  // Meeting the income bar directly is sufficient; so is a guarantor, so
+  // is deposit insurance, so are savings covering ~3 months' warm rent.
+  // None of these routes outranks another — this is a single pass/fail
+  // check, not a score that adds up across routes.
+  const incomeRoute = facts.netIncomeMonthlyDeclared >= requiredIncome;
+  const savingsRoute = savingsMultiple >= 3;
+  const passesFinancialSecurity = incomeRoute || facts.hasGuarantor || facts.hasDepositInsurance || savingsRoute;
+  const routesSatisfied = [
+    incomeRoute && `income (${incomeMultiple.toFixed(1)}x cold rent)`,
+    facts.hasGuarantor && "guarantor",
+    facts.hasDepositInsurance && "deposit insurance",
+    savingsRoute && `savings (${savingsMultiple.toFixed(1)}x warm rent)`,
+  ].filter((x): x is string => Boolean(x));
   checks.push({
-    key: "affordability",
-    label: `Affordability: income at least ${listing.min_income_multiple}x cold rent`,
-    passed: facts.netIncomeMonthlyDeclared >= requiredIncome,
-    detail: `Declared income is ${incomeMultiple.toFixed(1)}x the cold rent (needs ${listing.min_income_multiple}x, i.e. €${requiredIncome.toFixed(0)}).`,
+    key: "financial_security",
+    label: `Financial security: income at least ${minMultiple}x cold rent, or a guarantor, deposit insurance, or sufficient savings`,
+    passed: passesFinancialSecurity,
+    detail: passesFinancialSecurity
+      ? `Satisfied via: ${routesSatisfied.join(", ")}.`
+      : `No route satisfied — income is ${incomeMultiple.toFixed(1)}x cold rent (needs ${minMultiple}x, i.e. €${requiredIncome.toFixed(0)}), no guarantor, no deposit insurance, savings cover only ${savingsMultiple.toFixed(1)}x warm rent (needs 3x).`,
   });
 
   const missingDocs = listing.required_documents.filter((d) => !facts.documentsProvided.includes(d));
@@ -80,11 +109,12 @@ export function evaluateApplicant(facts: ApplicantFacts, listing: Listing): Eval
   if (facts.employmentType === "selfemployed" || facts.employmentType === "permanent_plus_selfemployed") {
     toCheck.push("Self-employed income — consider asking for the latest tax assessment.");
   }
-  const marginAboveThreshold = incomeMultiple - listing.min_income_multiple;
-  if (meetsAllRequirements && marginAboveThreshold < 0.3) {
-    toCheck.push(
-      `Closest to the affordability threshold (${incomeMultiple.toFixed(1)}x vs. ${listing.min_income_multiple}x required).`
-    );
+  const marginAboveThreshold = incomeMultiple - minMultiple;
+  if (meetsAllRequirements && incomeRoute && marginAboveThreshold < 0.3) {
+    toCheck.push(`Closest to the income threshold (${incomeMultiple.toFixed(1)}x vs. ${minMultiple}x required).`);
+  }
+  if (meetsAllRequirements && !incomeRoute) {
+    toCheck.push(`Qualified via ${routesSatisfied.join(", ")} rather than income alone — worth a quick look.`);
   }
   if (meetsAllRequirements && toCheck.length === 0) {
     toCheck.push("Nothing outstanding.");

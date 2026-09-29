@@ -4,6 +4,7 @@
  * existing convention of small assert-based tsx scripts for verification.
  */
 import { evaluateApplicant, rankByReadiness, findDuplicates, anonymizedLabel } from "../src/lib/landlord-eval";
+import { redactNameFromText } from "../src/lib/redact-name";
 import type { ApplicantFacts, ApplicantIdentity, Listing } from "../src/lib/landlord-types";
 
 let passed = 0;
@@ -39,6 +40,9 @@ function baseFacts(overrides: Partial<ApplicantFacts> = {}): ApplicantFacts {
     householdChildren: 1,
     netIncomeMonthlyDeclared: 3000,
     employmentType: "permanent",
+    hasGuarantor: false,
+    hasDepositInsurance: false,
+    savingsEur: 0,
     smoker: false,
     documentsProvided: ["identity", "payslips", "schufa", "mietschuldenfreiheit"],
     payslipExtractedIncome: 3000,
@@ -52,6 +56,33 @@ function baseFacts(overrides: Partial<ApplicantFacts> = {}): ApplicantFacts {
 assert(evaluateApplicant(baseFacts({ netIncomeMonthlyDeclared: 3000 }), listing).meetsAllRequirements, "exactly at 3x threshold passes");
 assert(!evaluateApplicant(baseFacts({ netIncomeMonthlyDeclared: 2999 }), listing).meetsAllRequirements, "just below 3x threshold fails");
 assert(evaluateApplicant(baseFacts({ netIncomeMonthlyDeclared: 3001 }), listing).meetsAllRequirements, "just above 3x threshold passes");
+
+// --- Alternate financial-security routes (income isn't the only path) ---
+const lowIncome = { netIncomeMonthlyDeclared: 500 }; // fails income outright
+assert(!evaluateApplicant(baseFacts(lowIncome), listing).meetsAllRequirements, "low income with no alternate route fails");
+assert(
+  evaluateApplicant(baseFacts({ ...lowIncome, hasGuarantor: true }), listing).meetsAllRequirements,
+  "low income + guarantor passes via the guarantor route"
+);
+assert(
+  evaluateApplicant(baseFacts({ ...lowIncome, hasDepositInsurance: true }), listing).meetsAllRequirements,
+  "low income + deposit insurance passes"
+);
+assert(
+  evaluateApplicant(baseFacts({ ...lowIncome, savingsEur: listing.warmmiete_eur_monthly * 3 }), listing).meetsAllRequirements,
+  "low income + 3x warm rent in savings passes"
+);
+assert(
+  !evaluateApplicant(baseFacts({ ...lowIncome, savingsEur: listing.warmmiete_eur_monthly * 2 }), listing).meetsAllRequirements,
+  "savings below the 3x threshold don't rescue a low-income applicant"
+);
+
+// --- Income multiple is clamped (Portland-style cap) ---
+const uncappedListing: Listing = { ...listing, min_income_multiple: 5 };
+assert(
+  evaluateApplicant(baseFacts({ netIncomeMonthlyDeclared: 3000 }), uncappedListing).meetsAllRequirements,
+  "a listing set to demand 5x rent is clamped down to 3x, so 3x income still passes"
+);
 
 // --- Documents ---
 assert(
@@ -100,6 +131,24 @@ assert(dupes[0].applicantIds.sort().join(",") === "a1,a2", "duplicate group cont
 assert(anonymizedLabel(0) === "Applicant A", "index 0 -> A");
 assert(anonymizedLabel(25) === "Applicant Z", "index 25 -> Z");
 assert(anonymizedLabel(26) === "Applicant AA", "index 26 -> AA");
+
+// --- redactNameFromText ---
+assert(
+  redactNameFromText("Hi, I'm Ahmed and I work in tech.", "Ahmed Hassan") === "Hi, I'm [name] and I work in tech.",
+  "first name is redacted"
+);
+assert(
+  redactNameFromText("Best regards, Ahmed Hassan", "Ahmed Hassan") === "Best regards, [name]",
+  "full name redacts as one unit, not as two separate replacements"
+);
+assert(
+  redactNameFromText("No name mentioned here at all.", "Ahmed Hassan") === "No name mentioned here at all.",
+  "text without the name is unchanged"
+);
+assert(
+  redactNameFromText("I love hassan-style architecture.", "Anna Hassan").includes("[name]"),
+  "case-insensitive match still redacts"
+);
 
 // --- Compile-time fairness boundary proof ---
 // If this line does NOT produce a type error, the boundary has been

@@ -12,6 +12,9 @@ interface RawApplicant {
   household_children: number;
   net_income_monthly_declared: number;
   employment_type: EmploymentType;
+  has_guarantor: boolean;
+  has_deposit_insurance: boolean;
+  savings_eur: number;
   smoker: boolean;
   documents_provided: DocumentType[];
   payslip_extracted_income: number | null;
@@ -41,6 +44,9 @@ function toFacts(a: RawApplicant): ApplicantFacts {
     householdChildren: a.household_children,
     netIncomeMonthlyDeclared: a.net_income_monthly_declared,
     employmentType: a.employment_type,
+    hasGuarantor: a.has_guarantor,
+    hasDepositInsurance: a.has_deposit_insurance,
+    savingsEur: a.savings_eur,
     smoker: a.smoker,
     documentsProvided: a.documents_provided,
     payslipExtractedIncome: a.payslip_extracted_income,
@@ -73,4 +79,11 @@ export function getApplicantNarrative(applicantId: string): ApplicantNarrative |
 export function getApplicantFactsById(applicantId: string): ApplicantFacts | undefined {
   const found = RAW_APPLICANTS.find((a) => a.id === applicantId);
   return found ? toFacts(found) : undefined;
+}
+/** Used ONLY to redact the applicant's own name out of their narrative
+ *  before it's shown to a landlord — see lib/redact-name.ts. Never passed
+ *  to evaluateApplicant, never returned to a landlord-facing response. */
+export function getApplicantIdentityById(applicantId: string): ApplicantIdentity | undefined {
+  const found = RAW_APPLICANTS.find((a) => a.id === applicantId);
+  return found ? toIdentity(found) : undefined;
 }

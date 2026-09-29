@@ -4,9 +4,11 @@ import {
   getApplicantFactsForListing,
   getApplicantFactsById,
   getApplicantNarrative,
+  getApplicantIdentityById,
   getAllApplicantIdentities,
 } from "@/lib/landlord-data";
 import { evaluateApplicant, rankByReadiness, findDuplicates, anonymizedLabel } from "@/lib/landlord-eval";
+import { redactNameFromText } from "@/lib/redact-name";
 import { DOCUMENT_LABELS } from "@/lib/landlord-types";
 
 /**
@@ -70,6 +72,12 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const otherApplications = (duplicateGroupOf.get(facts.id) ?? [facts.id]).filter((gid) => gid !== canonicalFacts.id);
 
   const narrative = getApplicantNarrative(canonicalFacts.id);
+  // The identity lookup here exists ONLY to redact the applicant's own
+  // name out of their narrative — it's never included in the response,
+  // never passed to evaluateApplicant, and this is the one place in the
+  // landlord-facing API where identity data is touched at all.
+  const identity = getApplicantIdentityById(canonicalFacts.id);
+  const redactedNarrativeText = narrative && identity ? redactNameFromText(narrative.text, identity.fullName) : narrative?.text;
 
   return NextResponse.json({
     anonLabel,
@@ -81,8 +89,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     checks: evaluation.checks,
     shownNotScored: evaluation.shownNotScored,
     otherApplicationIds: otherApplications, // duplicate/re-application flag — no names, just internal ids
-    narrative: narrative
-      ? { text: narrative.text, note: "Shown for context only — never used in scoring or ranking." }
+    narrative: redactedNarrativeText
+      ? {
+          text: redactedNarrativeText,
+          note: "Shown for context only — never used in scoring or ranking. Self-disclosed name redacted.",
+        }
       : null,
   });
 }

@@ -51,6 +51,9 @@ export interface Listing {
   move_in_date: string; // ISO date
   smoking_policy: SmokingPolicy;
   required_documents: DocumentType[];
+  /** Capped at 3.0x, per Portland's FAIR ordinance precedent (landlords
+   *  there may not demand above 2-2.5x depending on rent level) — see
+   *  clampIncomeMultiple in landlord-eval.ts. */
   min_income_multiple: number;
 }
 
@@ -68,6 +71,9 @@ export interface ApplicantFacts {
   listingId: string;
   householdAdults: number;
   householdChildren: number;
+  /** Cumulative resources, not wages alone — includes benefits (Wohngeld,
+   *  Jobcenter/ALG) where applicable, per the DSK/Portland precedent that
+   *  income shouldn't mean "wages only." */
   netIncomeMonthlyDeclared: number;
   employmentType: EmploymentType;
   smoker: boolean;
@@ -79,6 +85,15 @@ export interface ApplicantFacts {
   payslipExtractedIncome: number | null;
   earliestMoveInDate: string;
   submittedAt: string;
+  /** Alternative routes to satisfy the financial-security requirement,
+   *  alongside income — a permanent contract is ONE way to look secure,
+   *  not the only one. Each is an independent OR branch in
+   *  evaluateApplicant; freelancers, students, and newcomers without a
+   *  long employment history aren't structurally excluded just because
+   *  they lack the one route a landlord happened to think of first. */
+  hasGuarantor: boolean;
+  hasDepositInsurance: boolean;
+  savingsEur: number;
 }
 
 /** PII — used ONLY by findDuplicates() and a post-shortlist identity
