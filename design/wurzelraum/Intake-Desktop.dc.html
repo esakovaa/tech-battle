@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wurzelraum — tell us about your family</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&amp;family=Figtree:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4EDE1;font-family:'Figtree',system-ui,sans-serif;color:#3B2A1E}
+a{color:#4A5B37}a:hover{color:#3B2A1E}
+input::placeholder{color:#8C7662}
+</style>
+</helmet>
+<div style="width: 1440px; height: 2400px; box-sizing: border-box; background: #F4EDE1; font-family: 'Figtree', system-ui, sans-serif; color: #3B2A1E; display: flex; flex-direction: column">
+
+  <header style="height: 84px; box-sizing: border-box; padding: 0 64px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E3D5BD">
+    <a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #3B2A1E">
+      <svg viewBox="0 0 64 64" width="40" height="40" aria-hidden="true"><g fill="none" stroke="#7A5236" stroke-width="2.6" stroke-linecap="round"><path d="M32 51c0 4-3 6.5-8 9"></path><path d="M32 51c0 4.5 3 6.5 8.5 8.5"></path><path d="M32 51v11"></path></g><g fill="#5E7147"><circle cx="26" cy="11.5" r="4.5"></circle><path d="M21.5 30c0-7.5 1.6-11 4.5-11s4.5 3.5 4.5 11z"></path><circle cx="40.5" cy="18.5" r="3.6"></circle><path d="M37 30c0-5.3 1.3-7.6 3.5-7.6S44 24.7 44 30z"></path><path d="M50 21.5c.3-4 3-6.8 7-7 .1 4-2.7 6.8-7 7z"></path></g><g fill="none" stroke="#5E7147" stroke-width="3" stroke-linecap="round"><path d="M23.2 21.5 18.8 13.5"></path><path d="M28.8 21.5l4.2-7.5"></path><path d="M47.6 30c0-3.5.7-6.3 2.4-8.5" stroke-width="2.2"></path></g><path d="M18 34h28l-3.4 15.2A3.4 3.4 0 0 1 39.3 52H24.7a3.4 3.4 0 0 1-3.3-2.8z" fill="#B8643E"></path><rect x="14" y="27.5" width="36" height="7" rx="2.6" fill="#C9805A"></rect></svg>
+      <span style="font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 500">Wurzelraum</span>
+    </a>
+    <nav style="display: flex; align-items: center; gap: 32px; font-size: 16px">
+      <a href="#" style="color: #5A4535; text-decoration: none">How it works</a>
+      <a href="#" style="color: #5A4535; text-decoration: none">Where the data comes from</a>
+      <a href="#" style="color: #5A4535; text-decoration: none; padding: 8px 14px; border: 1px solid #D9C9AE; border-radius: 999px">DE · EN</a>
+    </nav>
+  </header>
+
+  <div style="flex-grow: 1; display: flex; gap: 72px; padding: 56px 64px 80px 64px">
+
+    <aside style="width: 420px; flex-shrink: 0; display: flex; flex-direction: column; gap: 28px">
+      <div style="font-size: 14px; font-weight: 600; letter-spacing: 1.6px; text-transform: uppercase; color: #9A4F2E">A gentle start</div>
+      <h1 style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 54px; line-height: 1.08; font-weight: 400; letter-spacing: -0.6px">Let’s find where your family can put down <span style="font-style: italic; color: #5E7147">roots</span>.</h1>
+      <p style="margin: 0; font-size: 19px; line-height: 1.7; color: #5A4535">Tell us what your days look like — school runs, weekend parks, how much quiet you need. We’ll compare your Kiez with three others and explain the trade-offs in plain words.</p>
+
+      <ol style="margin: 8px 0 0 0; padding: 24px 28px; list-style: none; background: #EFE4D1; border-radius: 22px; display: flex; flex-direction: column; gap: 14px; font-size: 16px">
+        <li style="display: flex; align-items: center; gap: 12px; color: #4A5B37"><span style="width: 24px; height: 24px; border-radius: 50%; background: #5E7147; color: #FBF6EC; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.3 4.3L19 7.2"></path></svg></span>Where you live now</li>
+        <li style="display: flex; align-items: center; gap: 12px; color: #4A5B37"><span style="width: 24px; height: 24px; border-radius: 50%; background: #5E7147; color: #FBF6EC; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.3 4.3L19 7.2"></path></svg></span>Your kids’ needs</li>
+        <li style="display: flex; align-items: center; gap: 12px; color: #4A5B37"><span style="width: 24px; height: 24px; border-radius: 50%; background: #5E7147; color: #FBF6EC; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.3 4.3L19 7.2"></path></svg></span>Rent budget</li>
+        <li style="display: flex; align-items: center; gap: 12px; font-weight: 600"><span style="width: 24px; height: 24px; box-sizing: border-box; border-radius: 50%; border: 2px solid #5E7147; background: #FBF6EC"></span>Rooms</li>
+        <li style="display: flex; align-items: center; gap: 12px; color: #6E5643"><span style="width: 24px; height: 24px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #B8A283"></span>Quiet &amp; clean air</li>
+        <li style="display: flex; align-items: center; gap: 12px; color: #6E5643"><span style="width: 24px; height: 24px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #B8A283"></span>Parks &amp; nature</li>
+        <li style="display: flex; align-items: center; gap: 12px; color: #6E5643"><span style="width: 24px; height: 24px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #B8A283"></span>Hobbies</li>
+        <li style="display: flex; align-items: center; gap: 12px; color: #6E5643"><span style="width: 24px; height: 24px; box-sizing: border-box; border-radius: 50%; border: 1.5px dashed #B8A283"></span>Commute</li>
+      </ol>
+
+      <div style="display: flex; align-items: flex-end; gap: 20px; padding-top: 12px">
+        <svg viewBox="0 0 200 260" width="150" height="195" fill="none" stroke="#8A6A4F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M100 258C98 200 96 150 104 90c4-30 8-50 16-70"></path>
+          <path d="M101 205c-18-8-30-22-34-42 18 4 30 18 34 42z"></path>
+          <path d="M102 172c16-10 30-12 44-8-10 14-26 16-44 8z"></path>
+          <path d="M103 132c-14-10-22-24-22-40 14 8 22 22 22 40z"></path>
+          <path d="M105 104c12-8 24-10 34-6-8 10-20 12-34 6z"></path>
+          <path d="M104 90c-10-20-22-32-40-38"></path>
+          <path d="M112 42c10-14 22-22 36-24"></path>
+          <circle cx="60" cy="50" r="6" fill="#E3C3A6"></circle>
+          <circle cx="152" cy="17" r="5" fill="#E3C3A6"></circle>
+          <circle cx="121" cy="15" r="5.5" fill="#E3C3A6"></circle>
+          <path d="M60 44v-6M54 50h-6M56 45l-4-4M121 9.5v-6M126 12l4-4M116 12l-4-4"></path>
+        </svg>
+        <p style="margin: 0 0 12px 0; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 18px; line-height: 1.6; color: #6E5643">About three minutes.<br>Skip anything that doesn’t fit your life.</p>
+      </div>
+    </aside>
+
+    <form style="flex-grow: 1; box-sizing: border-box; padding: 16px 56px 48px 56px; background: #FBF6EC; border: 1px solid #E3D5BD; border-radius: 32px; display: flex; flex-direction: column">
+
+      <section style="display: flex; gap: 24px; padding: 36px 0">
+        <div style="width: 44px; flex-shrink: 0; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 22px; color: #9A4F2E">01</div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <label for="addr" style="font-family: 'Fraunces', Georgia, serif; font-size: 28px; font-weight: 500; line-height: 1.25">Your current address</label>
+            <span id="addrHelp" style="font-size: 16px; color: #6E5643">So we know what you’re comparing against.</span>
+          </div>
+          <div style="position: relative; display: flex; align-items: center">
+            <span style="position: absolute; left: 18px; top: 18px; color: #9A4F2E; display: flex"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-6.2-5.6-6.2-10.3a6.2 6.2 0 0 1 12.4 0c0 4.7-6.2 10.3-6.2 10.3z"></path><circle cx="12" cy="10.2" r="2.1"></circle></svg></span>
+            <input id="addr" type="text" value="Torstraße 1, 10119 Berlin" aria-describedby="addrHelp" style="width: 100%; height: 58px; box-sizing: border-box; padding: 0 20px 0 52px; font-family: 'Figtree', sans-serif; font-size: 18px; color: #3B2A1E; background: #FFFBF3; border: 1.5px solid #5E7147; border-radius: 16px; outline: none">
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 15px; color: #4A5B37"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.3 4.3L19 7.2"></path></svg>Found it — Rosenthaler Vorstadt, Mitte</div>
+        </div>
+      </section>
+
+      <section style="display: flex; gap: 24px; padding: 36px 0; border-top: 1px solid #E8DCC6">
+        <div style="width: 44px; flex-shrink: 0; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 22px; color: #9A4F2E">02</div>
+        <fieldset style="flex-grow: 1; margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 16px">
+          <legend style="padding: 0; display: flex; flex-direction: column; gap: 6px"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 28px; font-weight: 500; line-height: 1.25">If you have kids, what matters to you?</span><span style="font-size: 16px; color: #6E5643">Pick as many as you like — or none at all.</span></legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; padding-top: 16px">
+            <label style="position: relative; height: 52px; box-sizing: border-box; padding: 0 20px 0 16px; display: flex; align-items: center; gap: 10px; background: #DCE3CC; border: 1.5px solid #5E7147; border-radius: 999px; font-size: 17px; font-weight: 500; color: #34432A; cursor: pointer"><input type="checkbox" checked style="position: absolute; opacity: 0; width: 1px; height: 1px"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="12" width="7" height="7" rx="1"></rect><rect x="13" y="12" width="7" height="7" rx="1"></rect><path d="M8.5 11 12 4.5l3.5 6.5z"></path></svg>Kita (daycare)<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.3 4.3L19 7.2"></path></svg></label>
+            <label style="position: relative; height: 52px; box-sizing: border-box; padding: 0 20px 0 16px; display: flex; align-items: center; gap: 10px; background: #DCE3CC; border: 1.5px solid #5E7147; border-radius: 999px; font-size: 17px; font-weight: 500; color: #34432A; cursor: pointer"><input type="checkbox" checked style="position: absolute; opacity: 0; width: 1px; height: 1px"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6.2c3-1 5.6-.6 8 1.1 2.4-1.7 5-2.1 8-1.1v12c-3-1-5.6-.6-8 1.1-2.4-1.7-5-2.1-8-1.1z"></path><path d="M12 7.3v12"></path></svg>Primary school<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.3 4.3L19 7.2"></path></svg></label>
+            <label style="position: relative; height: 52px; box-sizing: border-box; padding: 0 20px 0 16px; display: flex; align-items: center; gap: 10px; background: #FFFBF3; border: 1.5px solid #D9C9AE; border-radius: 999px; font-size: 17px; color: #3B2A1E; cursor: pointer"><input type="checkbox" style="position: absolute; opacity: 0; width: 1px; height: 1px"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6A4F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19.2l1-4.1L15.8 5.3a1.8 1.8 0 0 1 2.6 0l.3.3a1.8 1.8 0 0 1 0 2.6L8.9 18z"></path><path d="M14 7l3 3"></path></svg>High school</label>
+            <label style="position: relative; height: 52px; box-sizing: border-box; padding: 0 20px 0 16px; display: flex; align-items: center; gap: 10px; background: #FFFBF3; border: 1.5px solid #D9C9AE; border-radius: 999px; font-size: 17px; color: #3B2A1E; cursor: pointer"><input type="checkbox" style="position: absolute; opacity: 0; width: 1px; height: 1px"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6A4F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19.5s-7.2-4.3-7.2-9.5A3.9 3.9 0 0 1 12 8a3.9 3.9 0 0 1 7.2 2c0 5.2-7.2 9.5-7.2 9.5z"></path><path d="M12 11v4M10 13h4"></path></svg>Kids’ doctor nearby</label>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px">
+            <span style="font-size: 15px; color: #6E5643">or</span>
+            <label style="position: relative; height: 44px; box-sizing: border-box; padding: 0 18px; display: flex; align-items: center; gap: 8px; border: 1.5px dashed #C4AF90; border-radius: 999px; font-size: 16px; color: #5A4535; cursor: pointer"><input type="checkbox" style="position: absolute; opacity: 0; width: 1px; height: 1px">No kids / not relevant</label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section style="display: flex; gap: 24px; padding: 36px 0; border-top: 1px solid #E8DCC6">
+        <div style="width: 44px; flex-shrink: 0; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 22px; color: #9A4F2E">03</div>
+        <fieldset style="flex-grow: 1; margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 16px">
+          <legend style="padding: 0; display: flex; flex-direction: column; gap: 6px"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 28px; font-weight: 500; line-height: 1.25">Rent budget</span><span style="font-size: 16px; color: #6E5643">How much room is there in the monthly budget?</span></legend>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding-top: 16px">
+            <label style="box-sizing: border-box; padding: 18px 20px; display: flex; gap: 12px; align-items: flex-start; background: #FFFBF3; border: 1.5px solid #D9C9AE; border-radius: 18px; cursor: pointer"><input type="radio" name="rent" style="margin: 4px 0 0 0; width: 18px; height: 18px; accent-color: #5E7147"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 17px; font-weight: 600">Keep it minimal</span><span style="font-size: 14px; line-height: 1.5; color: #6E5643">Lower rent matters most</span></span></label>
+            <label style="box-sizing: border-box; padding: 18px 20px; display: flex; gap: 12px; align-items: flex-start; background: #DCE3CC; border: 1.5px solid #5E7147; border-radius: 18px; cursor: pointer"><input type="radio" name="rent" checked style="margin: 4px 0 0 0; width: 18px; height: 18px; accent-color: #5E7147"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 17px; font-weight: 600; color: #34432A">Flexible</span><span style="font-size: 14px; line-height: 1.5; color: #4A5B37">Happy to trade a little for a better fit</span></span></label>
+            <label style="box-sizing: border-box; padding: 18px 20px; display: flex; gap: 12px; align-items: flex-start; background: #FFFBF3; border: 1.5px solid #D9C9AE; border-radius: 18px; cursor: pointer"><input type="radio" name="rent" style="margin: 4px 0 0 0; width: 18px; height: 18px; accent-color: #5E7147"><span style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 17px; font-weight: 600">Not a concern</span><span style="font-size: 14px; line-height: 1.5; color: #6E5643">Just show me the best match</span></span></label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section style="display: flex; gap: 24px; padding: 36px 0; border-top: 1px solid #E8DCC6">
+        <div style="width: 44px; flex-shrink: 0; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 22px; color: #9A4F2E">04</div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span id="roomsLabel" style="font-family: 'Fraunces', Georgia, serif; font-size: 28px; font-weight: 500; line-height: 1.25">Minimum rooms you want</span>
+            <span style="font-size: 16px; color: #6E5643">Counted the German way — bedrooms plus living room, not kitchen or bath.</span>
+          </div>
+          <div role="group" aria-labelledby="roomsLabel" style="display: flex; align-items: center; gap: 28px">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 6px; background: #FFFBF3; border: 1.5px solid #D9C9AE; border-radius: 999px">
+              <button type="button" aria-label="Fewer rooms" style="width: 48px; height: 48px; border: 0; border-radius: 50%; background: #EFE4D1; color: #3B2A1E; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg></button>
+              <output aria-live="polite" style="width: 64px; text-align: center; font-family: 'Fraunces', Georgia, serif; font-size: 32px; font-weight: 500">3</output>
+              <button type="button" aria-label="More rooms" style="width: 48px; height: 48px; border: 0; border-radius: 50%; background: #5E7147; color: #FBF6EC; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+            </div>
+            <div aria-hidden="true" style="display: flex; align-items: flex-end; gap: 10px">
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 28px; height: 14px; border-radius: 6px; background: #CFE0B8"></div><span style="font-size: 13px; color: #6E5643">1</span></div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 28px; height: 22px; border-radius: 6px; background: #CFE0B8"></div><span style="font-size: 13px; color: #6E5643">2</span></div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 28px; height: 30px; border-radius: 6px; background: #5E7147"></div><span style="font-size: 13px; font-weight: 600; color: #34432A">3</span></div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 28px; height: 38px; box-sizing: border-box; border-radius: 6px; border: 1.5px dashed #C4AF90"></div><span style="font-size: 13px; color: #6E5643">4</span></div>
+              <div style="display: flex; flex-direction: column; align-items: center; gap: 6px"><div style="width: 28px; height: 46px; box-sizing: border-box; border-radius: 6px; border: 1.5px dashed #C4AF90"></div><span style="font-size: 13px; color: #6E5643">5+</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style="display: flex; gap: 24px; padding: 36px 0; border-top: 1px solid #E8DCC6">
+        <div style="width: 44px; flex-shrink: 0; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 22px; color: #9A4F2E">05</div>
+        <fieldset style="flex-grow: 1; margin: 0; padding: 0; border: 0; display: flex; align-items: center; justify-content: space-between; gap: 24px">
+          <legend style="float: left; padding: 0; display: flex; flex-direction: column; gap: 6px; max-width: 420px"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 28px; font-weight: 500; line-height: 1.25">Sensitive to noise and air quality?</span><span style="font-size: 16px; color: #6E5643">Busy roads, night traffic, construction.</span></legend>
+          <div style="display: flex; padding: 5px; background: #EFE4D1; border-radius: 999px">
+            <label style="position: relative; height: 48px; box-sizing: border-box; padding: 0 26px; display: flex; align-items: center; gap: 8px; background: #5E7147; color: #FBF6EC; border-radius: 999px; font-size: 17px; font-weight: 600; cursor: pointer"><input type="radio" name="noise" checked style="position: absolute; opacity: 0; width: 1px; height: 1px"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7.2 17.5h9.6a3.6 3.6 0 0 0 .5-7.2 5.2 5.2 0 0 0-9.9-1.2 4.2 4.2 0 0 0-.2 8.4z"></path></svg>Yes</label>
+            <label style="position: relative; height: 48px; box-sizing: border-box; padding: 0 26px; display: flex; align-items: center; color: #5A4535; border-radius: 999px; font-size: 17px; cursor: pointer"><input type="radio" name="noise" style="position: absolute; opacity: 0; width: 1px; height: 1px">No</label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section style="display: flex; gap: 24px; padding: 36px 0; border-top: 1px solid #E8DCC6">
+        <div style="width: 44px; flex-shrink: 0; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 22px; color: #9A4F2E">06</div>
+        <fieldset style="flex-grow: 1; margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 16px">
+          <legend style="padding: 0; display: flex; flex-direction: column; gap: 6px"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 28px; font-weight: 500; line-height: 1.25">Parks and nature</span><span style="font-size: 16px; color: #6E5643">Green space within an easy walk, playgrounds, water.</span></legend>
+          <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-top: 16px">
+            <label style="position: relative; box-sizing: border-box; padding: 20px 22px; display: flex; align-items: center; gap: 16px; background: #DCE3CC; border: 1.5px solid #5E7147; border-radius: 18px; cursor: pointer"><input type="radio" name="parks" checked style="position: absolute; opacity: 0; width: 1px; height: 1px"><span style="width: 48px; height: 48px; border-radius: 50%; background: #FBF6EC; color: #4A5B37; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.8c-3.4 0-5.6 2.7-5.6 5.6 0 3 2.4 5.3 5.6 5.3s5.6-2.3 5.6-5.3c0-2.9-2.2-5.6-5.6-5.6z"></path><path d="M12 14.7v5.8M9 20.5h6M12 17l-2-1.6"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 18px; font-weight: 600; color: #34432A">Very important</span><span style="font-size: 14px; color: #4A5B37">Weigh green space heavily</span></span></label>
+            <label style="position: relative; box-sizing: border-box; padding: 20px 22px; display: flex; align-items: center; gap: 16px; background: #FFFBF3; border: 1.5px solid #D9C9AE; border-radius: 18px; cursor: pointer"><input type="radio" name="parks" style="position: absolute; opacity: 0; width: 1px; height: 1px"><span style="width: 48px; height: 48px; border-radius: 50%; background: #EFE4D1; color: #8A6A4F; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5"></path><path d="M6 10v9.5h12V10"></path><path d="M10 19.5v-5h4v5"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 18px; font-weight: 600">Not important</span><span style="font-size: 14px; color: #6E5643">We’re happy with city streets</span></span></label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section style="display: flex; gap: 24px; padding: 36px 0; border-top: 1px solid #E8DCC6">
+        <div style="width: 44px; flex-shrink: 0; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 22px; color: #9A4F2E">07</div>
+        <fieldset style="flex-grow: 1; margin: 0; padding: 0; border: 0; display: flex; flex-direction: column; gap: 16px">
+          <legend style="padding: 0; display: flex; flex-direction: column; gap: 6px"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 28px; font-weight: 500; line-height: 1.25">Your hobbies</span><span style="font-size: 16px; color: #6E5643">We’ll look for studios and gyms close by.</span></legend>
+          <div style="display: flex; flex-wrap: wrap; gap: 12px; padding-top: 16px">
+            <label style="position: relative; height: 52px; box-sizing: border-box; padding: 0 20px 0 16px; display: flex; align-items: center; gap: 10px; background: #DCE3CC; border: 1.5px solid #5E7147; border-radius: 999px; font-size: 17px; font-weight: 500; color: #34432A; cursor: pointer"><input type="checkbox" checked style="position: absolute; opacity: 0; width: 1px; height: 1px"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5.5" r="1.9"></circle><path d="M12 8.5v5.5"></path><path d="M6 10.5c2 1.3 4 2 6 2s4-.7 6-2"></path><path d="M5 18.5c2.2-1.8 4.5-2.6 7-2.6s4.8.8 7 2.6"></path></svg>Yoga<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.3 4.3L19 7.2"></path></svg></label>
+            <label style="position: relative; height: 52px; box-sizing: border-box; padding: 0 20px 0 16px; display: flex; align-items: center; gap: 10px; background: #FFFBF3; border: 1.5px solid #D9C9AE; border-radius: 999px; font-size: 17px; color: #3B2A1E; cursor: pointer"><input type="checkbox" style="position: absolute; opacity: 0; width: 1px; height: 1px"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#8A6A4F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 10v4M6.5 7.5v9M17.5 7.5v9M20.5 10v4M6.5 12h11"></path></svg>Gym</label>
+            <label style="position: relative; height: 52px; box-sizing: border-box; padding: 0 20px 0 16px; display: flex; align-items: center; gap: 10px; background: #DCE3CC; border: 1.5px solid #5E7147; border-radius: 999px; font-size: 17px; font-weight: 500; color: #34432A; cursor: pointer"><input type="checkbox" checked style="position: absolute; opacity: 0; width: 1px; height: 1px"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 19.5 9.5 8l3.6 6 2.6-3.6 4.8 9.1z"></path><circle cx="16.8" cy="5.6" r="1.4"></circle></svg>Bouldering<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.3 4.3L19 7.2"></path></svg></label>
+          </div>
+        </fieldset>
+      </section>
+
+      <section style="display: flex; gap: 24px; padding: 36px 0; border-top: 1px solid #E8DCC6">
+        <div style="width: 44px; flex-shrink: 0; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 22px; color: #9A4F2E">08</div>
+        <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px">
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <span style="font-family: 'Fraunces', Georgia, serif; font-size: 28px; font-weight: 500; line-height: 1.25">Your core commute address(es)</span>
+            <span style="font-size: 16px; color: #6E5643">Work, a studio, grandparents — the places you travel to most. Totally optional.</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px">
+            <label for="commute1" style="position: absolute; width: 1px; height: 1px; overflow: hidden">First commute address</label>
+            <div style="position: relative"><span style="position: absolute; left: 18px; top: 17px; color: #8A6A4F; display: flex"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3.8" width="12" height="12.4" rx="3"></rect><path d="M6 10.5h12"></path><path d="M9 19.8l1.4-3.4M15 19.8l-1.4-3.4"></path></svg></span><input id="commute1" type="text" value="Friedrichstraße 43, 10117 Berlin" style="width: 100%; height: 56px; box-sizing: border-box; padding: 0 20px 0 52px; font-family: 'Figtree', sans-serif; font-size: 18px; color: #3B2A1E; background: #FFFBF3; border: 1.5px solid #D9C9AE; border-radius: 16px"></div>
+            <label for="commute2" style="position: absolute; width: 1px; height: 1px; overflow: hidden">Second commute address</label>
+            <div style="position: relative"><span style="position: absolute; left: 18px; top: 17px; color: #B8A283; display: flex"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span><input id="commute2" type="text" placeholder="A second address (optional)" style="width: 100%; height: 56px; box-sizing: border-box; padding: 0 20px 0 52px; font-family: 'Figtree', sans-serif; font-size: 18px; color: #3B2A1E; background: transparent; border: 1.5px dashed #D9C9AE; border-radius: 16px"></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 16px; padding: 4px 0"><div style="flex-grow: 1; height: 1px; background: #E3D5BD"></div><span style="font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 17px; color: #6E5643">or simply</span><div style="flex-grow: 1; height: 1px; background: #E3D5BD"></div></div>
+          <label style="position: relative; box-sizing: border-box; padding: 18px 22px; display: flex; align-items: center; gap: 16px; background: #F4EDE1; border: 1.5px solid #D9C9AE; border-radius: 18px; cursor: pointer"><input type="checkbox" style="position: absolute; opacity: 0; width: 1px; height: 1px"><span style="width: 44px; height: 44px; border-radius: 50%; background: #FBF6EC; color: #8A6A4F; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3.5c1.7 0 2.6 2 2.4 4.3-.2 2.1-1.2 3.4-2.4 3.4s-2.3-1.3-2.4-3.4C5.4 5.5 6.3 3.5 8 3.5z"></path><path d="M6.4 13.6h3.2"></path><path d="M16 9.5c1.7 0 2.6 2 2.4 4.3-.2 2.1-1.2 3.4-2.4 3.4s-2.3-1.3-2.4-3.4c-.2-2.3.7-4.3 2.4-4.3z"></path><path d="M14.4 19.6h3.2"></path></svg></span><span style="flex-grow: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 18px; font-weight: 600">None — I’m flexible / a nomad</span><span style="font-size: 14px; color: #6E5643">We’ll leave commute times out of it.</span></span><span style="width: 26px; height: 26px; box-sizing: border-box; border: 1.5px solid #B8A283; border-radius: 8px; background: #FFFBF3"></span></label>
+        </div>
+      </section>
+
+      <div style="margin-top: 12px; padding: 32px 36px; background: #EFE4D1; border-radius: 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px">
+        <p style="margin: 0; max-width: 360px; font-size: 16px; line-height: 1.65; color: #5A4535">We’ll compare Rosenthaler Vorstadt with three Kieze that fit what you told us. It usually takes about a minute.</p>
+        <button type="submit" style="height: 64px; padding: 0 34px 0 28px; border: 0; border-radius: 999px; background: #5E7147; color: #FBF6EC; font-family: 'Fraunces', Georgia, serif; font-size: 22px; font-weight: 500; display: flex; align-items: center; gap: 12px; box-shadow: 0 6px 18px rgba(74, 91, 55, 0.28); cursor: pointer"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8.2 5.2-13.2 14-14 0 8.8-5 14-13.2 14"></path><path d="M5 19c2.8-4 6-7 10-9.2"></path></svg>Find my Kiez</button>
+      </div>
+    </form>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Wurzelraum — your three Kieze</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&amp;family=Figtree:wght@400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#F4EDE1;font-family:'Figtree',system-ui,sans-serif;color:#3B2A1E}
+a{color:#4A5B37}a:hover{color:#3B2A1E}
+input::placeholder{color:#8C7662}
+@keyframes wr-blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.wr-caret{display:inline-block;width:2px;height:1.05em;margin-left:3px;vertical-align:-0.15em;background:#5E7147;border-radius:1px;animation:wr-blink 1s infinite}
+</style>
+</helmet>
+<div style="width: 1440px; height: 3900px; box-sizing: border-box; background: #F4EDE1; font-family: 'Figtree', system-ui, sans-serif; color: #3B2A1E; display: flex; flex-direction: column">
+
+  <header style="height: 84px; flex-shrink: 0; box-sizing: border-box; padding: 0 64px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #E3D5BD">
+    <a href="Intake-Desktop.dc.html" style="display: flex; align-items: center; gap: 10px; text-decoration: none; color: #3B2A1E">
+      <svg viewBox="0 0 64 64" width="40" height="40" aria-hidden="true"><g fill="none" stroke="#7A5236" stroke-width="2.6" stroke-linecap="round"><path d="M32 51c0 4-3 6.5-8 9"></path><path d="M32 51c0 4.5 3 6.5 8.5 8.5"></path><path d="M32 51v11"></path></g><g fill="#5E7147"><circle cx="26" cy="11.5" r="4.5"></circle><path d="M21.5 30c0-7.5 1.6-11 4.5-11s4.5 3.5 4.5 11z"></path><circle cx="40.5" cy="18.5" r="3.6"></circle><path d="M37 30c0-5.3 1.3-7.6 3.5-7.6S44 24.7 44 30z"></path><path d="M50 21.5c.3-4 3-6.8 7-7 .1 4-2.7 6.8-7 7z"></path></g><g fill="none" stroke="#5E7147" stroke-width="3" stroke-linecap="round"><path d="M23.2 21.5 18.8 13.5"></path><path d="M28.8 21.5l4.2-7.5"></path><path d="M47.6 30c0-3.5.7-6.3 2.4-8.5" stroke-width="2.2"></path></g><path d="M18 34h28l-3.4 15.2A3.4 3.4 0 0 1 39.3 52H24.7a3.4 3.4 0 0 1-3.3-2.8z" fill="#B8643E"></path><rect x="14" y="27.5" width="36" height="7" rx="2.6" fill="#C9805A"></rect></svg>
+      <span style="font-family: 'Fraunces', Georgia, serif; font-size: 26px; font-weight: 500">Wurzelraum</span>
+    </a>
+    <nav style="display: flex; align-items: center; gap: 12px; font-size: 16px">
+      <a href="Intake-Desktop.dc.html" style="height: 44px; padding: 0 18px; display: flex; align-items: center; gap: 8px; color: #3B2A1E; text-decoration: none; border: 1px solid #D9C9AE; border-radius: 999px"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19.2l1-4.1L15.8 5.3a1.8 1.8 0 0 1 2.6 0l.3.3a1.8 1.8 0 0 1 0 2.6L8.9 18z"></path></svg>Edit my answers</a>
+      <a href="#" style="height: 44px; padding: 0 18px; display: flex; align-items: center; color: #3B2A1E; text-decoration: none; border: 1px solid #D9C9AE; border-radius: 999px">Save these results</a>
+    </nav>
+  </header>
+
+  <section style="position: relative; flex-shrink: 0; box-sizing: border-box; padding: 56px 64px 52px 64px; background: #E8DCC6; display: flex; flex-direction: column; gap: 18px; overflow: hidden">
+    <svg viewBox="0 0 300 260" width="300" height="260" fill="none" stroke="#B89B78" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="position: absolute; right: 48px; top: 20px; opacity: 0.8">
+      <path d="M150 258c-2-60-4-110 6-170 5-30 10-52 20-74"></path>
+      <path d="M151 205c-20-8-34-24-38-46 20 4 34 20 38 46z"></path>
+      <path d="M152 170c18-12 34-14 50-9-12 16-30 18-50 9z"></path>
+      <path d="M154 128c-16-12-24-28-24-46 16 10 24 26 24 46z"></path>
+      <path d="M157 98c14-10 28-12 40-7-10 12-24 14-40 7z"></path>
+      <path d="M156 86c-12-22-26-34-46-40"></path>
+      <circle cx="106" cy="44" r="7" fill="#D9B596"></circle>
+      <circle cx="178" cy="12" r="6" fill="#D9B596"></circle>
+      <path d="M40 258c10-40 22-70 40-96M80 162c-10-6-16-16-16-28 10 6 16 16 16 28zM62 200c12-2 22 2 30 10-12 4-22 0-30-10z"></path>
+    </svg>
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; color: #9A4F2E"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-6.2-5.6-6.2-10.3a6.2 6.2 0 0 1 12.4 0c0 4.7-6.2 10.3-6.2 10.3z"></path><circle cx="12" cy="10.2" r="2.1"></circle></svg>Where you are now</div>
+    <h1 style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 58px; font-weight: 400; line-height: 1.05; letter-spacing: -0.6px">Rosenthaler Vorstadt, <span style="font-style: italic">Mitte</span></h1>
+    <p aria-live="polite" style="margin: 0; max-width: 820px; font-family: 'Fraunces', Georgia, serif; font-size: 23px; line-height: 1.6; color: #4E3B2D">Your Kiez puts the whole city at your doorstep — but for a family chasing quiet streets and green space, it asks a lot. These three give you more room to breathe, each in its own way.</p>
+    <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding-top: 6px">
+      <span style="font-size: 14px; color: #5A4535; margin-right: 4px">Matched on</span>
+      <span style="padding: 6px 12px; background: #F4EDE1; border-radius: 999px; font-size: 14px">Kita</span>
+      <span style="padding: 6px 12px; background: #F4EDE1; border-radius: 999px; font-size: 14px">Primary school</span>
+      <span style="padding: 6px 12px; background: #F4EDE1; border-radius: 999px; font-size: 14px">Flexible budget</span>
+      <span style="padding: 6px 12px; background: #F4EDE1; border-radius: 999px; font-size: 14px">3+ rooms</span>
+      <span style="padding: 6px 12px; background: #F4EDE1; border-radius: 999px; font-size: 14px">Quiet &amp; clean air</span>
+      <span style="padding: 6px 12px; background: #F4EDE1; border-radius: 999px; font-size: 14px">Parks</span>
+      <span style="padding: 6px 12px; background: #F4EDE1; border-radius: 999px; font-size: 14px">Yoga · Bouldering</span>
+      <span style="padding: 6px 12px; background: #F4EDE1; border-radius: 999px; font-size: 14px">Commute to Friedrichstraße</span>
+    </div>
+  </section>
+
+  <main style="flex-grow: 1; box-sizing: border-box; padding: 56px 64px 64px 64px; display: flex; flex-direction: column; gap: 28px">
+
+    <div style="display: flex; align-items: flex-end; justify-content: space-between">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <h2 style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 36px; font-weight: 500">Three Kieze worth a closer look</h2>
+        <p style="margin: 0; font-size: 17px; color: #6E5643">Each compared against where you live now. Choose one to see what homes there tend to look like.</p>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px">
+      <sc-for list="{{kieze}}" as="k" hint-placeholder-count="3">
+        <button type="button" onClick="{{k.pick}}" aria-pressed="{{k.pressed}}" style="padding: 0; margin: 0; text-align: left; font: inherit; color: inherit; background: #FBF6EC; border-radius: 26px; overflow: hidden; display: flex; flex-direction: column; cursor: pointer; transition: transform .2s, box-shadow .2s; {{k.cardStyle}}">
+          <div style="position: relative; width: 100%; height: 200px; background: {{k.sky}}">
+            <svg viewBox="0 0 400 200" width="100%" height="200" preserveAspectRatio="xMidYMid slice" role="img" aria-label="{{k.photoAlt}}">
+              <rect width="400" height="200" fill="{{k.sky}}"></rect>
+              <rect x="0" y="34" width="118" height="142" fill="{{k.b1}}"></rect>
+              <rect x="118" y="56" width="112" height="120" fill="{{k.b2}}"></rect>
+              <rect x="230" y="24" width="104" height="152" fill="{{k.b1}}"></rect>
+              <rect x="334" y="50" width="66" height="126" fill="{{k.b3}}"></rect>
+              <g fill="#FBF6EC" opacity=".55"><rect x="14" y="50" width="20" height="26" rx="2"></rect><rect x="48" y="50" width="20" height="26" rx="2"></rect><rect x="82" y="50" width="20" height="26" rx="2"></rect><rect x="14" y="90" width="20" height="26" rx="2"></rect><rect x="82" y="90" width="20" height="26" rx="2"></rect><rect x="134" y="70" width="18" height="24" rx="2"></rect><rect x="168" y="70" width="18" height="24" rx="2"></rect><rect x="202" y="70" width="18" height="24" rx="2"></rect><rect x="134" y="106" width="18" height="24" rx="2"></rect><rect x="202" y="106" width="18" height="24" rx="2"></rect><rect x="246" y="40" width="18" height="26" rx="2"></rect><rect x="280" y="40" width="18" height="26" rx="2"></rect><rect x="310" y="40" width="16" height="26" rx="2"></rect><rect x="246" y="80" width="18" height="26" rx="2"></rect><rect x="310" y="80" width="16" height="26" rx="2"></rect><rect x="346" y="66" width="16" height="22" rx="2"></rect><rect x="374" y="66" width="16" height="22" rx="2"></rect><rect x="346" y="102" width="16" height="22" rx="2"></rect></g>
+              <path d="M128 142h96l-6 13h-84z" fill="{{k.awning}}"></path>
+              <rect x="150" y="155" width="16" height="21" fill="#6B4A33" opacity=".6"></rect>
+              <rect y="176" width="400" height="24" fill="#CDBB9C"></rect>
+              <g fill="#6B4A33"><rect x="70" y="122" width="6" height="56" rx="2"></rect><rect x="262" y="118" width="6" height="60" rx="2"></rect><rect x="370" y="130" width="5" height="48" rx="2"></rect></g>
+              <circle cx="73" cy="108" r="34" fill="#6F7F52"></circle><circle cx="86" cy="98" r="20" fill="#82915F"></circle>
+              <circle cx="265" cy="102" r="36" fill="#6F7F52"></circle><circle cx="250" cy="92" r="20" fill="#82915F"></circle>
+              <circle cx="372" cy="118" r="24" fill="#6F7F52"></circle>
+            </svg>
+            <span style="position: absolute; left: 14px; bottom: 12px; padding: 5px 10px; background: rgba(59, 42, 30, 0.72); color: #FBF6EC; border-radius: 999px; font-size: 12px">Photo placeholder · {{k.photoHint}}</span>
+            <sc-if value="{{k.selected}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: 14px; top: 14px; padding: 6px 12px; background: #5E7147; color: #FBF6EC; border-radius: 999px; font-size: 13px; font-weight: 600">Viewing flats</span></sc-if>
+          </div>
+          <div style="box-sizing: border-box; width: 100%; padding: 22px 26px 24px 26px; display: flex; flex-direction: column; gap: 14px; flex-grow: 1">
+            <div style="display: flex; flex-direction: column; gap: 4px">
+              <span style="font-size: 13px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #6E5643">{{k.district}}</span>
+              <span style="font-family: 'Fraunces', Georgia, serif; font-size: 30px; font-weight: 500; line-height: 1.15">{{k.name}}</span>
+              <span style="font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 17px; color: #4A5B37">{{k.fit}}</span>
+            </div>
+            <div style="height: 1px; background: #E8DCC6"></div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <span style="font-size: 13px; font-weight: 600; color: #4A5B37">Better for you</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                <sc-for list="{{k.pros}}" as="p" hint-placeholder-count="3"><span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 9px; background: #DCE3CC; color: #34432A; border-radius: 999px; font-size: 14px; font-weight: 500"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.3 4.3L19 7.2"></path></svg>{{p}}</span></sc-for>
+              </div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px">
+              <span style="font-size: 13px; font-weight: 600; color: #8E4A42">Worth weighing</span>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px">
+                <sc-for list="{{k.cons}}" as="c" hint-placeholder-count="2"><span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 9px; background: #F3E0DA; color: #7E3F37; border-radius: 999px; font-size: 14px; font-weight: 500"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M7 7l10 10M17 7 7 17"></path></svg>{{c}}</span></sc-for>
+              </div>
+            </div>
+            <div style="flex-grow: 1"></div>
+            <span style="display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid #E8DCC6; font-size: 16px; font-weight: 600; color: {{k.ctaColor}}">{{k.cta}}<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg></span>
+          </div>
+        </button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{open}}" hint-placeholder-val="{{ true }}">
+    <section aria-label="Example flats" style="box-sizing: border-box; padding: 34px 38px 38px 38px; background: #FBF6EC; border: 2px solid #5E7147; border-radius: 28px; display: flex; flex-direction: column; gap: 22px">
+      <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 13px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: #4A5B37">Example flats · {{sel.name}}</span>
+          <h3 style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 30px; font-weight: 500">{{sel.flatsTitle}}</h3>
+          <p style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 16px; color: #6E5643">Example listings — for a feel of what’s typical here, not current live offers.</p>
+        </div>
+        <button type="button" onClick="{{collapse}}" style="height: 44px; padding: 0 18px; flex-shrink: 0; background: transparent; border: 1px solid #D9C9AE; border-radius: 999px; font-family: 'Figtree', sans-serif; font-size: 15px; color: #3B2A1E; cursor: pointer">Hide flats</button>
+      </div>
+      <sc-if value="{{sel.noExact}}" hint-placeholder-val="{{ false }}">
+        <div role="note" style="display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: #F4EDE1; border: 1.5px dashed #C4AF90; border-radius: 16px; font-size: 16px; line-height: 1.55; color: #4E3B2D">
+          <span style="width: 36px; height: 36px; flex-shrink: 0; border-radius: 50%; background: #E8DCC6; color: #7A5236; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 20.5V4.5h11v16"></path><path d="M3.5 20.5h17"></path><circle cx="14" cy="12.5" r=".6" fill="currentColor"></circle></svg></span>
+          <span><strong style="font-weight: 600">Three-room homes are rare in {{sel.name}} right now.</strong> Here are the closest matches instead — a little smaller or a little bigger than you asked for.</span>
+        </div>
+      </sc-if>
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px">
+        <sc-for list="{{sel.flats}}" as="f" hint-placeholder-count="3">
+          <article style="box-sizing: border-box; padding: 22px 24px; background: #FFFBF3; border: 1px solid #E3D5BD; border-radius: 20px; display: flex; flex-direction: column; gap: 16px">
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 12px">
+              <div style="display: flex; align-items: baseline; gap: 8px"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 42px; font-weight: 500; line-height: 1">{{f.rooms}}</span><span style="font-size: 16px; color: #5A4535">rooms</span></div>
+              <span style="padding: 6px 12px; background: #EFE4D1; border-radius: 999px; font-size: 15px; font-weight: 600">{{f.size}}</span>
+            </div>
+            <sc-if value="{{f.note}}" hint-placeholder-val="{{ false }}"><span style="align-self: flex-start; padding: 4px 10px; background: #F4EDE1; border: 1px dashed #C4AF90; border-radius: 999px; font-size: 13px; color: #5A4535">Closest match · {{f.note}}</span></sc-if>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 14px 16px; background: #F4EDE1; border-radius: 14px">
+              <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; color: #6E5643">Cold rent</span><span style="font-size: 20px; font-weight: 600">{{f.cold}}</span><span style="font-size: 12px; color: #6E5643">per month</span></div>
+              <div style="display: flex; flex-direction: column; gap: 2px"><span style="font-size: 13px; color: #6E5643">Warm rent</span><span style="font-size: 20px; font-weight: 600">{{f.warm}}</span><span style="font-size: 12px; color: #6E5643">incl. heating &amp; costs</span></div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; color: #4E3B2D">
+              <span style="display: flex; align-items: center; gap: 10px"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8A6A4F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20.5h16M6 20.5V8l6-4 6 4v12.5"></path><path d="M10 12h4M10 16h4"></path></svg>{{f.floor}}</span>
+              <span style="display: flex; align-items: center; gap: 10px"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#8A6A4F" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19c0-8.2 5.2-13.2 14-14 0 8.8-5 14-13.2 14"></path><path d="M5 19c2.8-4 6-7 10-9.2"></path></svg>{{f.cond}}</span>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 8px">
+              <sc-if value="{{f.balcony}}" hint-placeholder-val="{{ true }}"><span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border: 1px solid #D9C9AE; border-radius: 999px; font-size: 14px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5E7147" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 12V5h10v7"></path><path d="M4 12h16M4 19h16M6 12v7M10 12v7M14 12v7M18 12v7"></path></svg>Balcony</span></sc-if>
+              <sc-if value="{{f.lift}}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border: 1px solid #D9C9AE; border-radius: 999px; font-size: 14px"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#5E7147" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"></rect><path d="M9 9.5l3-3 3 3M9 14.5l3 3 3-3"></path></svg>Lift</span></sc-if>
+              <sc-if value="{{f.plain}}" hint-placeholder-val="{{ false }}"><span style="padding: 6px 11px; font-size: 14px; color: #6E5643">No balcony or lift</span></sc-if>
+            </div>
+          </article>
+        </sc-for>
+      </div>
+    </section>
+    </sc-if>
+
+    <section aria-labelledby="cmpTitle" style="padding-top: 44px; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px">
+        <div style="display: flex; flex-direction: column; gap: 6px">
+          <h2 id="cmpTitle" style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 36px; font-weight: 500">Side by side</h2>
+          <p style="margin: 0; font-size: 17px; color: #6E5643">Only the things you told us matter, plus two we always include.</p>
+        </div>
+        <div style="display: flex; gap: 8px; font-size: 14px">
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; background: #E3E9D4; color: #34432A; border-radius: 999px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 18V6M7 11l5-5 5 5"></path></svg>Better for you</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; background: #EFE7D8; color: #5A4535; border-radius: 999px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 10h12M6 14h12"></path></svg>About the same</span>
+          <span style="display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; background: #F4E3DD; color: #7E3F37; border-radius: 999px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6v12M7 13l5 5 5-5"></path></svg>Worse for you</span>
+        </div>
+      </div>
+      <div role="table" aria-labelledby="cmpTitle" style="background: #FBF6EC; border: 1px solid #E3D5BD; border-radius: 24px; overflow: hidden">
+        <div role="row" style="display: grid; grid-template-columns: 250px repeat(4, minmax(0, 1fr)); background: #EFE4D1">
+          <div role="columnheader" style="padding: 18px 22px; font-size: 14px; font-weight: 600; color: #5A4535; align-self: end">What you asked about</div>
+          <div role="columnheader" style="padding: 18px 16px; background: #E8DCC6; display: flex; flex-direction: column; gap: 2px"><span style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #9A4F2E"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20.5s-6.2-5.6-6.2-10.3a6.2 6.2 0 0 1 12.4 0c0 4.7-6.2 10.3-6.2 10.3z"></path></svg>You are here</span><span style="font-family: 'Fraunces', Georgia, serif; font-size: 19px; font-weight: 500">Rosenthaler Vorstadt</span></div>
+          <div role="columnheader" style="padding: 18px 16px; display: flex; flex-direction: column; gap: 2px; justify-content: flex-end"><span style="font-size: 12px; color: #6E5643">Tempelhof-Schöneberg</span><span style="font-family: 'Fraunces', Georgia, serif; font-size: 19px; font-weight: 500">Friedenau</span></div>
+          <div role="columnheader" style="padding: 18px 16px; display: flex; flex-direction: column; gap: 2px; justify-content: flex-end"><span style="font-size: 12px; color: #6E5643">Pankow</span><span style="font-family: 'Fraunces', Georgia, serif; font-size: 19px; font-weight: 500">Weißensee</span></div>
+          <div role="columnheader" style="padding: 18px 16px; display: flex; flex-direction: column; gap: 2px; justify-content: flex-end"><span style="font-size: 12px; color: #6E5643">Pankow</span><span style="font-family: 'Fraunces', Georgia, serif; font-size: 19px; font-weight: 500">Florakiez</span></div>
+        </div>
+        <sc-for list="{{rows}}" as="r" hint-placeholder-count="9">
+          <div role="row" style="display: grid; grid-template-columns: 250px repeat(4, minmax(0, 1fr)); border-top: 1px solid #E8DCC6">
+            <div role="rowheader" style="padding: 14px 22px; display: flex; flex-direction: column; justify-content: center; gap: 2px"><span style="font-size: 16px; font-weight: 600">{{r.f}}</span><span style="font-size: 13px; color: #6E5643">{{r.why}}</span></div>
+            <div role="cell" style="padding: 12px 16px; background: #F4EDE1; display: flex; align-items: center; font-size: 15px; color: #4E3B2D">{{r.cur}}</div>
+            <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="3">
+              <div role="cell" style="padding: 10px 12px; display: flex; align-items: center">
+                <span style="width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 12px; font-size: 15px; background: {{c.bg}}; color: {{c.fg}}">
+                  <span style="width: 26px; height: 26px; flex-shrink: 0; border-radius: 50%; background: #FBF6EC; display: flex; align-items: center; justify-content: center">
+                    <sc-if value="{{c.better}}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-label="Better"><path d="M12 18V6M7 11l5-5 5 5"></path></svg></sc-if>
+                    <sc-if value="{{c.same}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-label="About the same"><path d="M6 10h12M6 14h12"></path></svg></sc-if>
+                    <sc-if value="{{c.worse}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-label="Worse"><path d="M12 6v12M7 13l5 5 5-5"></path></svg></sc-if>
+                  </span>
+                  {{c.t}}
+                </span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section aria-label="What changes if you move" style="padding-top: 44px; display: flex; flex-direction: column; gap: 20px">
+      <h2 style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 36px; font-weight: 500">What would actually change</h2>
+      <div style="display: flex; gap: 22px; padding: 36px 40px; background: #FBF6EC; border: 1px solid #E3D5BD; border-radius: 28px">
+        <div style="width: 56px; height: 56px; flex-shrink: 0; border-radius: 50%; background: #EFE4D1; display: flex; align-items: center; justify-content: center">
+          <svg viewBox="0 0 64 64" width="40" height="40" aria-hidden="true"><g fill="none" stroke="#7A5236" stroke-width="2.6" stroke-linecap="round"><path d="M32 51c0 4-3 6.5-8 9"></path><path d="M32 51c0 4.5 3 6.5 8.5 8.5"></path><path d="M32 51v11"></path></g><g fill="#5E7147"><circle cx="26" cy="11.5" r="4.5"></circle><path d="M21.5 30c0-7.5 1.6-11 4.5-11s4.5 3.5 4.5 11z"></path><circle cx="40.5" cy="18.5" r="3.6"></circle><path d="M37 30c0-5.3 1.3-7.6 3.5-7.6S44 24.7 44 30z"></path></g><g fill="none" stroke="#5E7147" stroke-width="3" stroke-linecap="round"><path d="M23.2 21.5 18.8 13.5"></path><path d="M28.8 21.5l4.2-7.5"></path></g><path d="M18 34h28l-3.4 15.2A3.4 3.4 0 0 1 39.3 52H24.7a3.4 3.4 0 0 1-3.3-2.8z" fill="#B8643E"></path><rect x="14" y="27.5" width="36" height="7" rx="2.6" fill="#C9805A"></rect></svg>
+        </div>
+        <div style="flex-grow: 1; max-width: 860px; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; align-items: center; gap: 10px"><span style="font-family: 'Fraunces', Georgia, serif; font-size: 19px; font-weight: 500">Wurzelraum</span><span style="font-size: 14px; color: #6E5643">{{narrativeStatus}}</span></div>
+          <div aria-live="polite" style="display: flex; flex-direction: column; gap: 16px; font-size: 19px; line-height: 1.78; color: #3B2A1E">
+            <p style="margin: 0">If you move to Friedenau, the biggest change is the pace of your days. Kita drop-off becomes a walk under plane trees instead of along Torstraße, and Volkspark Wilmersdorf is close enough for after-school picnics. Rents are noticeably lower, which likely turns that third room from a stretch into a given.</p>
+            <sc-if value="{{streaming}}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 0">The honest trade-off is time. Friedrichstraße goes from a short hop to a real ride with a change, and your <span style="opacity: 0.55">bouldering evenings</span><span class="wr-caret"></span></p>
+            </sc-if>
+            <sc-if value="{{done}}" hint-placeholder-val="{{ true }}">
+              <p style="margin: 0">The honest trade-off is time. Friedrichstraße goes from a short hop to a real ride with a change, and your bouldering evenings would mean crossing into Schöneberg or Kreuzberg. Weißensee stretches your budget furthest and puts a lake within a short walk — but three-room flats there are scarce. Florakiez sits in between: big parks and good Kitas, at roughly the rent you pay now.</p>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="chatTitle" style="padding-top: 44px; display: flex; flex-direction: column; gap: 20px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <h2 id="chatTitle" style="margin: 0; font-family: 'Fraunces', Georgia, serif; font-size: 36px; font-weight: 500">Still wondering?</h2>
+        <p style="margin: 0; font-size: 17px; color: #6E5643">Ask anything — a worry, a “but what about…”. We’ll answer with your family in mind.</p>
+      </div>
+      <div style="padding: 32px 40px; background: #FBF6EC; border: 1px solid #E3D5BD; border-radius: 28px; display: flex; flex-direction: column; gap: 22px">
+        <div style="align-self: flex-end; max-width: 620px; padding: 14px 20px; background: #E8DCC6; border-radius: 20px 20px 6px 20px; font-size: 17px; line-height: 1.6">How far is the nearest bouldering gym from Friedenau?</div>
+        <div style="display: flex; gap: 14px; max-width: 860px">
+          <div style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: #EFE4D1; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 64 64" width="28" height="28" aria-hidden="true"><g fill="#5E7147"><circle cx="26" cy="11.5" r="4.8"></circle><path d="M21 30c0-7.5 1.8-11 5-11s5 3.5 5 11z"></path><circle cx="41" cy="18" r="4"></circle><path d="M37 30c0-5.3 1.5-7.6 4-7.6S45 24.7 45 30z"></path></g><path d="M18 34h28l-3.4 15.2A3.4 3.4 0 0 1 39.3 52H24.7a3.4 3.4 0 0 1-3.3-2.8z" fill="#B8643E"></path><rect x="14" y="27.5" width="36" height="7" rx="2.6" fill="#C9805A"></rect><path d="M32 52v9" stroke="#7A5236" stroke-width="3" stroke-linecap="round"></path></svg></div>
+          <p style="margin: 0; font-size: 17px; line-height: 1.75">There isn’t one inside Friedenau itself. The closest halls are a short ride away in neighbouring districts — easy for a weekly session, harder for a spontaneous one once the kids are asleep.</p>
+        </div>
+        <div style="align-self: flex-end; max-width: 620px; padding: 14px 20px; background: #E8DCC6; border-radius: 20px 20px 6px 20px; font-size: 17px; line-height: 1.6">But we don’t have a car — does that change anything?</div>
+        <div style="display: flex; gap: 14px; max-width: 860px">
+          <div style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: #EFE4D1; display: flex; align-items: center; justify-content: center"><svg viewBox="0 0 64 64" width="28" height="28" aria-hidden="true"><g fill="#5E7147"><circle cx="26" cy="11.5" r="4.8"></circle><path d="M21 30c0-7.5 1.8-11 5-11s5 3.5 5 11z"></path><circle cx="41" cy="18" r="4"></circle><path d="M37 30c0-5.3 1.5-7.6 4-7.6S45 24.7 45 30z"></path></g><path d="M18 34h28l-3.4 15.2A3.4 3.4 0 0 1 39.3 52H24.7a3.4 3.4 0 0 1-3.3-2.8z" fill="#B8643E"></path><rect x="14" y="27.5" width="36" height="7" rx="2.6" fill="#C9805A"></rect><path d="M32 52v9" stroke="#7A5236" stroke-width="3" stroke-linecap="round"></path></svg></div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <p aria-live="polite" style="margin: 0; font-size: 17px; line-height: 1.75">It actually tips things further toward Friedenau and Florakiez. Both sit on U- and S-Bahn lines, so school runs and your commute work well by train and bike. Weißensee leans on the tram — lovely for Kita drop-off, slower into Mitte on rainy mornings. If going car-free matters most, <span style="opacity: 0.55">I’d put</span><span class="wr-caret"></span></p>
+            <span style="font-size: 13px; color: #6E5643">Wurzelraum is writing…</span>
+          </div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; padding-top: 4px">
+          <button type="button" style="height: 40px; padding: 0 14px; background: transparent; border: 1px solid #D9C9AE; border-radius: 999px; font-family: 'Figtree', sans-serif; font-size: 14px; color: #4E3B2D; cursor: pointer">What are Kita waiting lists like in Friedenau?</button>
+          <button type="button" style="height: 40px; padding: 0 14px; background: transparent; border: 1px solid #D9C9AE; border-radius: 999px; font-family: 'Figtree', sans-serif; font-size: 14px; color: #4E3B2D; cursor: pointer">Could we afford 4 rooms in Weißensee?</button>
+          <button type="button" style="height: 40px; padding: 0 14px; background: transparent; border: 1px solid #D9C9AE; border-radius: 999px; font-family: 'Figtree', sans-serif; font-size: 14px; color: #4E3B2D; cursor: pointer">Show me somewhere closer to Mitte</button>
+        </div>
+        <form style="display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 22px; background: #FFFBF3; border: 1.5px solid #D9C9AE; border-radius: 999px">
+          <label for="followup" style="position: absolute; width: 1px; height: 1px; overflow: hidden">Ask a follow-up</label>
+          <input id="followup" type="text" placeholder="Ask a follow-up, like ‘but I don’t have a car’" style="flex-grow: 1; height: 48px; border: 0; background: transparent; font-family: 'Figtree', sans-serif; font-size: 17px; color: #3B2A1E; outline: none">
+          <button type="submit" aria-label="Send" style="width: 48px; height: 48px; border: 0; border-radius: 50%; background: #5E7147; color: #FBF6EC; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12.2 19.5 5l-5.6 15-2.9-6.4z"></path><path d="M11 13.6l8.5-8.6"></path></svg></button>
+        </form>
+      </div>
+    </section>
+
+    <footer style="padding-top: 32px; font-size: 14px; line-height: 1.6; color: #6E5643">Comparisons use Berlin’s neighbourhood-level (Planungsraum) data. <a href="#">Where the data comes from</a></footer>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"narrativeStreaming":{"editor":"boolean","default":false},"$preview":{"width":1440,"height":3900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const selId = (this.state && this.state.sel) || 'friedenau';
+    const open = !(this.state && this.state.open === false);
+    const streaming = !!this.props.narrativeStreaming;
+    const K = [
+      {
+        id: 'friedenau', district: 'Tempelhof-Schöneberg', name: 'Friedenau',
+        fit: 'Best fit for quiet streets and Kitas',
+        photoHint: 'Altbau street with plane trees', photoAlt: 'Placeholder illustration of a tree-lined Friedenau street with Altbau facades and a café awning',
+        sky: '#EADFCB', b1: '#D8B38F', b2: '#C99A74', b3: '#E0C6A5', awning: '#5E7147',
+        pros: ['Quieter side streets', 'Lower rent', 'More Kita places'],
+        cons: ['Longer commute', 'Fewer climbing gyms'],
+        flatsTitle: 'Three-room homes, as you asked', noExact: false,
+        flats: [
+          { rooms: '3', size: '78 m²', cold: '€1,240', warm: '€1,510', floor: '3rd of 5 floors', cond: 'Renovated Altbau', balcony: true, lift: false },
+          { rooms: '3', size: '84 m²', cold: '€1,380', warm: '€1,680', floor: '1st of 4 floors', cond: 'Well kept, original floorboards', balcony: true, lift: false },
+          { rooms: '3', size: '72 m²', cold: '€1,150', warm: '€1,420', floor: '4th of 5 floors', cond: 'First let after renovation', balcony: false, lift: true }
+        ]
+      },
+      {
+        id: 'weissensee', district: 'Pankow', name: 'Weißensee',
+        fit: 'Stretches your budget furthest',
+        photoHint: 'quiet street near the lake', photoAlt: 'Placeholder illustration of a calm Weißensee street with low buildings and large trees',
+        sky: '#E3E2CC', b1: '#E2CDB0', b2: '#CFAF8C', b3: '#D9BE9C', awning: '#A8584F',
+        pros: ['Much cheaper rent', 'Lake within a walk', 'Calm, clean air'],
+        cons: ['Tram-only into Mitte', 'Fewer primary schools'],
+        flatsTitle: 'Closest matches to three rooms', noExact: true,
+        flats: [
+          { rooms: '2.5', size: '68 m²', cold: '€980', warm: '€1,230', floor: '2nd of 4 floors', cond: 'Renovated', balcony: true, lift: false, note: 'half a room less' },
+          { rooms: '4', size: '96 m²', cold: '€1,420', warm: '€1,760', floor: 'Raised ground floor of 4', cond: 'Needs a light refresh', balcony: false, lift: false, note: 'one room more' },
+          { rooms: '2', size: '61 m²', cold: '€890', warm: '€1,110', floor: '5th of 6 floors', cond: 'Newer build', balcony: true, lift: true, note: 'one room less' }
+        ]
+      },
+      {
+        id: 'florakiez', district: 'Pankow', name: 'Florakiez',
+        fit: 'Parks and Kitas, familiar rent',
+        photoHint: 'playground corner, Altbau row', photoAlt: 'Placeholder illustration of a Florakiez street corner with Altbau houses and a small playground',
+        sky: '#EFE2CF', b1: '#CFA27E', b2: '#DDBF9E', b3: '#C49270', awning: '#7A5236',
+        pros: ['Two large parks', 'More Kita places', 'Quieter'],
+        cons: ['Rent about the same', 'Slightly longer commute'],
+        flatsTitle: 'Three-room homes, as you asked', noExact: false,
+        flats: [
+          { rooms: '3', size: '81 m²', cold: '€1,330', warm: '€1,630', floor: '2nd of 5 floors', cond: 'Renovated Altbau', balcony: true, lift: false },
+          { rooms: '3', size: '76 m²', cold: '€1,260', warm: '€1,540', floor: '3rd of 4 floors', cond: 'Well kept', balcony: false, lift: false },
+          { rooms: '3', size: '88 m²', cold: '€1,490', warm: '€1,810', floor: '4th of 6 floors', cond: 'Modernised', balcony: true, lift: true }
+        ]
+      }
+    ];
+    const kieze = K.map((k) => {
+      const selected = open && k.id === selId;
+      return Object.assign({}, k, {
+        selected: selected,
+        pressed: selected ? 'true' : 'false',
+        pick: () => this.setState({ sel: k.id, open: true }),
+        cardStyle: selected
+          ? 'border: 2px solid #5E7147; box-shadow: 0 14px 34px rgba(74, 91, 55, 0.20); transform: translateY(-4px)'
+          : 'border: 2px solid #E3D5BD; box-shadow: 0 2px 10px rgba(59, 42, 30, 0.05)',
+        cta: selected ? 'Showing example flats below' : 'See example flats',
+        ctaColor: selected ? '#4A5B37' : '#3B2A1E'
+      });
+    });
+    const selRaw = K.find((k) => k.id === selId) || K[0];
+    const sel = Object.assign({}, selRaw, {
+      flats: selRaw.flats.map((f) => Object.assign({ note: '' }, f, { plain: !f.balcony && !f.lift }))
+    });
+    const tone = {
+      b: { bg: '#E3E9D4', fg: '#34432A', better: true, same: false, worse: false },
+      s: { bg: '#EFE7D8', fg: '#5A4535', better: false, same: true, worse: false },
+      w: { bg: '#F4E3DD', fg: '#7E3F37', better: false, same: false, worse: true }
+    };
+    const c = (kind, t) => Object.assign({ t: t }, tone[kind]);
+    const rows = [
+      { f: 'Rent', why: 'Budget: flexible', cur: 'Among the city’s highest', cells: [c('b', 'Noticeably cheaper'), c('b', 'Much cheaper'), c('s', 'About the same')] },
+      { f: 'Noise & air', why: 'You’re sensitive to it', cur: 'Main-road traffic', cells: [c('b', 'Quieter side streets'), c('b', 'Calm and leafy'), c('b', 'Quieter')] },
+      { f: 'Parks & green', why: 'Very important to you', cur: 'Small pocket parks', cells: [c('b', 'Volkspark nearby'), c('b', 'Lake and parks close'), c('b', 'Two large parks')] },
+      { f: 'Kita', why: 'You chose Kita', cur: 'Long waiting lists', cells: [c('b', 'More places'), c('s', 'Similar'), c('b', 'More places')] },
+      { f: 'Primary school', why: 'You chose primary school', cur: 'Several within a walk', cells: [c('s', 'Similar'), c('w', 'Fewer nearby'), c('s', 'Similar')] },
+      { f: 'Commute', why: 'To Friedrichstraße', cur: 'A short hop', cells: [c('w', 'Longer, one change'), c('w', 'Longer, by tram'), c('w', 'A little longer')] },
+      { f: 'Yoga & bouldering', why: 'Your hobbies', cur: 'Plenty nearby', cells: [c('w', 'Fewer climbing gyms'), c('w', 'Few options'), c('s', 'Yoga close, climbing a ride')] },
+      { f: 'Crime rate', why: 'Always included', cur: 'Inner-city level', cells: [c('b', 'Lower'), c('b', 'Lower'), c('b', 'Lower')] },
+      { f: 'Kids population', why: 'Always included', cur: 'Fewer young families', cells: [c('b', 'Lots of families'), c('b', 'Growing'), c('b', 'Lots of families')] }
+    ];
+    return {
+      kieze: kieze,
+      sel: sel,
+      rows: rows,
+      collapse: () => this.setState({ open: false }),
+      open: open,
+      streaming: streaming,
+      done: !streaming,
+      narrativeStatus: streaming ? 'is writing…' : 'for your family'
+    };
+  }
+}
+</script>
+</body>
+</html>

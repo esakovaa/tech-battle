@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Option B — results</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gloock&amp;family=Geist:wght@300;400;500;600&amp;display=swap">
+<style>
+body{margin:0;background:#EDECE6;font-family:'Geist',sans-serif;color:#141414}
+a{color:#141414}a:hover{color:#5C5A4F}
+input::placeholder{color:#8A887D}
+@keyframes b-blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+.b-caret{display:inline-block;width:2px;height:1em;margin-left:3px;vertical-align:-0.12em;background:#EAD46C;animation:b-blink 1s infinite}
+</style>
+</helmet>
+<div style="width: 1440px; height: 4560px; box-sizing: border-box; display: flex; flex-direction: column; background: #EDECE6; font-family: 'Geist', sans-serif; color: #141414">
+
+  <section style="position: relative; height: 660px; flex-shrink: 0; overflow: hidden; background: #6E6A5E">
+    <img src="/_blob/363af5b0e3795f391d30e4fa8740b5ac" alt="A tree-lined street in Mitte with the TV tower behind" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20, 20, 20, 0.5) 0%, rgba(20, 20, 20, 0) 45%, rgba(20, 20, 20, 0.35) 100%)"></div>
+    <nav style="position: absolute; left: 0; right: 0; top: 0; height: 88px; padding: 0 40px; box-sizing: border-box; display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 500; letter-spacing: 2px; color: #FBF8EA">
+      <a href="B-Intake.dc.html" style="color: #FBF8EA; text-decoration: none">← EDIT ANSWERS</a>
+      <span style="font-family: 'Gloock', serif; font-size: 26px; letter-spacing: 0; color: #EAD46C">Wurzelraum</span>
+      <a href="#" style="color: #FBF8EA; text-decoration: none">SAVE RESULTS</a>
+    </nav>
+    <div style="position: absolute; left: 40px; top: 140px; max-width: 640px; display: flex; flex-direction: column; gap: 16px">
+      <span style="font-size: 10px; font-weight: 600; letter-spacing: 2px; color: #FBF8EA">WHERE YOU LIVE NOW</span>
+      <p aria-live="polite" style="margin: 0; font-size: 24px; line-height: 1.45; font-weight: 300; color: #FBF8EA">The whole city at your doorstep — but for a family chasing quiet streets and green space, it asks a lot. These three give you more room to <span style="opacity: 0.55">breathe</span><span class="b-caret"></span></p>
+    </div>
+    <div style="position: absolute; left: 34px; bottom: -28px; font-family: 'Gloock', serif; font-size: 170px; line-height: 1; letter-spacing: -4px; color: #EAD46C; white-space: nowrap">Rosenthaler Vorstadt</div>
+  </section>
+
+  <section style="flex-shrink: 0; padding: 88px 40px 72px 40px; display: flex; flex-direction: column; gap: 48px">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; align-items: end">
+      <h2 style="margin: 0; font-weight: 300; font-size: 50px; line-height: 1.1; letter-spacing: -1px">Three Kieze worth<br>a closer look</h2>
+      <p style="margin: 0; max-width: 460px; font-size: 16px; line-height: 1.65; justify-self: end">Matched on Kita and primary school, a flexible budget, three rooms, quiet air, parks, yoga and bouldering — and the ride to Friedrichstraße.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+      <sc-for list="{{kieze}}" as="k" hint-placeholder-count="3">
+        <article style="display: flex; flex-direction: column; gap: 22px">
+          <div style="position: relative; height: 520px; background: {{k.tone}}; overflow: hidden">
+            <img src="{{k.img}}" alt="{{k.photo}}" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover">
+            <div style="position: absolute; left: 0; right: 0; bottom: 0; height: 200px; background: linear-gradient(180deg, rgba(20, 20, 20, 0), rgba(20, 20, 20, 0.55))"></div>
+            <div style="position: absolute; left: 24px; bottom: 22px; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 10px; font-weight: 600; letter-spacing: 2px; color: #FBF8EA">{{k.district}}</span><span style="font-family: 'Gloock', serif; font-size: 58px; line-height: 1; color: #EAD46C">{{k.name}}</span></div>
+          </div>
+          <span style="font-size: 20px; font-weight: 300">{{k.fit}}</span>
+          <div style="display: flex; flex-direction: column; border-top: 1px solid #141414">
+            <sc-for list="{{k.pros}}" as="p" hint-placeholder-count="3"><div style="padding: 11px 0; border-bottom: 1px solid #C9C7BC; display: flex; gap: 12px; font-size: 15px"><span style="width: 20px; height: 20px; flex-shrink: 0; background: #EAD46C; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600">+</span>{{p}}</div></sc-for>
+            <sc-for list="{{k.cons}}" as="c" hint-placeholder-count="2"><div style="padding: 11px 0; border-bottom: 1px solid #C9C7BC; display: flex; gap: 12px; font-size: 15px; color: #3A3934"><span style="width: 20px; height: 20px; flex-shrink: 0; box-sizing: border-box; border: 1px solid #141414; display: flex; align-items: center; justify-content: center; font-size: 13px">–</span>{{c}}</div></sc-for>
+          </div>
+          <button type="button" style="height: 52px; border: 0; background: {{k.btnBg}}; color: {{k.btnFg}}; font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500; {{k.btnBorder}}">{{k.btn}}</button>
+        </article>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="Example flats in Friedenau" style="flex-shrink: 0; padding: 88px 40px; background: #EAD46C; display: flex; flex-direction: column; gap: 40px">
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; align-items: end">
+      <div style="display: flex; flex-direction: column; gap: 14px"><span style="font-size: 10px; font-weight: 600; letter-spacing: 2px">EXAMPLE FLATS · FRIEDENAU</span><h2 style="margin: 0; font-family: 'Gloock', serif; font-weight: 400; font-size: 60px; line-height: 1">Three rooms, as you asked</h2></div>
+      <p style="margin: 0; max-width: 420px; justify-self: end; font-size: 15px; line-height: 1.6">Example listings — for a feel of what’s typical here, not current live offers.</p>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px">
+      <sc-for list="{{flats}}" as="f" hint-placeholder-count="3">
+        <article style="background: #F6F4EC; display: flex; flex-direction: column">
+          <img src="{{f.img}}" alt="{{f.photo}}" style="width: 100%; height: 280px; display: block; object-fit: cover">
+          <div style="padding: 24px 24px 28px 24px; display: flex; flex-direction: column; gap: 18px">
+            <div style="display: flex; align-items: baseline; justify-content: space-between"><span style="font-family: 'Gloock', serif; font-size: 34px">{{f.rooms}} rooms</span><span style="font-size: 16px">{{f.size}}</span></div>
+            <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid #141414; border-bottom: 1px solid #141414">
+              <div style="padding: 12px 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 10px; font-weight: 600; letter-spacing: 1.6px">COLD RENT</span><span style="font-size: 22px">{{f.cold}}</span></div>
+              <div style="padding: 12px 0 12px 16px; border-left: 1px solid #C9C7BC; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 10px; font-weight: 600; letter-spacing: 1.6px">WARM RENT</span><span style="font-size: 22px">{{f.warm}}</span></div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 14px; color: #3A3934"><span>{{f.floor}}</span><span>{{f.cond}}</span><sc-if value="{{f.balcony}}" hint-placeholder-val="{{ true }}"><span style="font-weight: 500; color: #141414">+ Balcony</span></sc-if><sc-if value="{{f.lift}}" hint-placeholder-val="{{ false }}"><span style="font-weight: 500; color: #141414">+ Lift</span></sc-if></div>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-labelledby="b-cmp" style="flex-shrink: 0; padding: 96px 40px 88px 40px; display: flex; flex-direction: column; gap: 36px">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between">
+      <h2 id="b-cmp" style="margin: 0; font-weight: 300; font-size: 50px; letter-spacing: -1px">Side by side</h2>
+      <div style="display: flex; gap: 22px; font-size: 13px">
+        <span style="display: flex; align-items: center; gap: 8px"><span style="width: 22px; height: 22px; background: #EAD46C; display: flex; align-items: center; justify-content: center">↑</span>Better for you</span>
+        <span style="display: flex; align-items: center; gap: 8px"><span style="width: 22px; height: 22px; box-sizing: border-box; border: 1px solid #141414; display: flex; align-items: center; justify-content: center">=</span>About the same</span>
+        <span style="display: flex; align-items: center; gap: 8px"><span style="width: 22px; height: 22px; background: #141414; color: #EDECE6; display: flex; align-items: center; justify-content: center">↓</span>Worse for you</span>
+      </div>
+    </div>
+    <div role="table" aria-labelledby="b-cmp">
+      <div role="row" style="display: grid; grid-template-columns: 240px repeat(4, minmax(0, 1fr)); border-bottom: 1px solid #141414">
+        <div role="columnheader" style="padding: 16px 0; font-size: 10px; font-weight: 600; letter-spacing: 2px; align-self: end">WHAT YOU ASKED</div>
+        <div role="columnheader" style="padding: 16px; background: #DEDCD2; display: flex; flex-direction: column; gap: 4px"><span style="font-size: 10px; font-weight: 600; letter-spacing: 2px">YOU ARE HERE</span><span style="font-family: 'Gloock', serif; font-size: 24px">Rosenthaler V.</span></div>
+        <div role="columnheader" style="padding: 16px; font-family: 'Gloock', serif; font-size: 24px; align-self: end">Friedenau</div>
+        <div role="columnheader" style="padding: 16px; font-family: 'Gloock', serif; font-size: 24px; align-self: end">Weißensee</div>
+        <div role="columnheader" style="padding: 16px; font-family: 'Gloock', serif; font-size: 24px; align-self: end">Florakiez</div>
+      </div>
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="9">
+        <div role="row" style="display: grid; grid-template-columns: 240px repeat(4, minmax(0, 1fr)); border-bottom: 1px solid #C9C7BC">
+          <div role="rowheader" style="padding: 18px 0; font-size: 18px; display: flex; align-items: center">{{r.f}}</div>
+          <div role="cell" style="padding: 18px 16px; background: #DEDCD2; font-size: 14px; color: #3A3934; display: flex; align-items: center">{{r.cur}}</div>
+          <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="3">
+            <div role="cell" style="padding: 18px 16px; display: flex; align-items: center; gap: 10px; font-size: 14px">
+              <span aria-label="{{c.label}}" style="width: 24px; height: 24px; flex-shrink: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-size: 13px; {{c.chip}}">{{c.g}}</span>{{c.t}}
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section aria-label="What would change" style="flex-shrink: 0; padding: 88px 40px; border-top: 1px solid #141414; display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 80px">
+    <div style="display: flex; flex-direction: column; gap: 22px">
+      <svg viewBox="0 0 64 64" width="72" height="72" aria-hidden="true"><g fill="none" stroke="#E2C94F" stroke-width="3.4" stroke-linecap="round"><path d="M32 34V16"></path><path d="M32 23l-7-8M32 23l7-8"></path><path d="M22 34c0-8-3-12-9-14"></path><path d="M42 34c0-8 3-12 9-14"></path><path d="M32 56v6M26 55l-3 6M38 55l3 6"></path></g><circle cx="32" cy="9.5" r="4.2" fill="#E2C94F"></circle><path d="M8 34h48a24 21 0 0 1-48 0z" fill="#E2C94F"></path></svg>
+      <span style="font-size: 10px; font-weight: 600; letter-spacing: 2px">A NOTE FROM WURZELRAUM</span>
+      <h2 style="margin: 0; font-weight: 300; font-size: 40px; line-height: 1.1">What would actually change</h2>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 22px">
+      <p style="margin: 0; font-family: 'Gloock', serif; font-size: 30px; line-height: 1.4">If you move to Friedenau, the biggest change is the pace of your days. Kita drop-off becomes a walk under plane trees instead of along Torstraße, and the Volkspark is close enough for after-school picnics.</p>
+      <p style="margin: 0; font-size: 17px; line-height: 1.75; max-width: 780px; color: #2A2925">Rents are noticeably lower, which likely turns that third room from a stretch into a given. The honest trade-off is time: Friedrichstraße goes from a short hop to a real ride with a change, and bouldering evenings would mean crossing into Schöneberg or Kreuzberg. Weißensee stretches your budget furthest; Florakiez sits in between.</p>
+    </div>
+  </section>
+
+  <section aria-labelledby="b-chat" style="flex-shrink: 0; padding: 88px 40px 96px 40px; background: #141414; color: #EDECE6; display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 80px">
+    <div style="display: flex; flex-direction: column; gap: 16px"><h2 id="b-chat" style="margin: 0; font-family: 'Gloock', serif; font-weight: 400; font-size: 56px; line-height: 1; color: #EAD46C">Still wondering?</h2><p style="margin: 0; font-size: 15px; line-height: 1.6; color: #BDBBB0">Ask anything — a worry, a “but what about…”.</p></div>
+    <div style="display: flex; flex-direction: column; gap: 24px">
+      <div style="align-self: flex-end; max-width: 560px; padding: 16px 20px; background: #EAD46C; color: #141414; font-size: 16px; line-height: 1.55">But we don’t have a car — does that change anything?</div>
+      <div style="display: flex; gap: 16px; max-width: 820px">
+        <span style="font-size: 10px; font-weight: 600; letter-spacing: 2px; color: #EAD46C; padding-top: 6px; white-space: nowrap">WURZELRAUM</span>
+        <p aria-live="polite" style="margin: 0; font-size: 19px; font-weight: 300; line-height: 1.7">It tips things further toward Friedenau and Florakiez. Both sit on U- and S-Bahn lines, so school runs and your commute work well by train and bike. Weißensee leans on the tram — lovely for Kita drop-off, slower into Mitte on rainy <span style="opacity: 0.5">mornings. If</span><span class="b-caret"></span></p>
+      </div>
+      <form style="margin-top: 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1.5px solid #EDECE6">
+        <label for="b-follow" style="position: absolute; width: 1px; height: 1px; overflow: hidden">Ask a follow-up</label>
+        <input id="b-follow" type="text" placeholder="Ask a follow-up, like ‘but I don’t have a car’" style="flex-grow: 1; height: 60px; border: 0; background: transparent; font-family: 'Geist', sans-serif; font-size: 20px; color: #EDECE6; outline: none">
+        <button type="submit" style="height: 44px; padding: 0 22px; border: 0; background: #EAD46C; color: #141414; font-family: 'Geist', sans-serif; font-size: 14px; font-weight: 500">Ask</button>
+      </form>
+    </div>
+  </section>
+  <div style="flex-grow: 1; background: #141414"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":4560}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const K = [
+      { district: 'TEMPELHOF-SCHÖNEBERG', name: 'Friedenau', fit: 'Best fit for quiet streets and Kitas', photo: 'A quiet cobbled street lined with old houses', img: '/_blob/741bb91905427480595ecec42008033f', tone: '#9C8A6B', hint: '#E8E0CC', pros: ['Quieter side streets', 'Lower rent', 'More Kita places'], cons: ['Longer commute'], sel: true },
+      { district: 'PANKOW', name: 'Weißensee', fit: 'Stretches your budget furthest', photo: 'Green, open meadows at the edge of the city', img: '/_blob/bf8064c793c11dcb70d5bbbe5f1c983b', tone: '#7F97A3', hint: '#E4ECEF', pros: ['Much cheaper rent', 'Lake within a walk', 'Calm, clean air'], cons: ['Tram-only into Mitte', 'Fewer primary schools'], sel: false },
+      { district: 'PANKOW', name: 'Florakiez', fit: 'Big parks, familiar rent', photo: 'Kids playing in a leafy park', img: '/_blob/a9e048027e51188cf29956467a1b7ea9', tone: '#6F8454', hint: '#E2EAD4', pros: ['Two large parks', 'More Kita places'], cons: ['Rent about the same', 'Slightly longer commute'], sel: false }
+    ];
+    const kieze = K.map((k) => Object.assign({}, k, {
+      btn: k.sel ? 'Showing example flats ↓' : 'See example flats',
+      btnBg: k.sel ? '#141414' : 'transparent',
+      btnFg: k.sel ? '#EAD46C' : '#141414',
+      btnBorder: k.sel ? '' : 'box-shadow: inset 0 0 0 1px #141414'
+    }));
+    const flats = [
+      { rooms: '3', size: '78 m²', cold: '€1,240', warm: '€1,510', floor: '3rd of 5 floors', cond: 'Renovated Altbau', balcony: true, lift: false, photo: 'Bright living room with a lounge chair and plants', img: '/_blob/f53fcb5da67bc512235c2a9e6daf0016', tone: '#D9D4C6' },
+      { rooms: '3', size: '84 m²', cold: '€1,380', warm: '€1,680', floor: '1st of 4 floors', cond: 'Original floorboards', balcony: true, lift: false, photo: 'Light kitchen with wooden floors', img: '/_blob/a50c5083696131791208eca8db65932f', tone: '#D2CBB8' },
+      { rooms: '3', size: '72 m²', cold: '€1,150', warm: '€1,420', floor: '4th of 5 floors', cond: 'Freshly renovated', balcony: false, lift: true, photo: 'Warm bedroom with a window seat', img: '/_blob/305293a50873fed7d32be581b7bc27de', tone: '#DDD3C0' }
+    ];
+    const T = {
+      b: { g: '↑', chip: 'background: #EAD46C; color: #141414', label: 'Better' },
+      s: { g: '=', chip: 'border: 1px solid #141414', label: 'About the same' },
+      w: { g: '↓', chip: 'background: #141414; color: #EDECE6', label: 'Worse' }
+    };
+    const c = (k, t) => Object.assign({ t: t }, T[k]);
+    const rows = [
+      { f: 'Rent', cur: 'Among the highest', cells: [c('b', 'Noticeably cheaper'), c('b', 'Much cheaper'), c('s', 'About the same')] },
+      { f: 'Noise & air', cur: 'Main-road traffic', cells: [c('b', 'Quiet side streets'), c('b', 'Calm and leafy'), c('b', 'Quieter')] },
+      { f: 'Parks', cur: 'Pocket parks', cells: [c('b', 'Volkspark nearby'), c('b', 'Lake and parks'), c('b', 'Two large parks')] },
+      { f: 'Kita', cur: 'Long waiting lists', cells: [c('b', 'More places'), c('s', 'Similar'), c('b', 'More places')] },
+      { f: 'Primary school', cur: 'Several nearby', cells: [c('s', 'Similar'), c('w', 'Fewer nearby'), c('s', 'Similar')] },
+      { f: 'Commute', cur: 'A short hop', cells: [c('w', 'One change'), c('w', 'Tram, longer'), c('w', 'A little longer')] },
+      { f: 'Yoga & climbing', cur: 'Plenty nearby', cells: [c('w', 'Fewer gyms'), c('w', 'Few options'), c('s', 'Yoga close')] },
+      { f: 'Crime rate', cur: 'Inner-city level', cells: [c('b', 'Lower'), c('b', 'Lower'), c('b', 'Lower')] },
+      { f: 'Kids population', cur: 'Fewer families', cells: [c('b', 'Many families'), c('b', 'Growing'), c('b', 'Many families')] }
+    ];
+    return { kieze: kieze, flats: flats, rows: rows };
+  }
+}
+</script>
+</body>
+</html>
