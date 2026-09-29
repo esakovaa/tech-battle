@@ -165,6 +165,11 @@ export interface UserPreferences {
    *  extras beyond 2 are ignored. Geocoded server-side, same as
    *  currentAddress. Omit for no commute filtering/scoring at all. */
   commuteAddresses?: string[];
+  /** Free-text answer to "anything else important to you?" — agent-layer
+   *  only. Deliberately NOT read by rank.ts/compare.ts: it never affects
+   *  filtering or scoring, only what the agent chooses to surface/narrate
+   *  (see lib/context-criteria.ts and the /api/agent system prompt). */
+  additionalContext?: string;
 }
 
 // The soft-weighted (non-filter) scoring factors, derived from the intake

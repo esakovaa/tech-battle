@@ -3,6 +3,7 @@ import { z } from "zod";
 import { findTopAlternatives, getPlanungsraumById, PRIMARY_SCHOOL_DATA_AVAILABLE } from "./rank";
 import { resolveAddressToPlanungsraum } from "./geocode";
 import { buildComparisonTable } from "./compare";
+import { CONTEXT_CRITERIA, CONTEXT_CRITERIA_KEYS, UNAVAILABLE_TOPICS, evaluateContextCriteria } from "./context-criteria";
 import type { UserPreferences } from "./types";
 
 // ---------------------------------------------------------------
@@ -169,4 +170,41 @@ export const webSearch = tool({
   },
 });
 
-export const agentTools = { getTopKiezRecommendations, webSearch };
+// ---------------------------------------------------------------
+// getContextualCriteria — Node 2+3 of the free-text pipeline. The user can
+// answer "anything else important to you?" in the intake (preferences.
+// additionalContext); this tool is how the agent grounds whatever it
+// extracts from that free text against real data, rather than guessing.
+//
+// Node 1 (extract candidate topics from the free text) and Node 4 (decide
+// which grounded results are actually worth surfacing per Kiez, and write
+// the "why") are the agent's own reasoning — see the system prompt in
+// app/api/agent/route.ts — not separate code, since both are judgment
+// calls, not deterministic lookups. This tool is only the deterministic
+// middle: given topic keys the agent already matched to the list below,
+// compute each one's real value and (where a universal direction exists)
+// how statistically notable it is city-wide.
+// ---------------------------------------------------------------
+
+export const getContextualCriteria = tool({
+  description:
+    "Look up extra, non-core criteria (beyond the 7-question intake) for one Planungsraum, grounded in real data " +
+    "— use this when the user's free-text 'anything else important?' answer (or something said mid-conversation) " +
+    `mentions a topic. Available topics: ${CONTEXT_CRITERIA.map((c) => `${c.key} (${c.label}: ${c.description})`).join("; ")}. ` +
+    `Topics with NO data anywhere in this project — do not call this tool for these, just tell the user plainly ` +
+    `it isn't tracked: ${UNAVAILABLE_TOPICS}.`,
+  inputSchema: z.object({
+    plrId: z.string().describe("The Planungsraum id to evaluate — call once per Kiez (current + each alternative) you want data for."),
+    criteriaKeys: z
+      .array(z.enum(CONTEXT_CRITERIA_KEYS))
+      .min(1)
+      .describe("Which criteria keys (from the list in this tool's description) to look up — only the ones you matched from the user's free text, not all of them."),
+  }),
+  execute: async ({ plrId, criteriaKeys }) => {
+    const p = getPlanungsraumById(plrId);
+    if (!p) return { error: `Unknown plr_id: ${plrId}` };
+    return { plrId, plrName: p.plr_name, results: evaluateContextCriteria(criteriaKeys, p) };
+  },
+});
+
+export const agentTools = { getTopKiezRecommendations, webSearch, getContextualCriteria };
