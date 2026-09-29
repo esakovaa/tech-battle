@@ -309,7 +309,7 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
   );
 }
 
-type ResearchStatus = "researching" | "ready" | "offline" | "demo";
+type ResearchStatus = "researching" | "ready" | "offline" | "demo" | "web-unavailable" | "web-no-results";
 
 /** Show the first-turn agent research in the place the user asked for it. */
 function ExtraContext({ text, status, research }: { text: string; status: ResearchStatus; research: string }) {
@@ -325,9 +325,11 @@ function ExtraContext({ text, status, research }: { text: string; status: Resear
           <span className="wr-source">Your extra preferences don’t change the ranking. They guide this separate research and explanation.</span>
         </div>
         <div className="wr-personal-research" aria-live="polite" aria-busy={status === "researching"}>
-          {status === "researching" && <p className="wr-research-status">Matching your priorities to Kiez data and checking current local sources…</p>}
+          {status === "researching" && <p className="wr-research-status">Researching your priorities across Kiez data and current public sources…</p>}
           {status === "offline" && <p className="wr-research-status">Live research isn’t available right now. Here’s what the project’s neighborhood data can tell us; current web sources weren’t checked.</p>}
           {status === "demo" && <p className="wr-research-status">Demo mode: this is prepared example text based on local data, not live AI research or a web search.</p>}
+          {status === "web-unavailable" && <p className="wr-research-status">The AI agent is responding, but live internet search isn’t configured. This answer uses Wurzelraum’s local data only; add TAVILY_API_KEY in the deployment settings to research current sources.</p>}
+          {status === "web-no-results" && <p className="wr-research-status">The agent couldn’t retrieve public web sources for this answer. It uses Wurzelraum’s local data only.</p>}
           {research
             ? research.split(/\n{2,}/).map((paragraph, i) => <p key={i}>{renderSourceLinks(paragraph)}</p>)
             : status === "researching" && <span className="wr-caret" aria-hidden />}
@@ -382,19 +384,29 @@ function Conversation({
     const ctrl = new AbortController();
     let mocked = false;
     onResearchUpdate("researching", "");
+    let webResearchConfigured = true;
+    let webSearchSucceeded = false;
     streamAgent(agentPrefs, [], (t) => {
       setMode("agent");
       setNarrative(t);
-      if (prefs.additionalContext) onResearchUpdate(mocked ? "demo" : "researching", t);
+      if (prefs.additionalContext) onResearchUpdate(mocked ? "demo" : webResearchConfigured ? "researching" : "web-unavailable", t);
     }, ctrl.signal, () => {
       mocked = true;
       setIsMock(true);
+    }, (configured) => {
+      webResearchConfigured = configured;
+      if (prefs.additionalContext && !configured) onResearchUpdate("web-unavailable", "");
+    }, (hasResults) => {
+      webSearchSucceeded ||= hasResults;
     })
       .then((t) => {
         if (!t) throw new Error("empty");
         setNarrative(t);
         setNarrativeDone(true);
-        if (prefs.additionalContext) onResearchUpdate(mocked ? "demo" : "ready", t);
+        if (prefs.additionalContext) {
+          const status = mocked ? "demo" : !webResearchConfigured ? "web-unavailable" : webSearchSucceeded ? "ready" : "web-no-results";
+          onResearchUpdate(status, t);
+        }
       })
       .catch((err) => {
         if (ctrl.signal.aborted) return;

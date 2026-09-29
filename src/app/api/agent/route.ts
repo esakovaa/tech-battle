@@ -50,23 +50,26 @@ ${JSON.stringify(preferences, null, 2)}
    call getTopKiezRecommendations again with updated preferences rather than just reasoning in prose about it —
    the ranking should actually reflect the new priority, not just your description of it.
 4. If the user raises an objection OR their additionalContext asks about something the database doesn't cover
-   (e.g. cafes, wheelchair access, internet speed, nightlife), proactively use webSearch to find current,
-   neighborhood-specific evidence instead of stopping at "we don't track that." Research the most relevant
-   alternative Kieze, and include the current Kiez when a comparison is useful. Search separately for distinct
-   topics when one query would blur them together. If webSearch isn't configured, say plainly that current web
-   research isn't available — never fabricate a source.
+   (e.g. cafes, wheelchair access, internet speed, nightlife), you MUST use webSearch before answering. Search
+   separately for each distinct topic and for the most relevant alternative Kieze; include the current Kiez when
+   comparison helps. Use multiple searches when needed to find useful, neighborhood-specific evidence. Never
+   answer an unsupported topic with only "we don't track that" if webSearch is available. If webSearch reports
+   that it isn't configured or fails, say plainly that current web research couldn't be completed — never
+   fabricate a source or imply you searched.
 
 ## Handling preferences.additionalContext ("anything else important to you?")
-If this field is non-empty, treat it as a signal to look beyond the 7 core questions — but ground everything, in
-two steps:
+If this field is non-empty, treat it as a signal to look beyond the 7 core questions — and on the first response
+you MUST search the public web for each distinct topic to complement, not replace, local data. Ground everything,
+in two steps:
 1. Extract the topics it implies (e.g. "I work from home and want fast internet, also worried about crime at
    night" implies topics: internet speed, crime). For each topic, silently match it against
    getContextualCriteria's tool description (the list of available criteria keys) — do NOT ask the user to
    rephrase or pick from a menu.
 2. For topics that match an available key, call getContextualCriteria for the current Kiez and each alternative
-   you compare, to get the real value and city-wide notability. For topics with no matching key, use webSearch
-   to research useful local evidence for the alternative Kieze instead of only repeating that the project data
-   doesn't cover them. Be clear that web research is a separate, potentially incomplete snapshot.
+   you compare, to get the real value and city-wide notability. For every distinct topic in additionalContext,
+   you MUST also use webSearch to research useful local evidence for the relevant Kieze; search separately where
+   topics need different queries. This is supplemental to project data, even when the project tracks a related
+   measure. Be clear that web research is a separate, potentially incomplete snapshot.
 When deciding what to actually mention per Kiez: prefer criteria that are both (a) tied to something the user
 actually said and (b) genuinely notable (getContextualCriteria returns notability: null for anything broadly
 average — don't manufacture a reason to mention those). Cap it at 2-3 extra criteria per Kiez; this is meant to
@@ -118,9 +121,9 @@ Concrete and specific, not a corporate summary. Lead with what actually changes 
 every column in the table.`;
 }
 
-/** AGENT_MOCK=1: stream pre-written, data-filled replies (lib/agent-mock.ts)
- *  in the same UI message stream format as a real model — for demos and
- *  UI testing without an API key. Takes precedence over a configured LLM. */
+/** AGENT_MOCK=1: stream pre-written, data-filled replies for local demos.
+ *  Production always uses the real agent when configured, even if this
+ *  development flag was accidentally left in the deployment environment. */
 function mockResponse(preferences: UserPreferences, messages: UIMessage[]): Response {
   const stream = createUIMessageStream({
     execute: async ({ writer }) => {
@@ -140,7 +143,7 @@ function mockResponse(preferences: UserPreferences, messages: UIMessage[]): Resp
 }
 
 export async function POST(req: NextRequest) {
-  if (process.env.AGENT_MOCK === "1") {
+  if (process.env.NODE_ENV !== "production" && process.env.AGENT_MOCK === "1") {
     let mockBody: { preferences?: UserPreferences; messages?: UIMessage[] };
     try {
       mockBody = await req.json();
@@ -199,8 +202,12 @@ export async function POST(req: NextRequest) {
     system: buildSystemPrompt(body.preferences),
     messages: modelMessages,
     tools: agentTools,
-    stopWhen: stepCountIs(8),
+    stopWhen: stepCountIs(12),
   });
 
-  return result.toUIMessageStreamResponse();
+  return result.toUIMessageStreamResponse({
+    headers: {
+      "x-wurzelraum-web-research": process.env.TAVILY_API_KEY ? "configured" : "unavailable",
+    },
+  });
 }

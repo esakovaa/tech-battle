@@ -8,8 +8,9 @@ separate route per step, just what the user says next in the same thread.
 
 The results page streams the agent’s first response into the personalized-research section and reuses the same
 agent for follow-up questions. Live model output requires `LLM_PROVIDER` and its provider key. Live web research
-also requires `TAVILY_API_KEY`. Without those settings, the UI falls back to the project’s deterministic data and
-clearly labels that it did not perform a current web search.
+also requires `TAVILY_API_KEY`. Without that setting, the AI agent can still explain the project’s local data, but
+the UI labels the response as local-data-only. `AGENT_MOCK=1` is honored only outside production so a leftover
+demo flag cannot silently replace the live agent on Vercel.
 
 ## How it fits together
 
@@ -22,14 +23,15 @@ clearly labels that it did not perform a current web search.
     every conversation, and it can call it again mid-conversation if an objection changes what should be
     weighted. Chosen over trusting a client-supplied JSON blob so there's one source of truth and the agent can
     re-rank live — see the chat log this was built from for the reasoning.
-  - `webSearch` — backed by [Tavily](https://tavily.com) (`TAVILY_API_KEY`). Used proactively for additional
-    preferences the local database cannot answer (such as cafes, wheelchair access, or internet speed), and for
-    follow-up questions. Returns a clear “not configured” result instead of throwing if the key isn’t set.
+  - `webSearch` — backed by [Tavily](https://tavily.com) (`TAVILY_API_KEY`). Required for the user's free-text
+    additional preferences on the first response, and for follow-up questions needing current local details.
+    Uses Tavily's bearer-token API authentication and returns a clear “not configured” result instead of throwing
+    if the key isn’t set.
 - `src/app/api/agent/route.ts` — builds a system prompt that (a) injects the user's structured `preferences` as
   JSON so the model doesn't have to re-derive them from prose, and (b) restates the key data-trust caveats from
   `Kiez Profile Master Table/README.md` (synthetic vs. real prices, the Status-Index direction gotcha, Bezirk- vs
   Planungsraum-level grain, zero-inflated POI counts, no primary-school data) so the agent doesn't overclaim
-  precision the data doesn't have. Then runs `streamText` with all three tools, `stopWhen: stepCountIs(8)`, and
+  precision the data doesn't have. Then runs `streamText` with all three tools, `stopWhen: stepCountIs(12)`, and
   returns `toUIMessageStreamResponse()` — parsed by the results page to stream the research narrative and follow-up answers.
 
 ## Request contract

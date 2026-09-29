@@ -86,7 +86,9 @@ export async function streamAgent(
   history: ChatTurn[],
   onText: (full: string) => void,
   signal?: AbortSignal,
-  onMock?: () => void
+  onMock?: () => void,
+  onWebResearchAvailability?: (configured: boolean) => void,
+  onWebSearchResult?: (hasResults: boolean) => void
 ): Promise<string> {
   const messages = history.map((m, i) => ({ id: `m${i}`, role: m.role, parts: [{ type: "text", text: m.text }] }));
   const res = await fetch("/api/agent", {
@@ -98,11 +100,14 @@ export async function streamAgent(
   if (res.status === 501) throw new AgentNotConfigured();
   if (!res.ok || !res.body) throw new Error(`Agent request failed (${res.status})`);
   if (res.headers.get("x-wurzelraum-agent") === "mock") onMock?.();
+  const webResearchStatus = res.headers.get("x-wurzelraum-web-research");
+  if (webResearchStatus) onWebResearchAvailability?.(webResearchStatus === "configured");
 
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
   let full = "";
+  const webSearchCalls = new Set<string>();
   for (;;) {
     const { done, value } = await reader.read();
     if (done) break;
@@ -114,10 +119,21 @@ export async function streamAgent(
       const payload = line.slice(5).trim();
       if (!payload || payload === "[DONE]") continue;
       try {
-        const evt = JSON.parse(payload) as { type?: string; delta?: string; errorText?: string };
+        const evt = JSON.parse(payload) as {
+          type?: string;
+          delta?: string;
+          errorText?: string;
+          toolName?: string;
+          toolCallId?: string;
+          output?: { results?: unknown[]; error?: string };
+        };
         if (evt.type === "text-delta" && evt.delta) {
           full += evt.delta;
           onText(full);
+        } else if (evt.type === "tool-input-available" && evt.toolName === "webSearch") {
+          if (evt.toolCallId) webSearchCalls.add(evt.toolCallId);
+        } else if (evt.type === "tool-output-available" && evt.toolCallId && webSearchCalls.has(evt.toolCallId)) {
+          onWebSearchResult?.(Boolean(evt.output?.results?.length) && !evt.output?.error);
         } else if (evt.type === "error") {
           throw new Error(evt.errorText ?? "Agent error");
         }

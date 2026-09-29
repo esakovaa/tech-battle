@@ -136,7 +136,7 @@ export const getTopKiezRecommendations = tool({
 // ---------------------------------------------------------------
 // webSearch — for step 7 objection-handling ("but I don't have a car",
 // "is there a Kita nearby without needing a car"). Backed by Tavily
-// (api.tavily.com) since the provider choice was left generic tonight —
+// (api.tavily.com); this is independent of the LLM provider —
 // this doesn't depend on which LLM provider (Anthropic/OpenAI) ends up
 // configured in lib/llm.ts. Requires TAVILY_API_KEY; without it, the tool
 // still registers (so the agent knows it exists and can explain why it
@@ -146,10 +146,11 @@ export const getTopKiezRecommendations = tool({
 
 export const webSearch = tool({
   description:
-    "Search the web for a specific local fact the Kiez database doesn't contain. Use proactively when a user's " +
-    "additionalContext asks for something like cafes, wheelchair access, internet speed, or nightlife, and when " +
-    "a follow-up asks for current local details. Search for the named Kieze and return sources. Don't use web " +
-    "search for facts already covered by getTopKiezRecommendations; prefer this project's audited data.",
+    "Search the public web for current, neighborhood-specific information. Always use this for the user's " +
+    "free-text additionalContext on the first response, even when Wurzelraum has related local statistics: web " +
+    "research should complement those statistics with useful current sources. Also use it for follow-up questions " +
+    "about current local details. Search for the named Kieze and return sources. For core ranking facts, prefer " +
+    "the project's audited data.",
   inputSchema: z.object({
     query: z.string().describe("The search query."),
   }),
@@ -165,8 +166,11 @@ export const webSearch = tool({
     try {
       const res = await fetch("https://api.tavily.com/search", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ api_key: apiKey, query, max_results: 5 }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({ query, search_depth: "advanced", topic: "general", max_results: 5, include_answer: false }),
       });
       if (!res.ok) {
         return { error: `Search request failed (${res.status}).` };
