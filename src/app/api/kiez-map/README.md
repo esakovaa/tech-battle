@@ -37,19 +37,21 @@ actually present. Zero page/console errors from the component itself.
 
 ## Tile skin
 
-Base tiles are CARTO Positron (`basemaps.cartocdn.com`), not raw OpenStreetMap tiles — a cleaner,
-muted light style that stays out of the way of the boundary/POI colors, closer to the Wurzelraum
-brand than the default OSM look. No API key required. Swap `TileLayer`'s `url`/`attribution` in
-`KiezMap.tsx` to try alternatives (CARTO Voyager, OpenTopoMap, or a Thunderforest style once you
-have a free API key for one closer to a hand-drawn cottagecore look).
+Base tiles are the standard OpenStreetMap raster tiles (`tile.openstreetmap.org`) — no API key
+needed. **Tried CARTO Positron for a cleaner, more brand-matching muted look first, but reverted:
+CARTO now gates `basemaps.cartocdn.com` behind a free-but-signup-required API key**, which wasn't
+true when this was first tried. If a closer-to-brand skin is wanted later, either sign up for a
+CARTO API key (`carto.com/basemaps/apikey`) and add it to the `url`, or use a genuinely keyless
+alternative like OpenTopoMap (`{s}.tile.opentopomap.org`) — verify no-key-required status live
+before switching again, since these policies change.
 
-## Known gap: one OpenStreetMap domain is blocked in this sandbox
+## Known gap: two OpenStreetMap domains are blocked in this sandbox
 
-- **`basemaps.cartocdn.com`** (the actual map background imagery) — same class of gap as the old
-  `tile.openstreetmap.org`: confirmed blocked via the agent-proxy's own `recentRelayFailures` log
-  (`connect_rejected`, policy denial) in this sandbox. The map renders correctly *without* tiles
-  (gray background, boundary + markers still fully correct) but needs this domain allowlisted to
-  show real street imagery underneath. Not an issue on a real machine outside this sandbox.
+- **`tile.openstreetmap.org`** (the actual map background imagery) — confirmed blocked via the
+  agent-proxy's own `recentRelayFailures` log (`connect_rejected`, policy denial). The map renders
+  correctly *without* tiles (gray background, boundary + markers still fully correct) but needs this
+  domain allowed to show real street/satellite imagery underneath. Not an issue on a real machine
+  outside this sandbox.
 - **`nominatim.openstreetmap.org`** (address → coordinates geocoding, used for `currentAddress` /
   `commuteAddress` and also `/api/rank`'s existing `currentAddress` fallback) — this one is stranger:
   a direct `curl` to it returns `200`, but **every Node `fetch()` call to the exact same URL — including
