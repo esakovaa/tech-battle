@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateObject } from "ai";
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import { getModel, isLlmConfigured } from "@/lib/llm";
 import type { DocumentType } from "@/lib/landlord-types";
@@ -61,14 +62,31 @@ const EXTRACTION_PROMPTS: Record<DocumentType, string> = {
     "(permanent/fixed_term/probation/other).",
 };
 
-export async function POST(req: NextRequest) {
-  if (!isLlmConfigured()) {
-    return NextResponse.json(
-      { error: "Document extraction isn't configured yet — set LLM_PROVIDER + the matching key/model (see .env.example)." },
-      { status: 501 }
-    );
-  }
+// Only these exact, checked-in fictional demo PDFs can use the no-model
+// walkthrough path. A filename alone never marks an upload as verified.
+const DEMO_FIXTURES: Partial<Record<DocumentType, { sha256: string; extracted: Record<string, unknown> }>> = {
+  identity: {
+    sha256: "eccf4eed932010416218595f5c700d1b2d3ec1a3817470c300f5cff1dc6f901e",
+    extracted: { looksLikeAValidIdentityDocument: true },
+  },
+  payslips: {
+    sha256: "ff226b576ac9f3e5403f5cde5e782dc080d5c0913b787a5b38ad693f69d3afa1",
+    extracted: { looksLikeAPayslip: true, netMonthlyIncomeEur: null },
+  },
+  schufa: {
+    sha256: "fdc005fddebeaa75744b8f14db41447e87b1b10c7aee14765e2e8997275c2293",
+    extracted: { looksLikeASchufaReport: true, scoreOutOf100: null },
+  },
+  mietschuldenfreiheit: {
+    sha256: "500bfe6467a2fd805d69827e3491ea73e5f139d460935b17a0c405544c13608f",
+    extracted: {
+      looksLikeAMietschuldenfreiheitsbescheinigung: true,
+      confirmsNoRentArrears: true,
+    },
+  },
+};
 
+export async function POST(req: NextRequest) {
   let formData: FormData;
   try {
     formData = await req.formData();
@@ -93,6 +111,19 @@ export async function POST(req: NextRequest) {
   const docType = documentType as DocumentType;
 
   const bytes = new Uint8Array(await file.arrayBuffer());
+  const demoFixture = DEMO_FIXTURES[docType];
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  if (demoFixture && sha256 === demoFixture.sha256) {
+    return NextResponse.json({ documentType: docType, extracted: demoFixture.extracted, demoFixture: true });
+  }
+
+  if (!isLlmConfigured()) {
+    return NextResponse.json(
+      { error: "Document extraction isn't configured yet — set LLM_PROVIDER + the matching key/model (see .env.example)." },
+      { status: 501 }
+    );
+  }
+
   const model = getModel();
 
   try {

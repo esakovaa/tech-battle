@@ -61,19 +61,6 @@ export default function ApplyForm({ listing, kiez }: { listing: ExampleListing; 
     setFiles((current) => ({ ...current, [key]: file }));
     if (key === "employment_contract") return;
     setDocStatuses((current) => ({ ...current, [key]: { state: "checking", detail: "Checking document…" } }));
-    // Explicitly synthetic, local-only fixtures let the demo reach the story
-    // builder without pretending their contents prove a real applicant's
-    // identity, credit standing, income, or rental history.
-    if (process.env.NODE_ENV === "development" && file.name.startsWith("wurzelraum-demo-accepted-")) {
-      setDocStatuses((current) => ({
-        ...current,
-        [key]: {
-          state: "verified",
-          detail: "Demo fixture accepted for the local walkthrough only. No real document was verified.",
-        },
-      }));
-      return;
-    }
     const form = new FormData();
     form.set("file", file);
     form.set("documentType", key);
@@ -83,7 +70,12 @@ export default function ApplyForm({ listing, kiez }: { listing: ExampleListing; 
       if (!response.ok) throw new Error(body.error ?? `Document check failed (${response.status}).`);
       const values = Object.values(body.extracted ?? {}) as unknown[];
       const valid = values.length > 0 && values.every((value) => value !== false);
-      setDocStatuses((current) => ({ ...current, [key]: { state: valid ? "verified" : "rejected", detail: valid ? "Document type check passed. Only limited facts were extracted." : "This file did not pass the document type check. Please upload a clearer or correct document." } }));
+      const detail = body.demoFixture
+        ? "Fictional demo sample accepted for this walkthrough. No real document was verified."
+        : valid
+          ? "Document type check passed. Only limited facts were extracted."
+          : "This file did not pass the document type check. Please upload a clearer or correct document.";
+      setDocStatuses((current) => ({ ...current, [key]: { state: valid ? "verified" : "rejected", detail } }));
     } catch (error) {
       const detail = error instanceof Error ? error.message : "Document check failed.";
       setDocStatuses((current) => ({ ...current, [key]: { state: "unavailable", detail: `Could not verify this file: ${detail}` } }));
@@ -117,7 +109,7 @@ export default function ApplyForm({ listing, kiez }: { listing: ExampleListing; 
         <fieldset className="wr-apply-field"><legend>Does anyone in your household smoke?</legend><div className="wr-apply-pills"><button type="button" className={smoking === "no" ? "is-active" : ""} onClick={() => setSmoking("no")}>No</button><button type="button" className={smoking === "yes" ? "is-active" : ""} onClick={() => setSmoking("yes")}>Yes</button></div></fieldset>
         <label className="wr-apply-field">When could you move in?<input type="date" value={moveIn} onChange={(e) => setMoveIn(e.target.value)} /></label>
       </section>
-      <section className="wr-apply-section"><span className="wr-eyebrow">02 · Documents</span><h2>Attach the requested documents</h2><p>Real uploads are sent to the configured vision model for a narrow type check. Identity documents are checked for validity only; no personal details are extracted. This prototype does not store the files.</p><p>Local demo fixtures with the <code>wurzelraum-demo-accepted-</code> filename prefix skip extraction so you can preview the interview. They are never treated as verified documents in production.</p>
+      <section className="wr-apply-section"><span className="wr-eyebrow">02 · Documents</span><h2>Attach the requested documents</h2><p>Real uploads are sent to the configured vision model for a narrow type check. Identity documents are checked for validity only; no personal details are extracted. This prototype does not store the files.</p><p>The four fictional Wurzelraum demo PDFs are recognized by exact file contents, so you can preview the full interview even when document AI isn’t configured. They do not verify real documents.</p>
         <div className="wr-doc-list">{DOCS.map(([key, label]) => <label className="wr-doc-row" key={key}><span><b>{label}</b>{files[key] ? <small>{files[key]!.name}</small> : <small>{key === "employment_contract" ? "Optional" : "Required"}</small>}</span><input type="file" accept={ACCEPT} onChange={(e) => chooseFile(key, e.target.files?.[0])} /></label>)}</div>
       </section>
       <section className="wr-apply-section"><span className="wr-eyebrow">03 · How the basic check works</span><h2>Clear before you continue</h2><div className="wr-check-list">{checks.map((check) => <div className="wr-check-row" key={check.label}><span className={check.pass === false ? "is-fail" : check.pass ? "is-pass" : ""}>{check.pass === false ? "×" : check.pass ? "✓" : "○"}</span><div><b>{check.label}</b><p>{check.detail}</p></div></div>)}</div>

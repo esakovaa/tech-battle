@@ -100,6 +100,7 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
           <h2 id="cards-title" className="wr-h2">Three Kieze worth<br />a closer look</h2>
           <p>{matchedOn.length ? `Matched on ${matchedOn.join(", ")}` : "Matched on the basics every family cares about"} — each one further from the centre than where you are now.</p>
         </div>
+        <p className="wr-extra-note" style={{ margin: "-24px 0 32px" }}>Choose a Kiez to explore example flats, then apply to any flat that feels right.</p>
         {data.commuteConstraintRelaxed && (
           <p className="wr-extra-note" role="note" style={{ margin: "-24px 0 32px" }}>
             Fewer than three Kieze fit within {prefs.maxCommuteMinutes ?? 60} minutes of your commute address, so we included the closest-scoring ones anyway — they’re marked below.
@@ -138,7 +139,7 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
                   ))}
                 </div>
                 <button type="button" className="wr-btn wr-btn-ghost" onClick={() => openFlats(i)} aria-expanded={isSel} aria-controls="wr-flats">
-                  {isSel ? "Showing example flats ↓" : "See example flats"}
+                  {isSel ? "Showing flats and application options ↓" : "See flats & apply →"}
                 </button>
               </article>
             );
