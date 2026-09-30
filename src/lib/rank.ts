@@ -135,16 +135,20 @@ function factorScore(p: PlanungsraumProfile, key: keyof FactorWeights): number |
  *  ZIP code — e.g. picking yoga+gym and having only gym nearby scores 0.5,
  *  not a full miss. Returns null if no hobbies were selected (factor
  *  excluded from scoring entirely, same as any other unmeasured factor). */
+type HobbyKey = keyof UserPreferences["hobbies"];
+const HOBBY_PLZ_FLAG: Record<HobbyKey, keyof PlanungsraumProfile> = {
+  yoga: "has_yoga_studios_plz",
+  gym: "has_gym_plz",
+  bouldering: "has_bouldering_plz",
+  cafe: "has_cafe_plz",
+  playground: "has_playground_plz",
+};
+
 function selectedHobbiesScore(p: PlanungsraumProfile, hobbies: UserPreferences["hobbies"]): number | null {
-  const selected: ("yoga" | "gym" | "bouldering")[] = [];
-  if (hobbies.yoga) selected.push("yoga");
-  if (hobbies.gym) selected.push("gym");
-  if (hobbies.bouldering) selected.push("bouldering");
+  const selected = (Object.keys(HOBBY_PLZ_FLAG) as HobbyKey[]).filter((h) => hobbies[h]);
   if (selected.length === 0) return null;
 
-  const has = (h: "yoga" | "gym" | "bouldering") =>
-    h === "yoga" ? p.has_yoga_studios_plz : h === "gym" ? p.has_gym_plz : p.has_bouldering_plz;
-  const hits = selected.filter((h) => has(h) === 1).length;
+  const hits = selected.filter((h) => p[HOBBY_PLZ_FLAG[h]] === 1).length;
   return hits / selected.length;
 }
 
@@ -192,7 +196,7 @@ function commuteScore(p: PlanungsraumProfile, ctx: CommuteScoreContext | undefin
  *  not_a_concern, yes/no), not a 1-5 slider, so weights are fixed constants
  *  per tier rather than user-supplied numbers. */
 export function preferencesToWeights(prefs: UserPreferences): FactorWeights {
-  const anyHobbySelected = prefs.hobbies.yoga || prefs.hobbies.gym || prefs.hobbies.bouldering;
+  const anyHobbySelected = Object.values(prefs.hobbies).some(Boolean);
   const raw: FactorWeights = {
     price: prefs.rentBudget === "minimal" ? 3 : prefs.rentBudget === "flexible" ? 1.5 : 0,
     green_space: prefs.parksImportant ? 3 : 0,

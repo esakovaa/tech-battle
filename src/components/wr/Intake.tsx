@@ -20,7 +20,7 @@ export interface Answers {
   rooms: number;
   noiseAirSensitive: boolean | null;
   parksImportant: boolean | null;
-  hobbies: { yoga: boolean; gym: boolean; bouldering: boolean };
+  hobbies: { yoga: boolean; gym: boolean; bouldering: boolean; cafe: boolean; playground: boolean };
   otherHobby: boolean;
   otherHobbyText: string;
   commute1: string;
@@ -40,7 +40,7 @@ export const EMPTY_ANSWERS: Answers = {
   rooms: 3,
   noiseAirSensitive: null,
   parksImportant: null,
-  hobbies: { yoga: false, gym: false, bouldering: false },
+  hobbies: { yoga: false, gym: false, bouldering: false, cafe: false, playground: false },
   otherHobby: false,
   otherHobbyText: "",
   commute1: "",
@@ -50,19 +50,19 @@ export const EMPTY_ANSWERS: Answers = {
   anythingElse: "",
 };
 
-export const QUESTION_COUNT = 9;
+export const QUESTION_COUNT = 8;
 
 function answeredCount(a: Answers): number {
   const kidsAnswered = a.noKids || Object.values(a.kids).some(Boolean);
-  const hobbiesAnswered = Object.values(a.hobbies).some(Boolean) || (a.otherHobby && a.otherHobbyText.trim().length > 1);
+  const niceToHaveAnswered =
+    Object.values(a.hobbies).some(Boolean) || a.parksImportant != null || (a.otherHobby && a.otherHobbyText.trim().length > 1);
   return [
     a.plr != null || a.address.trim().length > 3,
     kidsAnswered,
     a.rentBudget != null,
     true, // rooms always has a value
     a.noiseAirSensitive != null,
-    a.parksImportant != null,
-    hobbiesAnswered,
+    niceToHaveAnswered,
     a.nomad || a.commute1.trim().length > 3,
     a.anythingElse.trim().length > 2,
   ].filter(Boolean).length;
@@ -269,20 +269,15 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
 
           <Question num="06">
             <fieldset className="wr-q-row">
-              <legend className="wr-q-title" style={{ float: "left" }}>Parks and nature</legend>
-              <YesNo name="parks" value={a.parksImportant} onChange={(v) => set({ parksImportant: v })} yes="Very important" no="Not important" />
-            </fieldset>
-          </Question>
-
-          <Question num="07">
-            <fieldset className="wr-q-row">
-              <legend className="wr-q-title" style={{ float: "left" }}>Your hobbies</legend>
+              <legend className="wr-q-title" style={{ float: "left" }}>Nice to have nearby</legend>
               <div className="wr-chips">
                 {(
                   [
                     ["yoga", "Yoga"],
                     ["gym", "Gym"],
                     ["bouldering", "Bouldering"],
+                    ["cafe", "Cafe"],
+                    ["playground", "Playground"],
                   ] as const
                 ).map(([key, label]) => (
                   <label key={key} className="wr-chip">
@@ -290,6 +285,10 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
                     {label}
                   </label>
                 ))}
+                <label className="wr-chip">
+                  <input type="checkbox" checked={a.parksImportant === true} onChange={(e) => set({ parksImportant: e.target.checked })} />
+                  Park/Nature
+                </label>
                 <label className="wr-chip">
                   <input
                     type="checkbox"
@@ -321,7 +320,7 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
             )}
           </Question>
 
-          <Question num="08">
+          <Question num="07">
             <span className="wr-q-title">Your core commute address(es)</span>
             <span className="wr-help">Work, a studio, grandparents. We check real public-transport times — totally optional.</span>
             <label htmlFor="wr-c1" className="wr-sr">First commute address</label>
@@ -366,7 +365,7 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
             </label>
           </Question>
 
-          <Question num="09">
+          <Question num="08">
             <label htmlFor="wr-anything" className="wr-q-title">Anything else is important for you?</label>
             <span id="wr-anything-help" className="wr-help">In your own words — we’ll check what our data can tell you about it, and say honestly where it can’t.</span>
             <textarea

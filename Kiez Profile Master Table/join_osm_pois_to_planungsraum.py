@@ -26,7 +26,7 @@ RAW_POIS = "osm_pois_raw.csv"
 BOUNDARIES = "planungsraum_boundaries.geojson"
 PROFILE = "planungsraum_profile.csv"
 
-CATEGORIES = ["n_yoga_studios", "n_kinderarzt", "n_gym", "n_bouldering"]
+CATEGORIES = ["n_yoga_studios", "n_kinderarzt", "n_gym", "n_bouldering", "n_cafe", "n_playground"]
 
 
 def main():

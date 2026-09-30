@@ -29,6 +29,8 @@ const CATEGORY_STYLE: Record<PoiCategory, { color: string; label: string }> = {
   n_kinderarzt: { color: "#e74c3c", label: "Kinderarzt" },
   n_gym: { color: "#16a085", label: "Gym" },
   n_bouldering: { color: "#8d6e63", label: "Bouldering" },
+  n_cafe: { color: "#6f4e37", label: "Cafe" },
+  n_playground: { color: "#27ae60", label: "Playground" },
 };
 const CURRENT_COLOR = "#1a1a2e";
 const COMMUTE_COLOR = "#2563eb";

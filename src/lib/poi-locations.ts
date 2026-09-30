@@ -8,7 +8,7 @@ import type { UserPreferences } from "./types";
  *  kept as "kita" here to avoid implying a 1:1 column match that isn't
  *  exact). Real point-in-polygon join — see
  *  "Kiez Profile Master Table/build_poi_locations.py". */
-export type PoiCategory = "kita" | "n_yoga_studios" | "n_kinderarzt" | "n_gym" | "n_bouldering";
+export type PoiCategory = "kita" | "n_yoga_studios" | "n_kinderarzt" | "n_gym" | "n_bouldering" | "n_cafe" | "n_playground";
 
 export interface PoiLocation {
   plr_id: string;
@@ -55,5 +55,7 @@ export function preferencesToPoiCategories(prefs: Pick<UserPreferences, "kids" |
   if (prefs.hobbies.yoga) categories.push("n_yoga_studios");
   if (prefs.hobbies.gym) categories.push("n_gym");
   if (prefs.hobbies.bouldering) categories.push("n_bouldering");
+  if (prefs.hobbies.cafe) categories.push("n_cafe");
+  if (prefs.hobbies.playground) categories.push("n_playground");
   return categories;
 }

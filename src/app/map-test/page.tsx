@@ -27,6 +27,8 @@ const ALL_CATEGORIES: { value: PoiCategory; label: string }[] = [
   { value: "n_yoga_studios", label: "Yoga studio (hobbies.yoga)" },
   { value: "n_gym", label: "Gym (hobbies.gym)" },
   { value: "n_bouldering", label: "Bouldering (hobbies.bouldering)" },
+  { value: "n_cafe", label: "Cafe (hobbies.cafe)" },
+  { value: "n_playground", label: "Playground (hobbies.playground)" },
 ];
 
 export default function MapTestPage() {

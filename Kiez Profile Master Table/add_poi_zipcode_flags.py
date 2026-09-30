@@ -29,7 +29,7 @@ import pandas as pd
 
 PROFILE = "planungsraum_profile.csv"
 OSM_PLZ = "osm_poi_counts_by_plz.csv"
-CATEGORIES = ["yoga_studios", "kinderarzt", "gym", "bouldering"]
+CATEGORIES = ["yoga_studios", "kinderarzt", "gym", "bouldering", "cafe", "playground"]
 
 
 def main():

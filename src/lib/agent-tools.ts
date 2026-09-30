@@ -53,8 +53,10 @@ const preferencesInputSchema = z.object({
       yoga: z.boolean().default(false),
       gym: z.boolean().default(false),
       bouldering: z.boolean().default(false),
+      cafe: z.boolean().default(false),
+      playground: z.boolean().default(false),
     })
-    .default({ yoga: false, gym: false, bouldering: false }),
+    .default({ yoga: false, gym: false, bouldering: false, cafe: false, playground: false }),
   commuteAddresses: z
     .array(z.string())
     .optional()

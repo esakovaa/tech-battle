@@ -150,6 +150,22 @@ export function buildComparisonRows(
       direction: dir(alt.has_bouldering_plz, current.has_bouldering_plz, true),
     });
   }
+  if (prefs.hobbies.cafe) {
+    rows.push({
+      factor: "Cafe",
+      currentDisplay: fmtBool(current.has_cafe_plz, "in ZIP code"),
+      alternativeDisplay: fmtBool(alt.has_cafe_plz, "in ZIP code"),
+      direction: dir(alt.has_cafe_plz, current.has_cafe_plz, true),
+    });
+  }
+  if (prefs.hobbies.playground) {
+    rows.push({
+      factor: "Playground",
+      currentDisplay: fmtBool(current.has_playground_plz, "in ZIP code"),
+      alternativeDisplay: fmtBool(alt.has_playground_plz, "in ZIP code"),
+      direction: dir(alt.has_playground_plz, current.has_playground_plz, true),
+    });
+  }
 
   return rows;
 }

@@ -119,6 +119,18 @@ export interface PlanungsraumProfile {
   has_kinderarzt_plz: 0 | 1;
   has_gym_plz: 0 | 1;
   has_bouldering_plz: 0 | 1;
+
+  // Cafe / playground — real (OSM/Overpass), same PLZ-grain convention as
+  // above. has_playground_plz is 542/542 (every Planungsraum's ZIP code has
+  // at least one) — real, not a bug, Berlin courtyards are full of them —
+  // so it never excludes anyone as a filter, only ever helps via the soft
+  // hobbies score.
+  n_cafe: number;
+  n_playground: number;
+  n_cafe_plz: number;
+  n_playground_plz: number;
+  has_cafe_plz: 0 | 1;
+  has_playground_plz: 0 | 1;
 }
 
 // ---------------------------------------------------------------
@@ -141,6 +153,8 @@ export interface HobbiesCriteria {
   yoga: boolean;
   gym: boolean;
   bouldering: boolean;
+  cafe: boolean;
+  playground: boolean;
 }
 
 export type RentBudget = "minimal" | "flexible" | "not_a_concern";

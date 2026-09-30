@@ -108,9 +108,10 @@ not just "closest good match"), not a bug or an oversight. When you narrate resu
   population-normalized version and the one to actually compare on.
 - primarySchool: there is NO data source for this at all. If asked about primary schools, say so plainly rather
   than substituting Abitur (high school) data.
-- n_yoga_studios / n_kinderarzt / n_gym / n_bouldering (Planungsraum-exact counts) are zero-inflated — a 0 does
-  not mean "none in the area," it can just mean none in this specific small polygon. Prefer the has_*_plz /
-  n_*_plz fields (ZIP-code grain) when talking about whether something is realistically nearby.
+- n_yoga_studios / n_kinderarzt / n_gym / n_bouldering / n_cafe / n_playground (Planungsraum-exact counts) are
+  zero-inflated — a 0 does not mean "none in the area," it can just mean none in this specific small polygon.
+  Prefer the has_*_plz / n_*_plz fields (ZIP-code grain) when talking about whether something is realistically
+  nearby. Note has_playground_plz is 542/542 (every ZIP code has one) — real, not a data gap.
 - pct_population_coverage below 100 means the population figures for that Planungsraum are a partial estimate
   (never zero, but say "roughly" rather than stating them as exact if coverage is notably under 100).
 - OSM-sourced POI counts (yoga/gym/etc.) reflect what's mapped in OpenStreetMap, not a licensed business

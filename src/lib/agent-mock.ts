@@ -119,7 +119,10 @@ function followUp(q: string, c: Ctx): string {
     return names.map((p) => `${p.plr_name}: noise ${en(p.ug_laerm)}, air pollution ${en(p.ug_luft)}`).join("\n") + `\n\nFor comparison, ${c.current.plr_name} is noise ${en(c.current.ug_laerm)}, air ${en(c.current.ug_luft)}. If sleep is the priority, the “low noise” ones are the safe bet — these are the city's own environmental-justice ratings, not guesses.`;
   }
   if (/(park|green|nature|playground|forest|lake)/.test(s)) {
-    return names.map((p) => `${p.plr_name}: green space ${en(p.ug_gruenversorgung)}`).join("\n") + `\n\n${c.current.plr_name} rates ${en(c.current.ug_gruenversorgung)}. The rating is about how much green is within walking reach of home — exactly what matters for after-Kita afternoons.`;
+    return names.map((p) => `${p.plr_name}: green space ${en(p.ug_gruenversorgung)}, playgrounds in the ZIP code: ${p.has_playground_plz ? "yes" : "no"}`).join("\n") + `\n\n${c.current.plr_name} rates ${en(c.current.ug_gruenversorgung)}. The rating is about how much green is within walking reach of home — exactly what matters for after-Kita afternoons.`;
+  }
+  if (/(cafe|café|coffee)/.test(s)) {
+    return names.map((p) => `${p.plr_name}: cafes in the ZIP code: ${p.has_cafe_plz ? "yes" : "no"}`).join("\n") + "\n\nThat's from OpenStreetMap, so small independent places can be missing.";
   }
   if (/(safe|crime|danger)/.test(s)) {
     return names.map((p) => `${p.plr_name}: ${p.crime_rate_per_10k_2017_2019?.toFixed(0) ?? "?"} incidents per 10k residents`).join("\n") + `\n\n${c.current.plr_name}: ${c.current.crime_rate_per_10k_2017_2019?.toFixed(0) ?? "?"}. One caveat: these are district-wide figures from 2017–2019, so they tell you about the Bezirk, not your street.`;
@@ -133,7 +136,7 @@ function followUp(q: string, c: Ctx): string {
   if (/(which|pick|choose|recommend|best|you think)/.test(s)) {
     return `${best.plr_name}. It scored highest on the things you said matter, and its trade-offs are the kind you can plan around. If one thing would change my mind, it's the commute — tell me more about your daily trips and I'll say which of the three holds up best.`;
   }
-  return `That's a good question, but I'm running in mock mode, so I only have answers prepared for transport without a car, rent, schools, noise and air, parks, safety, Kitas and doctors, and hobbies. Switch on a real model with an API key in .env.local and I can take anything.`;
+  return `That's a good question, but I'm running in mock mode, so I only have answers prepared for transport without a car, rent, schools, noise and air, parks, playgrounds, cafes, safety, Kitas and doctors, and hobbies. Switch on a real model with an API key in .env.local and I can take anything.`;
 }
 
 /** The full reply text for this turn — narrative on the first turn, a

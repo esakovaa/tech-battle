@@ -73,6 +73,18 @@ QUERIES = {
         nwr["sport"="climbing"]["leisure"="sports_centre"]({bbox});
         out center;""",
     ],
+    # cafe: standard OSM amenity tag
+    "n_cafe": [
+        """[out:json][timeout:60];
+        nwr["amenity"="cafe"]({bbox});
+        out center;""",
+    ],
+    # playground: standard OSM leisure tag
+    "n_playground": [
+        """[out:json][timeout:60];
+        nwr["leisure"="playground"]({bbox});
+        out center;""",
+    ],
 }
 
 

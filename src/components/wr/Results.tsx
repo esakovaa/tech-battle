@@ -74,6 +74,8 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
     prefs.hobbies.yoga && "yoga",
     prefs.hobbies.gym && "a gym",
     prefs.hobbies.bouldering && "bouldering",
+    prefs.hobbies.cafe && "cafes nearby",
+    prefs.hobbies.playground && "a playground nearby",
     prefs.additionalContext?.includes("Other hobby:") && "your other hobby",
     prefs.commuteAddresses?.length && (prefs.maxCommuteMinutes ? `a commute under ${prefs.maxCommuteMinutes} min` : "your commute"),
   ].filter(Boolean) as string[];

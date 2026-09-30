@@ -275,7 +275,10 @@ export function offlineAnswer(question: string, data: RankApiResponse, prefs: Us
     return alts.map((a) => `${name(a.plr)}: noise ${ORDINAL_EN[a.plr.ug_laerm ?? "unknown"]}, air pollution ${ORDINAL_EN[a.plr.ug_luft ?? "unknown"]}`).join(". ") + `. For comparison, ${data.current.plr_name} is noise ${ORDINAL_EN[data.current.ug_laerm ?? "unknown"]}, air ${ORDINAL_EN[data.current.ug_luft ?? "unknown"]}.`;
   }
   if (/(park|green|nature|grün|playground|spielplatz)/.test(q)) {
-    return alts.map((a) => `${name(a.plr)}: green space ${ORDINAL_EN[a.plr.ug_gruenversorgung ?? "unknown"]}`).join(". ") + `. ${data.current.plr_name} rates ${ORDINAL_EN[data.current.ug_gruenversorgung ?? "unknown"]}.`;
+    return alts.map((a) => `${name(a.plr)}: green space ${ORDINAL_EN[a.plr.ug_gruenversorgung ?? "unknown"]}, playgrounds ${a.plr.has_playground_plz ? "yes" : "no"} in the ZIP code`).join(". ") + `. ${data.current.plr_name} rates ${ORDINAL_EN[data.current.ug_gruenversorgung ?? "unknown"]}.`;
+  }
+  if (/(cafe|café|coffee|kaffee)/.test(q)) {
+    return alts.map((a) => `${name(a.plr)}: ${a.plr.has_cafe_plz ? "yes, cafes in the ZIP code" : "none mapped in the ZIP code"}`).join(". ") + ". These come from OpenStreetMap, so small independent cafes can be missing.";
   }
   if (/(safe|crime|danger|night)/.test(q)) {
     return alts.map((a) => `${name(a.plr)}: ${a.plr.crime_rate_per_10k_2017_2019?.toFixed(0) ?? "?"} per 10k residents`).join(". ") + `. ${data.current.plr_name}: ${data.current.crime_rate_per_10k_2017_2019?.toFixed(0) ?? "?"}. These are district-level figures from 2017–2019, so treat them as a rough relative signal.`;
@@ -292,7 +295,7 @@ export function offlineAnswer(question: string, data: RankApiResponse, prefs: Us
       .join(". ") + ". These come from OpenStreetMap, so small studios can be missing.";
   }
   void prefs;
-  return "I can answer from the data about transport without a car, rent, noise and air, parks, safety, Kitas, kids' doctors, schools and hobbies. Try one of those — live, open-ended answers need the AI agent switched on (an API key in .env.local).";
+  return "I can answer from the data about transport without a car, rent, noise and air, parks, playgrounds, cafes, safety, Kitas, kids' doctors, schools and hobbies. Try one of those — live, open-ended answers need the AI agent switched on (an API key in .env.local).";
 }
 
 /** Same mapping as preferencesToPoiCategories in lib/poi-locations.ts —
@@ -305,5 +308,7 @@ export function poiCategoriesFor(prefs: Pick<UserPreferences, "kids" | "hobbies"
   if (prefs.hobbies.yoga) categories.push("n_yoga_studios");
   if (prefs.hobbies.gym) categories.push("n_gym");
   if (prefs.hobbies.bouldering) categories.push("n_bouldering");
+  if (prefs.hobbies.cafe) categories.push("n_cafe");
+  if (prefs.hobbies.playground) categories.push("n_playground");
   return categories;
 }

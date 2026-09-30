@@ -60,6 +60,8 @@ export async function POST(req: NextRequest) {
       yoga: body.hobbies?.yoga ?? false,
       gym: body.hobbies?.gym ?? false,
       bouldering: body.hobbies?.bouldering ?? false,
+      cafe: body.hobbies?.cafe ?? false,
+      playground: body.hobbies?.playground ?? false,
     },
     commuteAddresses: body.commuteAddresses,
     maxCommuteMinutes: body.maxCommuteMinutes,
