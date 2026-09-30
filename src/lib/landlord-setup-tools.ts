@@ -1,6 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
-import { ALL_DOCUMENT_TYPES, type DocumentType, type Listing, type SmokingPolicy } from "./landlord-types";
+import { ALL_DOCUMENT_TYPES, type DocumentType, type EmploymentContextType, type Listing, type PropertyType, type SmokingPolicy } from "./landlord-types";
 import { clampIncomeMultiple } from "./landlord-eval";
 import { matchIllegalCriterion } from "./landlord-illegal-criteria";
 
@@ -8,6 +8,8 @@ export function validateListingConfig(input: Record<string, unknown>) {
   const valid: Record<string, unknown> = {};
   const issues: string[] = [];
   const adjustments: string[] = [];
+  if (input.property_type === "flat" || input.property_type === "house") valid.property_type = input.property_type satisfies PropertyType;
+  else issues.push("Is the property a flat or a house?");
   const textFields = ["address", "ortsteil"] as const;
   for (const field of textFields) {
     if (typeof input[field] === "string" && input[field].trim()) valid[field] = input[field].trim();
@@ -45,6 +47,16 @@ export function validateListingConfig(input: Record<string, unknown>) {
     valid.min_income_multiple = clamped;
     if (clamped !== input.min_income_multiple) adjustments.push(`Income multiple adjusted from ${input.min_income_multiple}x to ${clamped}x: this product supports 2x–3x only.`);
   }
+  if (input.households_with_children_welcome !== undefined) {
+    if (typeof input.households_with_children_welcome === "boolean") valid.households_with_children_welcome = input.households_with_children_welcome;
+    else issues.push("Please confirm whether households with children are welcome (this never affects priority or eligibility).");
+  } else issues.push("Would you like to note that households with children are welcome? This cannot create priority or affect eligibility.");
+  if (input.employment_context_types !== undefined) {
+    const supported: EmploymentContextType[] = ["unlimited_contract", "self_employed", "retired", "limited_contract", "burgergeld"];
+    if (!Array.isArray(input.employment_context_types) || input.employment_context_types.some((type) => !supported.includes(type as EmploymentContextType))) {
+      issues.push("Choose employment context labels from the supported list.");
+    } else valid.employment_context_types = [...new Set(input.employment_context_types as EmploymentContextType[])];
+  } else issues.push("Which employment situations should the listing welcome as context? Choose any or none; this never filters applicants.");
   return { valid: valid as Partial<Listing>, issues, adjustments };
 }
 
@@ -64,6 +76,8 @@ export const validateListingConfigTool = tool({
     rooms: z.number().optional(), kaltmiete_eur_monthly: z.number().optional(), warmmiete_eur_monthly: z.number().optional(),
     move_in_date: z.string().optional(), smoking_policy: z.string().optional(), required_documents: z.array(z.string()).optional(),
     min_income_multiple: z.number().optional(),
+    property_type: z.enum(["flat", "house"]).optional(), households_with_children_welcome: z.boolean().optional(),
+    employment_context_types: z.array(z.string()).optional(),
   }),
   execute: async (input) => validateListingConfig(input),
 });

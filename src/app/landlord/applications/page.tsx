@@ -33,6 +33,10 @@ const TAB_LABELS: Record<TabKey, string> = {
   needsCheck: "Need a check",
   all: "All",
 };
+const EMPLOYMENT_CONTEXT_LABELS: Record<string, string> = {
+  unlimited_contract: "Unlimited contract", self_employed: "Self-employed", retired: "Retired",
+  limited_contract: "Limited working contract", burgergeld: "Bürgergeld",
+};
 
 function isCompleteDocs(documents: string): boolean {
   const [have, of] = documents.split(" of ").map(Number);
@@ -202,9 +206,16 @@ export default function ApplicationsDashboardPage() {
       <StepProgress step={2} label="Applications" />
       <div className="ll-wrap ll-page">
         <div className="ll-kicker">
-          {listing.address.toUpperCase()} · €{listing.warmmiete_eur_monthly.toLocaleString()} · {listing.rooms} ROOMS
+          {listing.address.toUpperCase()} · €{listing.warmmiete_eur_monthly.toLocaleString()} · {listing.rooms} ROOMS{listing.property_type ? ` · ${listing.property_type.toUpperCase()}` : ""}
         </div>
         <h1 className="ll-h1">Your applications, clearly organized.</h1>
+        {(listing.households_with_children_welcome !== undefined || listing.employment_context_types) && (
+          <p className="ll-lede" style={{ fontSize: 14 }}>
+            {listing.households_with_children_welcome ? "Households with children are welcome. " : "Family status does not affect the draw. "}
+            {listing.employment_context_types?.length ? `Employment context selected: ${listing.employment_context_types.map((type) => EMPLOYMENT_CONTEXT_LABELS[type] ?? type).join(", ")}. ` : ""}
+            These details are context only; they do not affect eligibility, scoring, or lottery order.
+          </p>
+        )}
 
         <div className="ll-stat-row">
           <div>

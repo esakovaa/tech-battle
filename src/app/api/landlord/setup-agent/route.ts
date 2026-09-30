@@ -6,7 +6,7 @@ import { landlordSetupTools } from "@/lib/landlord-setup-tools";
 import { matchIllegalCriterion } from "@/lib/landlord-illegal-criteria";
 
 const SYSTEM = `You are a careful, friendly landlord setup assistant. Help configure one listing from the landlord's words.
-Collect: address, cold rent and warm rent (ask which is which if ambiguous), optional neighborhood/area, rooms, move-in date, smoking policy, required documents, and minimum income multiple.
+Collect: property type (flat or house), address, cold rent and warm rent (ask which is which if ambiguous), optional neighborhood/area, rooms, move-in date, smoking policy, required documents, and minimum income multiple. Ask whether households with children are welcome (never offer priority), and which employment situations the landlord wants to highlight as welcome context (never use these as a filter). The platform keeps the four financial routes equal: qualifying income, guarantor, deposit insurance, or savings of at least three months' warm rent.
 
 FAIRNESS RULES:
 - Before including ANY preference that might concern who a tenant is rather than a neutral property fact or financial ability, call checkCriterionLegality with the landlord's exact short phrase. Never skip the tool call.
@@ -26,7 +26,7 @@ function mockResponse(messages: UIMessage[]): Response {
     ? criterion.action === "refuse_outright"
       ? `I can’t include “${text}” as a tenant-selection rule. ${criterion.basis} I’ll leave it out and can help set neutral flat details instead.`
       : `I wouldn’t use “${text}” as a blanket exclusion. ${criterion.alternative} What is the accurate room count?`
-    : "I can help set this up. What are the address, cold rent, warm rent, room count, and preferred move-in date? I’ll also need your smoking policy, required documents, and income threshold.";
+    : "I can help set this up. Is this a flat or a house? Then tell me the address, cold rent, warm rent, room count, and preferred move-in date. I’ll also ask about smoking, documents, and the income threshold. Every eligible household gets the same chance; employment and family details won’t affect scoring.";
   const stream = createUIMessageStream({ execute: async ({ writer }) => {
     writer.write({ type: "text-start", id: "mock" });
     writer.write({ type: "text-delta", id: "mock", delta: reply });

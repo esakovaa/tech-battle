@@ -39,6 +39,8 @@ export const DOCUMENT_LABELS: Record<DocumentType, string> = {
 };
 
 export type SmokingPolicy = "no_preference" | "non_smoking_only";
+export type PropertyType = "flat" | "house";
+export type EmploymentContextType = "unlimited_contract" | "self_employed" | "retired" | "limited_contract" | "burgergeld";
 
 export interface Listing {
   id: string;
@@ -55,6 +57,10 @@ export interface Listing {
    *  there may not demand above 2-2.5x depending on rent level) — see
    *  clampIncomeMultiple in landlord-eval.ts. */
   min_income_multiple: number;
+  /** Listing context only; never used to qualify, score, or lottery-rank applicants. */
+  property_type?: PropertyType;
+  households_with_children_welcome?: boolean;
+  employment_context_types?: EmploymentContextType[];
 }
 
 /**

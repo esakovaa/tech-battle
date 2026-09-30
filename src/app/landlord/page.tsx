@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StepProgress } from "./StepProgress";
-import type { DocumentType, Listing, SmokingPolicy } from "@/lib/landlord-types";
+import type { DocumentType, EmploymentContextType, Listing, PropertyType, SmokingPolicy } from "@/lib/landlord-types";
 import { DOCUMENT_LABELS } from "@/lib/landlord-types";
 
 const ALL_DOCS: DocumentType[] = ["identity", "payslips", "schufa", "mietschuldenfreiheit", "employment_contract"];
@@ -12,6 +12,11 @@ const ALL_DOCS: DocumentType[] = ["identity", "payslips", "schufa", "mietschulde
 export default function LandlordFlatSetupPage() {
   const router = useRouter();
   const [listing, setListing] = useState<Listing | null>(null);
+  const [propertyType, setPropertyType] = useState<PropertyType>("flat");
+  const [childrenWelcome, setChildrenWelcome] = useState(false);
+  const [employmentContexts, setEmploymentContexts] = useState<EmploymentContextType[]>([
+    "unlimited_contract", "self_employed", "retired", "limited_contract", "burgergeld",
+  ]);
   const [warmRent, setWarmRent] = useState(1480);
   const [coldRent, setColdRent] = useState(1200);
   const [minIncomeMultiple, setMinIncomeMultiple] = useState(3);
@@ -35,6 +40,9 @@ export default function LandlordFlatSetupPage() {
           sessionStorage.removeItem("ll_setup_assistant");
         } catch { /* Ignore an invalid saved setup and use the listing defaults. */ }
         setWarmRent(setup.warmmiete_eur_monthly ?? l.warmmiete_eur_monthly);
+        setPropertyType(setup.property_type ?? l.property_type ?? "flat");
+        setChildrenWelcome(setup.households_with_children_welcome ?? l.households_with_children_welcome ?? false);
+        setEmploymentContexts(setup.employment_context_types ?? l.employment_context_types ?? ["unlimited_contract", "self_employed", "retired", "limited_contract", "burgergeld"]);
         setColdRent(setup.kaltmiete_eur_monthly ?? l.kaltmiete_eur_monthly);
         setMinIncomeMultiple(setup.min_income_multiple ?? l.min_income_multiple);
         setMoveInDate(setup.move_in_date ?? l.move_in_date);
@@ -59,12 +67,19 @@ export default function LandlordFlatSetupPage() {
     setRequiredDocs((prev) => (prev.includes(doc) ? prev.filter((d) => d !== doc) : [...prev, doc]));
   }
 
+  function toggleEmploymentContext(type: EmploymentContextType) {
+    setEmploymentContexts((current) => current.includes(type) ? current.filter((item) => item !== type) : [...current, type]);
+  }
+
   function handleOpenApplications() {
     if (!listing) return;
     const overrides: Partial<Listing> = {
       warmmiete_eur_monthly: warmRent,
       kaltmiete_eur_monthly: coldRent,
       min_income_multiple: minIncomeMultiple,
+      property_type: propertyType,
+      households_with_children_welcome: childrenWelcome,
+      employment_context_types: employmentContexts,
       move_in_date: moveInDate,
       rooms,
       smoking_policy: smokingPolicy,
@@ -90,6 +105,13 @@ export default function LandlordFlatSetupPage() {
             <Link className="ll-btn-primary" href="/landlord/setup-chat" style={{ display: "inline-block", margin: "18px 0" }}>
               Set up the flat with an assistant →
             </Link>
+
+            <p className="ll-section-label">Property type</p>
+            <div className="ll-pill-row" role="group" aria-label="Property type">
+              {([{ value: "flat", label: "Flat" }, { value: "house", label: "House" }] as const).map((option) => (
+                <button key={option.value} className={`ll-pill wide ${propertyType === option.value ? "selected" : ""}`} onClick={() => setPropertyType(option.value)} type="button">{option.label}</button>
+              ))}
+            </div>
 
             <div
               style={{
@@ -157,6 +179,35 @@ export default function LandlordFlatSetupPage() {
             ))}
 
             <hr className="ll-divider" />
+            <p className="ll-section-label">Would you like to give priority to people with children?</p>
+            <p className="ll-retention-note" style={{ marginTop: 0 }}>Every eligible household gets the same chance in the lottery. You can choose to add a welcoming note; family status never affects eligibility or draw order.</p>
+            <div className="ll-pill-row" role="group" aria-label="Welcoming households with children">
+              <button className={`ll-pill wide ${!childrenWelcome ? "selected" : ""}`} type="button" onClick={() => setChildrenWelcome(false)}>No extra welcome note</button>
+              <button className={`ll-pill wide ${childrenWelcome ? "selected" : ""}`} type="button" onClick={() => setChildrenWelcome(true)}>Families are welcome</button>
+            </div>
+
+            <p className="ll-section-label">Which employment situations do you consider?</p>
+            <p className="ll-retention-note" style={{ marginTop: 0 }}>Choose what to highlight as welcome context. These selections never exclude, score, or rank applicants.</p>
+            {([
+              ["unlimited_contract", "Unlimited contract"], ["self_employed", "Self-employed"], ["retired", "Retired"],
+              ["limited_contract", "Limited working contract"], ["burgergeld", "Bürgergeld"],
+            ] as const).map(([type, label]) => (
+              <label key={type} className="ll-check-row"><input type="checkbox" checked={employmentContexts.includes(type)} onChange={() => toggleEmploymentContext(type)} />{label}</label>
+            ))}
+
+            <p className="ll-section-label">If someone doesn’t have an unlimited contract, will you consider alternative proof?</p>
+            <div style={{ border: "1px solid var(--ll-line)", borderRadius: 12, padding: 16, background: "var(--ll-paper)" }}>
+              <p style={{ margin: "0 0 12px", fontWeight: 600 }}>Yes. The same four financial routes are accepted equally for every applicant:</p>
+              <ul style={{ margin: 0, paddingLeft: 20, lineHeight: 1.7 }}>
+                <li>Income meeting the threshold (income may include dividends; the current tenant form has no dedicated dividend-proof upload yet)</li>
+                <li>A guarantor</li>
+                <li>Deposit insurance</li>
+                <li>Savings covering at least three months of warm rent</li>
+              </ul>
+              <p className="ll-retention-note" style={{ marginBottom: 0 }}>A permanent contract is not a requirement. Financial security is checked the same way regardless of employment type.</p>
+            </div>
+
+            <hr className="ll-divider" />
 
             <h2 className="ll-panel-title" id="how-it-works">
               How applications will be reviewed
@@ -164,8 +215,8 @@ export default function LandlordFlatSetupPage() {
             <div className="ll-review-row">
               <span className="ll-review-tag required">REQUIRED</span>
               <span className="ll-review-detail">
-                Net income at least {minIncomeMultiple} times the cold rent (€{requiredIncome.toLocaleString()}), the
-                documents you selected, and a move-in from {moveInDate}
+                Financial security via income of at least {minIncomeMultiple}× cold rent (€{requiredIncome.toLocaleString()}), a guarantor,
+                deposit insurance, or savings of at least 3× warm rent; the documents you selected; and move-in from {moveInDate}
                 {smokingPolicy === "non_smoking_only" ? ", non-smoking" : ""}.
               </span>
             </div>
@@ -175,7 +226,7 @@ export default function LandlordFlatSetupPage() {
                 <br />
                 NOT SCORED
               </span>
-              <span className="ll-review-detail">Household size for {rooms} rooms, employment security.</span>
+              <span className="ll-review-detail">Household size for {rooms} rooms and employment context. {childrenWelcome ? "Households with children are welcome; there is no priority." : "Family status does not affect eligibility or the lottery."} Employment selections are context only.</span>
             </div>
             <div className="ll-review-row">
               <span className="ll-review-tag never">NEVER USED</span>

@@ -14,8 +14,9 @@ assert.equal(matchIllegalCriterion("non-smoking only"), null);
 assert.equal(matchIllegalCriterion("fifth floor, no lift"), null);
 
 const base = {
-  address: "Example Street 1", rooms: 3, kaltmiete_eur_monthly: 1200, warmmiete_eur_monthly: 1500,
+  property_type: "flat", address: "Example Street 1", rooms: 3, kaltmiete_eur_monthly: 1200, warmmiete_eur_monthly: 1500,
   move_in_date: "2026-12-01", smoking_policy: "non_smoking_only", required_documents: ["identity"], min_income_multiple: 5,
+  households_with_children_welcome: true, employment_context_types: ["unlimited_contract", "self_employed", "retired", "limited_contract", "burgergeld"],
 };
 const valid = validateListingConfig(base);
 assert.equal(valid.valid.min_income_multiple, 3);
