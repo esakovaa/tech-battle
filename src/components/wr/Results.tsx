@@ -298,7 +298,7 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
                   {l.has_balcony && <b>+ Balcony</b>}
                   {l.has_lift && <b>+ Lift</b>}
                 </div>
-                <Link className="wr-btn wr-btn-yellow wr-flat-apply" href={`/apply?listingId=${encodeURIComponent(l.id)}&plrId=${encodeURIComponent(alt.plr.plr_id)}&kiez=${encodeURIComponent(alt.plr.plr_name)}`}>Apply for this flat →</Link>
+                <Link className="wr-btn wr-btn-yellow wr-flat-apply" href={`/apply?listingId=${encodeURIComponent(l.id)}&plrId=${encodeURIComponent(alt.plr.plr_id)}&kiez=${encodeURIComponent(alt.plr.plr_name)}&kita=${Number(prefs.kids.kita)}&primarySchool=${Number(prefs.kids.primarySchool)}&highSchool=${Number(prefs.kids.highSchool)}&kidDoctor=${Number(prefs.kids.kidDoctor)}`}>Apply for this flat →</Link>
               </div>
             </article>
           ) : (
