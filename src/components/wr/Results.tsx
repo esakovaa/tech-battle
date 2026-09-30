@@ -32,6 +32,7 @@ const KiezMap = dynamic(() => import("@/components/KiezMap"), {
 interface ResultsProps {
   data: RankApiResponse;
   prefs: UserPreferences;
+  isDemoProfile: boolean;
   onEdit: () => void;
   onRestart: () => void;
 }
@@ -39,7 +40,7 @@ interface ResultsProps {
 const GLYPH: Record<Direction, string> = { better: "↑", same: "=", worse: "↓" };
 const GLYPH_LABEL: Record<Direction, string> = { better: "Better for you", same: "About the same", worse: "Worse for you" };
 
-export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps) {
+export default function Results({ data, prefs, isDemoProfile, onEdit, onRestart }: ResultsProps) {
   const { current, alternatives, comparisonTable: table } = data;
   const photos = useMemo(() => assignKiezPhotos(alternatives.map((a) => a.plr)), [alternatives]);
   const bestIdx = alternatives.reduce((bi, a, i) => (a.score > alternatives[bi].score ? i : bi), 0);
@@ -204,7 +205,7 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
 
       {selected != null && (
         <section id="wr-flats" ref={flatsRef} className="wr-flats" aria-label={`Example flats in ${alternatives[selected].plr.plr_name}`}>
-          <Flats key={alternatives[selected].plr.plr_id} data={data} prefs={prefs} index={selected} onClose={() => setSelected(null)} />
+          <Flats key={alternatives[selected].plr.plr_id} data={data} prefs={prefs} isDemoProfile={isDemoProfile} index={selected} onClose={() => setSelected(null)} />
         </section>
       )}
 
@@ -223,7 +224,7 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
   );
 }
 
-function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: UserPreferences; index: number; onClose: () => void }) {
+function Flats({ data, prefs, isDemoProfile, index, onClose }: { data: RankApiResponse; prefs: UserPreferences; isDemoProfile: boolean; index: number; onClose: () => void }) {
   const alt = data.alternatives[index];
   const rooms = prefs.roomsNeeded;
   const [state, setState] = useState<{ data: ListingsApiResponse | null; error: string | null }>({ data: null, error: null });
@@ -299,7 +300,7 @@ function Flats({ data, prefs, index, onClose }: { data: RankApiResponse; prefs: 
                   {l.has_balcony && <b>+ Balcony</b>}
                   {l.has_lift && <b>+ Lift</b>}
                 </div>
-                <Link className="wr-btn wr-btn-yellow wr-flat-apply" href={`/apply?listingId=${encodeURIComponent(l.id)}&plrId=${encodeURIComponent(alt.plr.plr_id)}&kiez=${encodeURIComponent(alt.plr.plr_name)}&kita=${Number(prefs.kids.kita)}&primarySchool=${Number(prefs.kids.primarySchool)}&highSchool=${Number(prefs.kids.highSchool)}&kidDoctor=${Number(prefs.kids.kidDoctor)}`}>Apply for this flat →</Link>
+                <Link className="wr-btn wr-btn-yellow wr-flat-apply" href={`/apply?listingId=${encodeURIComponent(l.id)}&plrId=${encodeURIComponent(alt.plr.plr_id)}&kiez=${encodeURIComponent(alt.plr.plr_name)}&kita=${Number(prefs.kids.kita)}&primarySchool=${Number(prefs.kids.primarySchool)}&highSchool=${Number(prefs.kids.highSchool)}&kidDoctor=${Number(prefs.kids.kidDoctor)}${isDemoProfile ? "&demo=anna-mueller" : ""}`}>Apply for this flat →</Link>
               </div>
             </article>
           ) : (

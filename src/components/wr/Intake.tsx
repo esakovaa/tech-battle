@@ -29,6 +29,7 @@ export interface Answers {
   maxCommute: number | null;
   nomad: boolean;
   anythingElse: string;
+  demoProfile: boolean;
 }
 
 export const EMPTY_ANSWERS: Answers = {
@@ -48,6 +49,7 @@ export const EMPTY_ANSWERS: Answers = {
   maxCommute: null,
   nomad: false,
   anythingElse: "",
+  demoProfile: false,
 };
 
 export const QUESTION_COUNT = 8;
@@ -73,9 +75,11 @@ interface IntakeProps {
   setAnswers: (fn: (a: Answers) => Answers) => void;
   onSubmit: () => void;
   addressError: string | null;
+  onUseDemo: () => void;
+  onStartFresh: () => void;
 }
 
-export default function Intake({ answers: a, setAnswers, onSubmit, addressError }: IntakeProps) {
+export default function Intake({ answers: a, setAnswers, onSubmit, addressError, onUseDemo, onStartFresh }: IntakeProps) {
   const set = (patch: Partial<Answers>) => setAnswers((prev) => ({ ...prev, ...patch }));
   const canSubmit = a.plr != null || a.address.trim().length > 3;
   const done = answeredCount(a);
@@ -181,6 +185,15 @@ export default function Intake({ answers: a, setAnswers, onSubmit, addressError 
             <div style={{ width: `${(done / QUESTION_COUNT) * 100}%` }} />
           </div>
           <span className="wr-help">{done} of {QUESTION_COUNT} answered</span>
+          <div role="group" aria-label="Demo profile options" style={{ border: "1px solid var(--wr-line)", background: "var(--wr-card)", borderRadius: 12, padding: 18, marginTop: 22 }}>
+            <span className="wr-eyebrow">Quick demo</span>
+            <strong>Anna Müller · Neukölln · Alexanderplatz commute</strong>
+            <p style={{ margin: "8px 0 14px", color: "var(--wr-ink-3)" }}>{a.demoProfile ? "Anna’s fictional demo profile is prefilled. Review or edit every answer, or start fresh with your own details." : "Prefill a fictional family profile for a fast walkthrough. You can edit every answer."}</p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+              <button type="button" className="wr-btn wr-btn-yellow" onClick={onUseDemo}>{a.demoProfile ? "Reload Anna’s demo details" : "Use Anna’s demo details"}</button>
+              <button type="button" className="wr-btn wr-btn-ghost" onClick={onStartFresh}>Start with my own details</button>
+            </div>
+          </div>
         </div>
 
         <div>

@@ -144,6 +144,7 @@ export default function LandlordSetupChatPage() {
       {error && <p role="alert" style={{ color: "#a83b1c" }}>{error}</p>}
       {confirmed && <button className="ll-btn-primary" type="button" onClick={useSetup} style={{ marginTop: 18 }}>Review setup and continue →</button>}
     </section>
+    <p style={{ marginTop: 18, color: "var(--ll-muted)" }}>Want to skip the assistant for a quick demo? <a href="/landlord">Continue with the sample listing and set requirements on screen →</a></p>
     <p style={{ marginTop: 22 }}><a href="/landlord">← Back to manual setup</a></p>
   </main>;
 }

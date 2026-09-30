@@ -5,8 +5,28 @@ import Intake, { EMPTY_ANSWERS, type Answers } from "./Intake";
 import Results from "./Results";
 import type { RankApiResponse } from "@/lib/wurzelraum";
 import type { UserPreferences } from "@/lib/types";
+import { ANNA_MUELLER_DEMO } from "@/lib/demo-profile";
 
-type Stage = { name: "intake" } | { name: "loading" } | { name: "results"; data: RankApiResponse; prefs: UserPreferences };
+type Stage = { name: "intake" } | { name: "loading" } | { name: "results"; data: RankApiResponse; prefs: UserPreferences; demoProfile: boolean };
+
+function annaDemoAnswers(): Answers {
+  const { currentKiez, kids } = ANNA_MUELLER_DEMO;
+  return {
+    ...EMPTY_ANSWERS,
+    address: `${currentKiez.plr_name}, ${currentKiez.dominant_plz} Berlin`,
+    plr: currentKiez,
+    kids: { ...kids },
+    noKids: false,
+    rentBudget: ANNA_MUELLER_DEMO.rentBudget,
+    rooms: ANNA_MUELLER_DEMO.rooms,
+    noiseAirSensitive: false,
+    parksImportant: false,
+    commute1: ANNA_MUELLER_DEMO.commuteAddress,
+    maxCommute: 60,
+    anythingElse: "I’m a mother of two: a toddler in Kita and a teenager in high school. We live in Neukölln, and I work near Alexanderplatz. A practical public-transport commute and routines near daycare and school matter to us.",
+    demoProfile: true,
+  };
+}
 
 function toPreferences(a: Answers): UserPreferences {
   const commutes = a.nomad ? [] : [a.commute1, a.commute2].map((s) => s.trim()).filter((s) => s.length > 3);
@@ -38,7 +58,7 @@ const STEPS = ["Finding your Kiez on the map", "Reading all 542 Berlin Planungsr
 const MIN_LOADING_MS = 2200;
 
 export default function WurzelraumApp() {
-  const [answers, setAnswersState] = useState<Answers>(EMPTY_ANSWERS);
+  const [answers, setAnswersState] = useState<Answers>(() => annaDemoAnswers());
   const [stage, setStage] = useState<Stage>({ name: "intake" });
   const [addressError, setAddressError] = useState<string | null>(null);
 
@@ -70,7 +90,7 @@ export default function WurzelraumApp() {
         requestAnimationFrame(() => document.getElementById("questions")?.scrollIntoView({ behavior: "smooth" }));
         return;
       }
-      setStage({ name: "results", data: body as RankApiResponse, prefs });
+      setStage({ name: "results", data: body as RankApiResponse, prefs, demoProfile: answers.demoProfile });
       window.scrollTo({ top: 0 });
     } catch {
       setAddressError("We couldn’t reach the server — is `npm run dev` still running?");
@@ -83,6 +103,7 @@ export default function WurzelraumApp() {
       <Results
         data={stage.data}
         prefs={stage.prefs}
+        isDemoProfile={stage.demoProfile}
         onEdit={() => {
           setStage({ name: "intake" });
           requestAnimationFrame(() => document.getElementById("questions")?.scrollIntoView());
@@ -98,7 +119,14 @@ export default function WurzelraumApp() {
 
   return (
     <>
-      <Intake answers={answers} setAnswers={setAnswers} onSubmit={submit} addressError={addressError} />
+      <Intake
+        answers={answers}
+        setAnswers={setAnswers}
+        onSubmit={submit}
+        addressError={addressError}
+        onUseDemo={() => setAnswers(() => annaDemoAnswers())}
+        onStartFresh={() => setAnswers(() => EMPTY_ANSWERS)}
+      />
       {stage.name === "loading" && <Loading />}
     </>
   );

@@ -13,6 +13,7 @@ export default function LandlordFlatSetupPage() {
   const router = useRouter();
   const [listing, setListing] = useState<Listing | null>(null);
   const [assistantSetupLoaded, setAssistantSetupLoaded] = useState(false);
+  const [sampleListingActive, setSampleListingActive] = useState(true);
   const [address, setAddress] = useState("");
   const [ortsteil, setOrtsteil] = useState("");
   const [areaM2, setAreaM2] = useState(0);
@@ -43,6 +44,9 @@ export default function LandlordFlatSetupPage() {
           if (saved) {
             setup = JSON.parse(saved) as Partial<Listing>;
             setAssistantSetupLoaded(true);
+            setSampleListingActive(false);
+          } else {
+            setSampleListingActive(true);
           }
           sessionStorage.removeItem("ll_setup_assistant");
         } catch { /* Ignore an invalid saved setup and use the listing defaults. */ }
@@ -81,6 +85,45 @@ export default function LandlordFlatSetupPage() {
     setEmploymentContexts((current) => current.includes(type) ? current.filter((item) => item !== type) : [...current, type]);
   }
 
+  function loadSampleListing() {
+    if (!listing) return;
+    sessionStorage.removeItem("ll_setup_assistant");
+    setAddress(listing.address);
+    setOrtsteil(listing.ortsteil);
+    setAreaM2(listing.area_m2);
+    setWarmRent(listing.warmmiete_eur_monthly);
+    setColdRent(listing.kaltmiete_eur_monthly);
+    setMinIncomeMultiple(listing.min_income_multiple);
+    setPropertyType(listing.property_type ?? "flat");
+    setChildrenWelcome(listing.households_with_children_welcome ?? false);
+    setEmploymentContexts(listing.employment_context_types ?? ["unlimited_contract", "self_employed", "retired", "limited_contract", "burgergeld"]);
+    setMoveInDate(listing.move_in_date);
+    setRooms(listing.rooms);
+    setSmokingPolicy(listing.smoking_policy);
+    setRequiredDocs(listing.required_documents);
+    setSampleListingActive(true);
+    setAssistantSetupLoaded(false);
+  }
+
+  function startOwnListing() {
+    setAddress("");
+    setOrtsteil("");
+    setAreaM2(0);
+    setWarmRent(0);
+    setColdRent(0);
+    setMinIncomeMultiple(3);
+    setPropertyType("flat");
+    setChildrenWelcome(false);
+    setEmploymentContexts([]);
+    setMoveInDate("");
+    setRooms(3);
+    setSmokingPolicy("no_preference");
+    setRequiredDocs([]);
+    setSampleListingActive(false);
+    setAssistantSetupLoaded(false);
+    sessionStorage.removeItem("ll_setup_assistant");
+  }
+
   function handleOpenApplications() {
     if (!listing) return;
     const overrides: Partial<Listing> = {
@@ -104,6 +147,7 @@ export default function LandlordFlatSetupPage() {
   }
 
   const requiredIncome = listing ? Math.round(minIncomeMultiple * coldRent) : 0;
+  const canContinue = Boolean(listing && address.trim() && warmRent > 0 && coldRent > 0 && areaM2 > 0 && moveInDate);
 
   return (
     <>
@@ -114,6 +158,14 @@ export default function LandlordFlatSetupPage() {
             <span className="ll-eyebrow">Landlord</span>
             <h1 className="ll-h1">Tell us about the flat.</h1>
             <p className="ll-lede">What you set here becomes the only thing applicants are checked against.</p>
+
+            <div role="group" aria-label="Listing demo options" style={{ background: "var(--ll-paper)", border: "1px solid var(--ll-line)", borderRadius: 14, padding: 18, margin: "20px 0" }}>
+              <strong>{sampleListingActive ? "Sample listing prefilled" : "Your listing details"}</strong>
+              <p style={{ margin: "8px 0 12px", color: "var(--ll-muted)" }}>{sampleListingActive ? "Use the sample flat and applicant dataset for a quick landlord walkthrough, or clear the property fields to enter your own listing." : "Enter your own property details, or reload the fictional sample listing."}</p>
+              {sampleListingActive
+                ? <button className="ll-btn-ghost" type="button" onClick={startOwnListing} disabled={!listing}>Start with my own listing →</button>
+                : <button className="ll-btn-ghost" type="button" onClick={loadSampleListing} disabled={!listing}>Load sample listing →</button>}
+            </div>
 
             {assistantSetupLoaded && (
               <div role="status" style={{ background: "var(--ll-paper)", border: "1px solid var(--ll-line-strong)", borderRadius: 14, padding: 18, margin: "20px 0" }}>
@@ -257,7 +309,7 @@ export default function LandlordFlatSetupPage() {
             <p className="ll-retention-note">Application data is kept only for this letting and deleted 30 days after the flat is let.</p>
 
             <div style={{ marginTop: 28, textAlign: "right" }}>
-              <button className="ll-btn-primary" onClick={handleOpenApplications} disabled={!listing}>
+              <button className="ll-btn-primary" onClick={handleOpenApplications} disabled={!canContinue}>
                 Open {applicationsReceived ?? "…"} applications →
               </button>
             </div>

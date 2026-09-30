@@ -23,5 +23,5 @@ export default async function ApplyPage({ searchParams }: PageProps<"/apply">) {
     return <main className="wr-apply-page"><div className="wr-apply-shell"><Link href="/" className="wr-apply-back">← Back to Wurzelraum</Link><h1>This example flat isn’t available</h1><p>Return to your Kiez results and choose one of the example flats shown there.</p></div></main>;
   }
 
-  return <ApplyForm listing={listing} kiez={kiez || plr.plr_name} initialKids={initialKids} />;
+  return <ApplyForm listing={listing} kiez={kiez || plr.plr_name} initialKids={initialKids} demoMode={q.demo === "anna-mueller"} />;
 }
