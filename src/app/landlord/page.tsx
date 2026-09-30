@@ -12,6 +12,10 @@ const ALL_DOCS: DocumentType[] = ["identity", "payslips", "schufa", "mietschulde
 export default function LandlordFlatSetupPage() {
   const router = useRouter();
   const [listing, setListing] = useState<Listing | null>(null);
+  const [assistantSetupLoaded, setAssistantSetupLoaded] = useState(false);
+  const [address, setAddress] = useState("");
+  const [ortsteil, setOrtsteil] = useState("");
+  const [areaM2, setAreaM2] = useState(0);
   const [propertyType, setPropertyType] = useState<PropertyType>("flat");
   const [childrenWelcome, setChildrenWelcome] = useState(false);
   const [employmentContexts, setEmploymentContexts] = useState<EmploymentContextType[]>([
@@ -36,9 +40,15 @@ export default function LandlordFlatSetupPage() {
         let setup: Partial<Listing> = {};
         try {
           const saved = sessionStorage.getItem("ll_setup_assistant");
-          if (saved) setup = JSON.parse(saved) as Partial<Listing>;
+          if (saved) {
+            setup = JSON.parse(saved) as Partial<Listing>;
+            setAssistantSetupLoaded(true);
+          }
           sessionStorage.removeItem("ll_setup_assistant");
         } catch { /* Ignore an invalid saved setup and use the listing defaults. */ }
+        setAddress(setup.address ?? l.address);
+        setOrtsteil(setup.ortsteil ?? l.ortsteil);
+        setAreaM2(setup.area_m2 ?? l.area_m2);
         setWarmRent(setup.warmmiete_eur_monthly ?? l.warmmiete_eur_monthly);
         setPropertyType(setup.property_type ?? l.property_type ?? "flat");
         setChildrenWelcome(setup.households_with_children_welcome ?? l.households_with_children_welcome ?? false);
@@ -74,6 +84,9 @@ export default function LandlordFlatSetupPage() {
   function handleOpenApplications() {
     if (!listing) return;
     const overrides: Partial<Listing> = {
+      address,
+      ortsteil,
+      area_m2: areaM2,
       warmmiete_eur_monthly: warmRent,
       kaltmiete_eur_monthly: coldRent,
       min_income_multiple: minIncomeMultiple,
@@ -102,6 +115,13 @@ export default function LandlordFlatSetupPage() {
             <h1 className="ll-h1">Tell us about the flat.</h1>
             <p className="ll-lede">What you set here becomes the only thing applicants are checked against.</p>
 
+            {assistantSetupLoaded && (
+              <div role="status" style={{ background: "var(--ll-paper)", border: "1px solid var(--ll-line-strong)", borderRadius: 14, padding: 18, margin: "20px 0" }}>
+                <strong>Your assistant setup is ready to review.</strong>
+                <p style={{ margin: "8px 0 0", color: "var(--ll-muted)" }}>We’ve filled in the details below. Check or edit them, then continue to the applications dashboard to apply these requirements and run the viewing lottery.</p>
+              </div>
+            )}
+
             <Link className="ll-btn-primary" href="/landlord/setup-chat" style={{ display: "inline-block", margin: "18px 0" }}>
               Set up the flat with an assistant →
             </Link>
@@ -125,11 +145,13 @@ export default function LandlordFlatSetupPage() {
                 marginBottom: 16,
               }}
             >
-              Photo: the flat or building on {listing?.address ?? "…"}
+              Photo: the flat or building on {address || "…"}
             </div>
-            <p style={{ fontSize: 14, fontWeight: 500, margin: 0 }}>
-              {listing?.address} · {listing?.ortsteil} · {listing?.area_m2} m²
-            </p>
+            <label style={{ display: "grid", gap: 8, marginBottom: 12 }}>Address<input className="ll-input" value={address} onChange={(e) => setAddress(e.target.value)} /></label>
+            <div className="ll-field-row">
+              <label style={{ display: "grid", gap: 8 }}>Neighborhood<input className="ll-input" value={ortsteil} onChange={(e) => setOrtsteil(e.target.value)} /></label>
+              <label style={{ display: "grid", gap: 8 }}>Area (m²)<input className="ll-input" type="number" min={1} value={areaM2} onChange={(e) => setAreaM2(Number(e.target.value) || 0)} /></label>
+            </div>
           </div>
 
           <div>

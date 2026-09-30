@@ -60,6 +60,42 @@ export function validateListingConfig(input: Record<string, unknown>) {
   return { valid: valid as Partial<Listing>, issues, adjustments };
 }
 
+/** Validate only objective facts about the property. Tenant requirements stay
+ * on the clickable listing form and are never elicited by the chat. */
+export function validatePropertyDescription(input: Record<string, unknown>) {
+  const valid: Partial<Listing> = {};
+  const issues: string[] = [];
+  if (input.property_type !== undefined) {
+    if (input.property_type === "flat" || input.property_type === "house") valid.property_type = input.property_type;
+    else issues.push("Property type must be flat or house.");
+  }
+  for (const field of ["address", "ortsteil"] as const) {
+    const value = input[field];
+    if (value !== undefined) {
+      if (typeof value === "string" && value.trim()) valid[field] = value.trim();
+      else issues.push(`${field} must be a non-empty text value.`);
+    }
+  }
+  for (const field of ["area_m2", "rooms", "kaltmiete_eur_monthly", "warmmiete_eur_monthly"] as const) {
+    const value = input[field];
+    if (value !== undefined) {
+      if (typeof value === "number" && Number.isFinite(value) && value > 0 && (field !== "rooms" || Number.isInteger(value))) valid[field] = value;
+      else issues.push(`${field} must be a positive${field === "rooms" ? " whole" : ""} number.`);
+    }
+  }
+  if (input.move_in_date !== undefined) {
+    const date = input.move_in_date;
+    const parsed = typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) ? new Date(`${date}T00:00:00.000Z`) : null;
+    if (parsed && !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date) valid.move_in_date = date;
+    else issues.push("move_in_date must be a valid calendar date in YYYY-MM-DD format.");
+  }
+  if (typeof input.kaltmiete_eur_monthly === "number" && typeof input.warmmiete_eur_monthly === "number" && input.warmmiete_eur_monthly < input.kaltmiete_eur_monthly) {
+    issues.push("Warm rent is lower than cold rent. Please check both amounts.");
+    delete valid.warmmiete_eur_monthly;
+  }
+  return { valid, issues };
+}
+
 export const checkCriterionLegality = tool({
   description: "Check a landlord's proposed tenant-selection criterion against the fixed reviewed policy registry. A no-match is not legal clearance.",
   inputSchema: z.object({ phrase: z.string().min(1).describe("Short criterion or wording proposed by the landlord.") }),
@@ -82,4 +118,14 @@ export const validateListingConfigTool = tool({
   execute: async (input) => validateListingConfig(input),
 });
 
-export const landlordSetupTools = { checkCriterionLegality, validateListingConfig: validateListingConfigTool };
+export const validatePropertyDescriptionTool = tool({
+  description: "Validate objective property facts from the landlord's description only. Do not collect tenant requirements or personal-selection criteria in chat.",
+  inputSchema: z.object({
+    property_type: z.enum(["flat", "house"]).optional(), address: z.string().optional(), ortsteil: z.string().optional(),
+    area_m2: z.number().optional(), rooms: z.number().optional(), kaltmiete_eur_monthly: z.number().optional(),
+    warmmiete_eur_monthly: z.number().optional(), move_in_date: z.string().optional(),
+  }),
+  execute: async (input) => validatePropertyDescription(input),
+});
+
+export const landlordSetupTools = { validatePropertyDescription: validatePropertyDescriptionTool };
