@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { StepProgress } from "./StepProgress";
 import type { DocumentType, Listing, SmokingPolicy } from "@/lib/landlord-types";
@@ -12,6 +13,8 @@ export default function LandlordFlatSetupPage() {
   const router = useRouter();
   const [listing, setListing] = useState<Listing | null>(null);
   const [warmRent, setWarmRent] = useState(1480);
+  const [coldRent, setColdRent] = useState(1200);
+  const [minIncomeMultiple, setMinIncomeMultiple] = useState(3);
   const [moveInDate, setMoveInDate] = useState("2026-12-01");
   const [rooms, setRooms] = useState(3);
   const [smokingPolicy, setSmokingPolicy] = useState<SmokingPolicy>("non_smoking_only");
@@ -25,11 +28,19 @@ export default function LandlordFlatSetupPage() {
         const l = d.listings[0];
         if (!l) return;
         setListing(l);
-        setWarmRent(l.warmmiete_eur_monthly);
-        setMoveInDate(l.move_in_date);
-        setRooms(l.rooms);
-        setSmokingPolicy(l.smoking_policy);
-        setRequiredDocs(l.required_documents);
+        let setup: Partial<Listing> = {};
+        try {
+          const saved = sessionStorage.getItem("ll_setup_assistant");
+          if (saved) setup = JSON.parse(saved) as Partial<Listing>;
+          sessionStorage.removeItem("ll_setup_assistant");
+        } catch { /* Ignore an invalid saved setup and use the listing defaults. */ }
+        setWarmRent(setup.warmmiete_eur_monthly ?? l.warmmiete_eur_monthly);
+        setColdRent(setup.kaltmiete_eur_monthly ?? l.kaltmiete_eur_monthly);
+        setMinIncomeMultiple(setup.min_income_multiple ?? l.min_income_multiple);
+        setMoveInDate(setup.move_in_date ?? l.move_in_date);
+        setRooms(setup.rooms ?? l.rooms);
+        setSmokingPolicy(setup.smoking_policy ?? l.smoking_policy);
+        setRequiredDocs(setup.required_documents ?? l.required_documents);
       });
   }, []);
 
@@ -52,6 +63,8 @@ export default function LandlordFlatSetupPage() {
     if (!listing) return;
     const overrides: Partial<Listing> = {
       warmmiete_eur_monthly: warmRent,
+      kaltmiete_eur_monthly: coldRent,
+      min_income_multiple: minIncomeMultiple,
       move_in_date: moveInDate,
       rooms,
       smoking_policy: smokingPolicy,
@@ -62,8 +75,7 @@ export default function LandlordFlatSetupPage() {
     router.push("/landlord/applications");
   }
 
-  const coldRentEstimate = listing ? Math.round(warmRent * (listing.kaltmiete_eur_monthly / listing.warmmiete_eur_monthly)) : 0;
-  const requiredIncome = listing ? Math.round(listing.min_income_multiple * coldRentEstimate) : 0;
+  const requiredIncome = listing ? Math.round(minIncomeMultiple * coldRent) : 0;
 
   return (
     <>
@@ -74,6 +86,10 @@ export default function LandlordFlatSetupPage() {
             <span className="ll-eyebrow">Landlord</span>
             <h1 className="ll-h1">Tell us about the flat.</h1>
             <p className="ll-lede">What you set here becomes the only thing applicants are checked against.</p>
+
+            <Link className="ll-btn-primary" href="/landlord/setup-chat" style={{ display: "inline-block", margin: "18px 0" }}>
+              Set up the flat with an assistant →
+            </Link>
 
             <div
               style={{
@@ -96,12 +112,13 @@ export default function LandlordFlatSetupPage() {
 
           <div>
             <div className="ll-field-row">
-              <input
-                className="ll-input"
-                value={`€${warmRent.toLocaleString()}`}
-                onChange={(e) => setWarmRent(Number(e.target.value.replace(/[^\d]/g, "")) || 0)}
-              />
+              <label style={{ display: "grid", gap: 8 }}>Warm rent (€)<input className="ll-input" value={warmRent} onChange={(e) => setWarmRent(Number(e.target.value) || 0)} /></label>
               <input className="ll-input" type="date" value={moveInDate} onChange={(e) => setMoveInDate(e.target.value)} />
+            </div>
+
+            <div className="ll-field-row" style={{ marginTop: 12 }}>
+              <label style={{ display: "grid", gap: 8 }}>Cold rent (€)<input className="ll-input" value={coldRent} onChange={(e) => setColdRent(Number(e.target.value) || 0)} /></label>
+              <label style={{ display: "grid", gap: 8 }}>Minimum income multiple (2–3x)<input className="ll-input" type="number" min={2} max={3} step={0.1} value={minIncomeMultiple} onChange={(e) => setMinIncomeMultiple(Math.min(3, Math.max(2, Number(e.target.value) || 2)))} /></label>
             </div>
 
             <p className="ll-section-label">Rooms</p>
@@ -147,7 +164,7 @@ export default function LandlordFlatSetupPage() {
             <div className="ll-review-row">
               <span className="ll-review-tag required">REQUIRED</span>
               <span className="ll-review-detail">
-                Net income at least {listing?.min_income_multiple ?? 3} times the cold rent (€{requiredIncome.toLocaleString()}), the
+                Net income at least {minIncomeMultiple} times the cold rent (€{requiredIncome.toLocaleString()}), the
                 documents you selected, and a move-in from {moveInDate}
                 {smokingPolicy === "non_smoking_only" ? ", non-smoking" : ""}.
               </span>
