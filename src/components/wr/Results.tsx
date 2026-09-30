@@ -99,6 +99,47 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
         <h1 className="wr-rhero-name" style={{ fontSize: nameSize, margin: 0, fontWeight: 400 }}>{current.plr_name}</h1>
       </section>
 
+      <section className="wr-section wr-wrap" aria-labelledby="cmp-title">
+        <div className="wr-section-head" style={{ marginBottom: 32 }}>
+          <h2 id="cmp-title" className="wr-h2">Side by side</h2>
+          <div className="wr-legend" style={{ justifySelf: "end" }}>
+            {(["better", "same", "worse"] as Direction[]).map((d) => (
+              <span key={d}><span className={`wr-glyph is-${d}`} aria-hidden>{GLYPH[d]}</span>{GLYPH_LABEL[d]}</span>
+            ))}
+          </div>
+        </div>
+        <div className="wr-table-scroll">
+          <div className="wr-table" role="table" aria-labelledby="cmp-title">
+            <div className="wr-tr is-head" role="row">
+              <div className="wr-th" role="columnheader" style={{ paddingLeft: 0 }}><small>What you asked about</small></div>
+              <div className="wr-th is-current" role="columnheader"><small>You are here</small>{current.plr_name}</div>
+              {alternatives.map((a, i) => (
+                <div key={a.plr.plr_id} className={`wr-th${selected === i ? " is-current" : ""}`} role="columnheader"><small>{a.plr.bezirk}</small>{a.plr.plr_name}</div>
+              ))}
+            </div>
+            {table.rows.map((row) => (
+              <div key={row.factor} className="wr-tr" role="row">
+                <div className="wr-rh" role="rowheader">{factorCopy(row.factor).label}</div>
+                <div className="wr-td is-current" role="cell">{displayValue(row.current)}</div>
+                {row.alternatives.map((v, i) => {
+                  const d = cellDirection(table, i, row.factor);
+                  return (
+                    <div key={i} className={`wr-td${selected === i ? " is-selected" : ""}`} role="cell">
+                      <span className={`wr-glyph is-${d}`} role="img" aria-label={GLYPH_LABEL[d]}>{GLYPH[d]}</span>
+                      {displayValue(v)}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="wr-source" style={{ marginTop: 16 }}>
+          Rent is a modelled estimate (runs below real asking prices) — compare Kieze with each other, not with live listings. Crime rates are district-level, 2017–2019.
+          {data.primarySchoolNote ? ` ${data.primarySchoolNote}` : ""}
+        </p>
+      </section>
+
       <section className="wr-section wr-wrap" aria-labelledby="cards-title">
         <div className="wr-section-head">
           <h2 id="cards-title" className="wr-h2">Three Kieze worth<br />a closer look</h2>
@@ -167,46 +208,6 @@ export default function Results({ data, prefs, onEdit, onRestart }: ResultsProps
         </section>
       )}
 
-      <section className="wr-section wr-wrap" aria-labelledby="cmp-title">
-        <div className="wr-section-head" style={{ marginBottom: 32 }}>
-          <h2 id="cmp-title" className="wr-h2">Side by side</h2>
-          <div className="wr-legend" style={{ justifySelf: "end" }}>
-            {(["better", "same", "worse"] as Direction[]).map((d) => (
-              <span key={d}><span className={`wr-glyph is-${d}`} aria-hidden>{GLYPH[d]}</span>{GLYPH_LABEL[d]}</span>
-            ))}
-          </div>
-        </div>
-        <div className="wr-table-scroll">
-          <div className="wr-table" role="table" aria-labelledby="cmp-title">
-            <div className="wr-tr is-head" role="row">
-              <div className="wr-th" role="columnheader" style={{ paddingLeft: 0 }}><small>What you asked about</small></div>
-              <div className="wr-th is-current" role="columnheader"><small>You are here</small>{current.plr_name}</div>
-              {alternatives.map((a, i) => (
-                <div key={a.plr.plr_id} className={`wr-th${selected === i ? " is-current" : ""}`} role="columnheader"><small>{a.plr.bezirk}</small>{a.plr.plr_name}</div>
-              ))}
-            </div>
-            {table.rows.map((row) => (
-              <div key={row.factor} className="wr-tr" role="row">
-                <div className="wr-rh" role="rowheader">{factorCopy(row.factor).label}</div>
-                <div className="wr-td is-current" role="cell">{displayValue(row.current)}</div>
-                {row.alternatives.map((v, i) => {
-                  const d = cellDirection(table, i, row.factor);
-                  return (
-                    <div key={i} className={`wr-td${selected === i ? " is-selected" : ""}`} role="cell">
-                      <span className={`wr-glyph is-${d}`} role="img" aria-label={GLYPH_LABEL[d]}>{GLYPH[d]}</span>
-                      {displayValue(v)}
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
-          </div>
-        </div>
-        <p className="wr-source" style={{ marginTop: 16 }}>
-          Rent is a modelled estimate (runs below real asking prices) — compare Kieze with each other, not with live listings. Crime rates are district-level, 2017–2019.
-          {data.primarySchoolNote ? ` ${data.primarySchoolNote}` : ""}
-        </p>
-      </section>
 
       {prefs.additionalContext && (
         <ExtraContext
